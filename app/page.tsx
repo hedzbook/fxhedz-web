@@ -335,7 +335,9 @@ export default function Page() {
         console.log("SUB DATA:", data)
 
         setAccessMeta(data)
-        setSubActive(Boolean(data?.active))
+        if (data?.active !== undefined) {
+          setSubActive(Boolean(data.active))
+        }
 
       } catch {
         setSubActive(false)
@@ -444,8 +446,7 @@ export default function Page() {
   }, [uiSignals, pairData])
 
   const isGuest =
-    !isAuthenticated ||
-    subActive === false
+    !isAuthenticated
 
   const plan = accessMeta?.status?.toLowerCase()
 
