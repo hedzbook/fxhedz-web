@@ -51,11 +51,22 @@ export async function POST(req: NextRequest) {
     .toUpperCase()
     .trim()
 
-  // ============================
-  // PLATFORM DETECTION
-  // ============================
-  const platform =
+// ============================
+// PLATFORM DETECTION
+// ============================
+
+// If request contains JWT from native app → android
+const hasAuthHeader =
+  req.headers.get("authorization")?.startsWith("Bearer ")
+
+let platform = "web"
+
+if (hasAuthHeader) {
+  platform = "android"
+} else {
+  platform =
     req.cookies.get("fx_platform")?.value || "web"
+}
 
   // ============================
   // BUILD GAS PAYLOAD
