@@ -277,13 +277,17 @@ export default function Page() {
 
     if (status === "loading") return
 
-    // 🔥 FIX: Only block unauthenticated for WEB
+    // Only block unauthenticated for WEB
     if (!isAndroid && status === "unauthenticated") {
       setSubActive(false)
       return
     }
 
-
+    // If Android and no native token → block
+    if (isAndroid && !hasNativeToken) {
+      setSubActive(false)
+      return
+    }
 
     async function init() {
 
@@ -346,7 +350,7 @@ export default function Page() {
 
     init()
 
-  }, [status])
+  }, [status, hasNativeToken])
 
   // =============================
   // SUBSCRIPTION POLLING (LIVE SYNC)
