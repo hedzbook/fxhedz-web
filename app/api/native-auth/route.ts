@@ -9,7 +9,7 @@ const REFRESH_EXPIRES_DAYS = 14
 export async function POST(req: NextRequest) {
   try {
 
-    const { idToken, deviceId, pushToken } = await req.json()
+    const { idToken, deviceId, pushToken, platform } = await req.json()
 
     if (!idToken || !deviceId) {
       return NextResponse.json(
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         email,
         device_id: deviceId,
         fingerprint: deviceId,
-        platform: "android",
+        platform: platform || "web",
         refresh_token_hash: refreshHash,
         refresh_expires: refreshExpires.toISOString()
       })
