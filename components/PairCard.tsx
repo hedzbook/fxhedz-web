@@ -33,11 +33,7 @@ function PairCard({
   notes
 }: Props) {
 
-  const hasOrders = (orders?.length ?? 0) > 0
-const safeDirection =
-  hasOrders ? direction : "--"
-
-const dir: TradeDirection = safeDirection ?? "--"
+  const dir: TradeDirection = direction ?? "--"
   const [liveDir, setLiveDir] = useState<TradeDirection>(dir)
   const [tab, setTab] = useState<"market" | "updates" | "history" | "performance">("market")
   const [liveOrders, setLiveOrders] = useState<any[]>(orders ?? [])
