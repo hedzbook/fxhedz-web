@@ -6,7 +6,7 @@ const ACCESS_EXPIRES_IN = "15m"
 
 export async function POST(req: NextRequest) {
   try {
-    const { refreshToken, deviceId, email } = await req.json()
+    const { refreshToken, deviceId, email, platform } = await req.json()
 
     if (!refreshToken || !deviceId || !email) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 })
@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
         refresh_validate: true,
         email,
         device_id: deviceId,
-        refresh_token_hash: refreshHash
+        refresh_token_hash: refreshHash,
+        platform: platform || "web"
       })
     })
 
