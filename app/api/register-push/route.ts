@@ -28,7 +28,9 @@ export async function POST(req: NextRequest) {
     // READ BODY
     // ===============================
     const body = await req.json()
-    const pushToken = body?.pushToken
+    const pushToken =
+      body?.pushToken ||
+      body?.push_token
 
     if (!pushToken || typeof pushToken !== "string") {
       return NextResponse.json(
