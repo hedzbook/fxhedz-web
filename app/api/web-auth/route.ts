@@ -11,13 +11,6 @@ export async function POST(req: NextRequest) {
   const deviceId = body.deviceId
   const telegramChatId = body.telegram_chat_id || ""
 
-  if (telegramChatId) {
-  return NextResponse.json({
-    debug: "TELEGRAM CHAT ID RECEIVED",
-    value: telegramChatId
-  })
-}
-
   if (!idToken || !deviceId) {
     return NextResponse.json({ error: "invalid_input" }, { status: 400 })
   }
@@ -45,14 +38,14 @@ export async function POST(req: NextRequest) {
   const gasRes = await fetch(process.env.GAS_AUTH_URL!, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email,
-      device_id: deviceId,
-      platform,
-      telegram_chat_id: telegramChatId,
-      refresh_token_hash: refreshHash,
-      refresh_expires: refreshExpires.toISOString()
-    })
+body: JSON.stringify({
+  email,
+  device_id: "",
+  platform: telegramChatId ? "telegram" : platform,
+  telegram_chat_id: telegramChatId,
+  refresh_token_hash: telegramChatId ? "" : refreshHash,
+  refresh_expires: telegramChatId ? "" : refreshExpires
+})
   })
 
   const gasData = await gasRes.json()
