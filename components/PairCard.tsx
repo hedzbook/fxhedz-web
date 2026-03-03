@@ -41,18 +41,14 @@ function PairCard({
   const expanded = !!open
   const [frozenExitPrice, setFrozenExitPrice] = useState<number | null>(null)
 
-const prevDirRef = React.useRef<TradeDirection>("--")
-
-useEffect(() => {
-  if (prevDirRef.current !== "EXIT" && liveDir === "EXIT" && signal?.price) {
+  useEffect(() => {
+  if (liveDir === "EXIT" && signal?.price) {
     setFrozenExitPrice(Number(signal.price))
   }
 
-  if (prevDirRef.current === "EXIT" && liveDir !== "EXIT") {
+  if (liveDir !== "EXIT") {
     setFrozenExitPrice(null)
   }
-
-  prevDirRef.current = liveDir
 }, [liveDir, signal?.price])
 
   useEffect(() => setLiveDir(dir), [dir])
@@ -375,15 +371,7 @@ function Metric({ label, value }: any) {
    INLINE STRIP (MIN MODE)
 ======================================================= */
 
-function InlineTradeStrip({
-  signal,
-  direction,
-  frozenExitPrice
-}: {
-  signal: any
-  direction?: TradeDirection
-  frozenExitPrice?: number | null
-}) {
+function InlineTradeStrip({ signal, direction }: any) {
   if (!signal) return null
 
   const sl = Number(signal?.sl)
@@ -398,7 +386,7 @@ function InlineTradeStrip({
 
   if (direction === "EXIT") {
 
-    const exitPrice = frozenExitPrice ?? "-"
+    const exitPrice = signal?.price ?? "-"
 
     return (
       <div className="flex flex-col w-full gap-[clamp(1px,0.5vw,6px)]">
@@ -428,13 +416,17 @@ function InlineTradeStrip({
     )
   }
 
-  if (!signal?.entry || !sl || !tp) return null
+  if (direction !== "EXIT" && (!signal?.entry || !sl || !tp)) return null
 
   const isHedged = direction === "HEDGED"
 
   let pricePercent = 50
 
-  if (!isHedged) {
+  if (direction === "LIVE+") {
+    pricePercent = 50
+  }
+
+  if (!isHedged && direction !== "LIVE+") {
     if (direction === "BUY") {
       const leftRange = Math.abs(entry - sl)
       const rightRange = Math.abs(tp - entry)
