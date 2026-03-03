@@ -2,11 +2,23 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
 
-  const body = await req.json()
-  const email = (body?.email || "").toLowerCase().trim()
+  let email = ""
+
+  try {
+    const body = await req.json()
+    email = (body?.email || "").toLowerCase().trim()
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid body" },
+      { status: 400 }
+    )
+  }
 
   if (!email) {
-    return NextResponse.json({ error: "Email required" }, { status: 400 })
+    return NextResponse.json(
+      { error: "Email required" },
+      { status: 400 }
+    )
   }
 
   await fetch(process.env.GAS_AUTH_URL!, {

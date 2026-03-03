@@ -148,20 +148,21 @@ export default function Page() {
           })
         })
 
-if (res.status === 403) {
+        if (res.status === 403) {
 
-  const data = await res.json()
+          const data = await res.json()
 
-  setEmail(storedEmail)
+          setEmail(storedEmail)
+          setRefreshToken(storedRefresh)
 
-  setDeviceLimit({
-    active: true,
-    count: data.device_count
-  })
+          setDeviceLimit({
+            active: true,
+            count: data.device_count
+          })
 
-  setAuthLoading(false)
-  return
-}
+          setAuthLoading(false)
+          return
+        }
 
         if (!res.ok) {
           localStorage.clear()
@@ -187,51 +188,50 @@ if (res.status === 403) {
   }, [])
 
   // =======================================
-// REFRESH TOKEN POLLING (REVOCATION CONTROL)
-// =======================================
-useEffect(() => {
+  // REFRESH TOKEN POLLING (REVOCATION CONTROL)
+  // =======================================
+  useEffect(() => {
 
-if (isAndroid) return
-if (deviceLimit.active) return
-if (!refreshToken || !email) return
+    if (isAndroid) return
+    if (!refreshToken || !email) return
 
-  const interval = setInterval(async () => {
+    const interval = setInterval(async () => {
 
-    try {
+      try {
 
-      const res = await fetch("/api/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          refreshToken,
-          email,
-          deviceId: localStorage.getItem("fxhedz_device_id"),
-          platform: "web"
+        const res = await fetch("/api/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            refreshToken,
+            email,
+            deviceId: localStorage.getItem("fxhedz_device_id"),
+            platform: "web"
+          })
         })
-      })
 
-      if (!res.ok) {
-        // 🔥 Token invalid → force logout
-        localStorage.clear()
-        window.location.reload()
-        return
+        if (!res.ok) {
+          // 🔥 Token invalid → force logout
+          localStorage.clear()
+          window.location.reload()
+          return
+        }
+
+        const data = await res.json()
+
+        if (data?.accessToken) {
+          setAccessToken(data.accessToken)
+        }
+
+      } catch {
+        // Optional silent fail
       }
 
-      const data = await res.json()
+    }, 15000) // every 15 seconds
 
-      if (data?.accessToken) {
-        setAccessToken(data.accessToken)
-      }
+    return () => clearInterval(interval)
 
-    } catch {
-      // Optional silent fail
-    }
-
-  }, 15000) // every 15 seconds
-
-  return () => clearInterval(interval)
-
-}, [refreshToken, email])
+  }, [refreshToken, email])
 
   const isAuthenticated =
     isAndroid
@@ -414,12 +414,11 @@ if (!refreshToken || !email) return
 
     if (authLoading) return
 
-if (deviceLimit.active) return
-
-if (!isAndroid && !isAuthenticated) {
-  setSubActive(false)
-  return
-}
+    // Only block unauthenticated for WEB
+    if (!isAndroid && !isAuthenticated) {
+      setSubActive(false)
+      return
+    }
 
     // If Android and no native token → block
     if (isAndroid && !hasNativeToken) {
@@ -493,7 +492,7 @@ if (!isAndroid && !isAuthenticated) {
 
     init()
 
-  }, [authLoading, deviceLimit.active])
+  }, [authLoading])
 
   // =============================
   // SUBSCRIPTION POLLING (LIVE SYNC)
@@ -591,41 +590,30 @@ if (!isAndroid && !isAuthenticated) {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-async function logoutAllWebDevices() {
+  async function logoutAllWebDevices() {
 
-  console.log("FUNCTION START")
+    if (!email) {
+      console.error("No email available")
+      return
+    }
 
-  const storedEmail =
-    email ||
-    localStorage.getItem("email")
-
-  console.log("Email found:", storedEmail)
-
-  if (!storedEmail) {
-    console.log("No email available")
-    return
-  }
-
-  alert("About to call API")
-
-  try {
-    const res = await fetch("/api/logout-all-web", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: storedEmail
+    try {
+      await fetch("/api/logout-all-web", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email
+        })
       })
-    })
+    } catch (e) {
+      console.error("Logout all failed", e)
+    }
 
-    console.log("Response:", res.status)
-
-  } catch (e) {
-    console.error("Logout all failed", e)
+    localStorage.clear()
+    window.location.reload()
   }
-
-  localStorage.clear()
-  window.location.reload()
-}
   const pairsData = useMemo(() => {
     return instrumentOrder.map((pair) => {
       const signal = uiSignals?.[pair]
