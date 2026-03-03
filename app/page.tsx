@@ -183,6 +183,52 @@ export default function Page() {
 
   }, [])
 
+  // =======================================
+// REFRESH TOKEN POLLING (REVOCATION CONTROL)
+// =======================================
+useEffect(() => {
+
+  if (isAndroid) return
+  if (!refreshToken || !email) return
+
+  const interval = setInterval(async () => {
+
+    try {
+
+      const res = await fetch("/api/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          refreshToken,
+          email,
+          deviceId: localStorage.getItem("fxhedz_device_id"),
+          platform: "web"
+        })
+      })
+
+      if (!res.ok) {
+        // 🔥 Token invalid → force logout
+        localStorage.clear()
+        window.location.reload()
+        return
+      }
+
+      const data = await res.json()
+
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken)
+      }
+
+    } catch {
+      // Optional silent fail
+    }
+
+  }, 15000) // every 15 seconds
+
+  return () => clearInterval(interval)
+
+}, [refreshToken, email])
+
   const isAuthenticated =
     isAndroid
       ? hasNativeToken
