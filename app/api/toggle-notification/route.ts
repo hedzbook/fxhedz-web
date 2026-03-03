@@ -1,22 +1,27 @@
 import { NextRequest, NextResponse } from "next/server"
 import { verifyAccessToken } from "@/lib/jwt"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../auth/[...nextauth]/route"
 
 export async function POST(req: NextRequest) {
 
-  // ============================
-  // REQUIRE JWT AUTHENTICATION
-  // ============================
+  let email: string | null = null
 
+  // ============================
+  // ANDROID (JWT)
+  // ============================
   const jwtUser = verifyAccessToken(req)
-
-  if (!jwtUser || typeof jwtUser !== "object") {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    )
+  if (jwtUser && typeof jwtUser === "object") {
+    email = (jwtUser as any).email
   }
 
-  const email = (jwtUser as any).email
+  // ============================
+  // WEB / TELEGRAM (SESSION)
+  // ============================
+  if (!email) {
+    const session = await getServerSession(authOptions)
+    email = session?.user?.email || null
+  }
 
   if (!email) {
     return NextResponse.json(
@@ -28,7 +33,6 @@ export async function POST(req: NextRequest) {
   // ============================
   // READ BODY (ATOMIC TOGGLE)
   // ============================
-
   const body = await req.json()
   const pair = body?.pair
   const action = body?.action
@@ -47,27 +51,27 @@ export async function POST(req: NextRequest) {
     .toUpperCase()
     .trim()
 
-  // ============================
-  // PLATFORM DETECTION
-  // ============================
+// ============================
+// PLATFORM DETECTION
+// ============================
 
-  const hasAuthHeader =
-    req.headers.get("authorization")?.startsWith("Bearer ")
+// If request contains JWT from native app → android
+const hasAuthHeader =
+  req.headers.get("authorization")?.startsWith("Bearer ")
 
-  let platform = "web"
+let platform = "web"
 
-  if (hasAuthHeader) {
-    platform = "android"
-  } else {
-    platform =
-      req.cookies.get("fx_platform")?.value || "web"
-  }
+if (hasAuthHeader) {
+  platform = "android"
+} else {
+  platform =
+    req.cookies.get("fx_platform")?.value || "web"
+}
 
   // ============================
   // BUILD GAS PAYLOAD
   // ============================
-
-  const payload = {
+  const payload: any = {
     email,
     toggle_pair: cleanPair,
     toggle_action: action,
@@ -77,7 +81,6 @@ export async function POST(req: NextRequest) {
   // ============================
   // SEND TO GAS
   // ============================
-
   const res = await fetch(process.env.GAS_AUTH_URL!, {
     method: "POST",
     headers: {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import jwt from "jsonwebtoken"
 import crypto from "crypto"
-import { createAccessToken } from "@/lib/jwt"
+
+const ACCESS_EXPIRES_IN = "15m"
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,11 +12,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 })
     }
 
+    // 🔐 Hash incoming refresh token
     const refreshHash = crypto
       .createHash("sha256")
       .update(refreshToken)
       .digest("hex")
 
+    // 🔎 Ask GAS to validate
     const gasRes = await fetch(process.env.GAS_AUTH_URL!, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -29,16 +33,6 @@ export async function POST(req: NextRequest) {
 
     const gasData = await gasRes.json()
 
-    if (gasData.device_limit) {
-      return NextResponse.json(
-        {
-          device_limit: true,
-          device_count: gasData.device_count
-        },
-        { status: 403 }
-      )
-    }
-
     if (!gasData.valid) {
       return NextResponse.json(
         { error: "Invalid refresh token" },
@@ -46,7 +40,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const accessToken = createAccessToken({ email, deviceId })
+    // 🔹 Issue new access token
+    const accessToken = jwt.sign(
+      { email, deviceId },
+      process.env.FXHEDZ_SECRET!,
+      { expiresIn: ACCESS_EXPIRES_IN }
+    )
 
     return NextResponse.json({ accessToken })
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { signOut, useSession } from "next-auth/react"
 
 type Props = {
     accessMeta: {
@@ -10,7 +11,6 @@ type Props = {
     } | null
     deviceId?: string | null
     version: string
-    onLogout: () => void
 }
 
 const PLAN = {
@@ -23,9 +23,10 @@ const PLAN = {
 export default function ControlPanel({
     accessMeta,
     deviceId,
-    version,
-    onLogout
+    version
 }: Props) {
+
+    const { data: session } = useSession()
 
     const isAndroid =
         typeof window !== "undefined" &&
@@ -59,6 +60,14 @@ export default function ControlPanel({
         window.open(PLAN.razorpayLink, "_blank")
     }
 
+    function handleLogout() {
+        if (isAndroid) {
+            (window as any).ReactNativeWebView.postMessage("LOGOUT_REQUEST")
+            return
+        }
+        signOut()
+    }
+
     const status = accessMeta?.status?.toLowerCase()
     const isAccountActive = Boolean(accessMeta?.active)
     const isLivePlus = status === "live+"
@@ -89,7 +98,7 @@ export default function ControlPanel({
                     value={
                         isAndroid
                             ? nativeEmail || "—"
-                            : localStorage.getItem("email") || "—"
+                            : session?.user?.email || "—"
                     }
                 />
 
@@ -163,7 +172,7 @@ export default function ControlPanel({
             {/* ================= LOGOUT ================= */}
             <div className="mt-auto pt-4 border-t border-neutral-800">
                 <button
-                    onClick={onLogout}
+                    onClick={handleLogout}
                     className="w-full text-red-500 font-semibold hover:text-red-400 transition-colors"
                 >
                     Sign Out
