@@ -29,11 +29,18 @@ export default function WebGoogleLogin() {
 
   async function completeLogin(idToken: string) {
 
-    let deviceId = localStorage.getItem("deviceId")
+    let deviceId: string | null = null
 
-    if (!deviceId) {
-      deviceId = crypto.randomUUID()
-      localStorage.setItem("deviceId", deviceId)
+    const tg = (window as any)?.Telegram?.WebApp
+
+    if (tg?.initDataUnsafe?.user?.id) {
+      deviceId = "tg_" + tg.initDataUnsafe.user.id
+    } else {
+      deviceId =
+        localStorage.getItem("fxhedz_device_id") ||
+        crypto.randomUUID()
+
+      localStorage.setItem("fxhedz_device_id", deviceId)
     }
 
     const res = await fetch("/api/web-auth", {
@@ -45,7 +52,6 @@ export default function WebGoogleLogin() {
     const data = await res.json()
 
     if (res.status === 403 && data.device_limit) {
-
       localStorage.setItem("email", data.email)
       localStorage.setItem("fxhedz_device_id", deviceId)
 
