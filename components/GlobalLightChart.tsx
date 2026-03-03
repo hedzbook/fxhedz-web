@@ -223,7 +223,7 @@ export default function GlobalLightChart({
 
             if (sl) {
                 const hedgeLabel =
-                    o.direction === "BUY" ? "SS" : "BS"
+                    o.direction === "BUY" ? "HS" : "HS"
 
                 const slLine = candleSeries.createPriceLine({
                     price: sl,

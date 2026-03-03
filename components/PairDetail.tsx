@@ -29,6 +29,8 @@ export default function PairDetail({
     const [preview, setPreview] = useState<any>(null)
     const [saving, setSaving] = useState(false)
     const showConfidence = true
+    const showReasonBlocks = true
+    const showDecisionBlocks = true
 
     useEffect(() => {
         if (preview) {
@@ -101,6 +103,22 @@ export default function PairDetail({
 
         return Math.max(-100, Math.min(100, normalized))
     }
+    const direction = signal?.direction
+
+    const atValue =
+        direction === "EXIT"
+            ? signal?.price ?? "--"
+            : signal?.entry ?? "--"
+
+    const tpValue =
+        direction === "HEDGED" || direction === "EXIT"
+            ? "--"
+            : signal?.tp ?? "--"
+
+    const slValue =
+        direction === "HEDGED" || direction === "EXIT"
+            ? "--"
+            : signal?.sl ?? "--"
     return (
         <div className="flex flex-col h-full bg-black min-h-0">
 
@@ -191,64 +209,71 @@ export default function PairDetail({
                         <div className="space-y-[clamp(8px,1vh,16px)]">
 
                             {/* REASON ROW (4 Blocks) */}
-                            <div className="grid grid-cols-4 gap-[clamp(6px,1vw,12px)]">
+                            {showReasonBlocks && (
+                                <div className="grid grid-cols-4 gap-[clamp(6px,1vw,12px)]">
 
-                                <MiniBlock
-                                    label="Technical"
-                                    value="Bullish"
-                                    highlight="text-green-400"
-                                />
+                                    <MiniBlock
+                                        label="Technical"
+                                        value="Bullish"
+                                        highlight="text-green-400"
+                                    />
 
-                                <MiniBlock
-                                    label="Macro"
-                                    value="Neutral"
-                                    highlight="text-neutral-400"
-                                />
+                                    <MiniBlock
+                                        label="Macro"
+                                        value="Neutral"
+                                        highlight="text-neutral-400"
+                                    />
 
-                                <MiniBlock
-                                    label="Sentiment"
-                                    value="Bearish"
-                                    highlight="text-red-400"
-                                />
+                                    <MiniBlock
+                                        label="Sentiment"
+                                        value="Bearish"
+                                        highlight="text-red-400"
+                                    />
 
-                                <MiniBlock
-                                    label="Volatility"
-                                    value="Expanding"
-                                    highlight="text-yellow-400"
-                                />
+                                    <MiniBlock
+                                        label="Volatility"
+                                        value="Expanding"
+                                        highlight="text-yellow-400"
+                                    />
 
-                            </div>
+                                </div>
+                            )}
 
                             {/* SIGNAL ROW (4 Blocks) */}
-                            <div className="grid grid-cols-4 gap-[clamp(6px,1vw,12px)]">
+                            {showDecisionBlocks && (
+                                <div className="grid grid-cols-4 gap-[clamp(6px,1vw,12px)]">
 
-                                <MiniBlock
-                                    label="Decision"
-                                    value={signal?.direction || "--"}
-                                    highlight={
-                                        signal?.direction === "BUY"
-                                            ? "text-green-400"
-                                            : signal?.direction === "SELL"
-                                                ? "text-red-400"
-                                                : ""
-                                    }
-                                />
+                                    <MiniBlock
+                                        label="Decision"
+                                        value={direction || "--"}
+                                        highlight={
+                                            direction === "BUY"
+                                                ? "text-green-400"
+                                                : direction === "SELL"
+                                                    ? "text-red-400"
+                                                    : direction === "HEDGED"
+                                                        ? "text-sky-400"
+                                                        : ""
+                                        }
+                                    />
 
-                                <MiniBlock
-                                    label="At"
-                                    value={signal?.entry || "--"}
-                                />
+                                    <MiniBlock
+                                        label="At"
+                                        value={atValue}
+                                    />
 
-                                <MiniBlock
-                                    label="Take Profit"
-                                    value={signal?.tp || "--"}
-                                />
-                                
-                                <MiniBlock
-                                    label="Hedz Stop"
-                                    value={signal?.sl || "--"}
-                                />
-                            </div>
+                                    <MiniBlock
+                                        label="Take Profit"
+                                        value={tpValue}
+                                    />
+
+                                    <MiniBlock
+                                        label="Hedz Stop"
+                                        value={slValue}
+                                    />
+
+                                </div>
+                            )}
 
                         </div>
 
@@ -544,27 +569,34 @@ function Metric({ label, value }: any) {
 
 function MiniBlock({ label, value, highlight = "" }: any) {
     return (
-        <div className="
-            bg-neutral-900
-            px-[clamp(8px,1vw,14px)]
-            py-[clamp(8px,1vh,12px)]
-            flex flex-col
-            justify-center
-        ">
-            <div className="
-                text-neutral-500
-                text-[clamp(8px,4.8px+1vw,16px)]
-                leading-none
-            ">
+        <div
+            className="
+                bg-neutral-900
+                px-[clamp(8px,1vw,14px)]
+                py-[clamp(8px,1vh,12px)]
+                flex flex-col
+                justify-center
+                gap-[clamp(1px,0.2vh,4px)]
+            "
+        >
+            <div
+                className="
+                    text-neutral-500
+                    text-[clamp(8px,4.8px+1vw,16px)]
+                    leading-none
+                "
+            >
                 {label}
             </div>
 
-            <div className={`
-                font-semibold
-                text-[clamp(9px,5.5px+1.0937vw,19.5px)]
-                leading-tight
-                ${highlight}
-            `}>
+            <div
+                className={`
+                    font-semibold
+                    text-[clamp(9px,5.5px+1.0937vw,19.5px)]
+                    leading-tight
+                    ${highlight}
+                `}
+            >
                 {value}
             </div>
         </div>
