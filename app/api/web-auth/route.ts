@@ -40,11 +40,11 @@ export async function POST(req: NextRequest) {
     headers: { "Content-Type": "application/json" },
 body: JSON.stringify({
   email,
-  device_id: "",
-  platform: telegramChatId ? "telegram" : platform,
+  device_id: deviceId,
+  platform,
   telegram_chat_id: telegramChatId,
-  refresh_token_hash: telegramChatId ? "" : refreshHash,
-  refresh_expires: telegramChatId ? "" : refreshExpires
+  refresh_token_hash: refreshHash,
+  refresh_expires: refreshExpires.toISOString()
 })
   })
 

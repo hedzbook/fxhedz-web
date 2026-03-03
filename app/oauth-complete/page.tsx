@@ -20,11 +20,24 @@ export default function OAuthComplete() {
         localStorage.setItem("deviceId", deviceId)
       }
 
-      const res = await fetch("/api/web-auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken, deviceId })
-      })
+let telegramChatId = ""
+
+try {
+  const tg = (window as any)?.Telegram?.WebApp
+  if (tg?.initDataUnsafe?.user?.id) {
+    telegramChatId = String(tg.initDataUnsafe.user.id)
+  }
+} catch {}
+
+const res = await fetch("/api/web-auth", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    idToken,
+    deviceId,
+    telegram_chat_id: telegramChatId
+  })
+})
 
       const data = await res.json()
 
