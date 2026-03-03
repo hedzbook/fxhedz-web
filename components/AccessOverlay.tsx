@@ -1,6 +1,6 @@
 "use client"
 
-import AuthButton from "./AuthButton"
+import WebGoogleLogin from "./WebGoogleLogin"
 
 type Props = {
   sessionExists: boolean
@@ -21,7 +21,7 @@ export default function AccessOverlay({ sessionExists }: Props) {
           Sign in to access FXHEDZ LIVE Terminal
         </Description>
         <div className="w-full flex justify-center">
-          <AuthButton />
+          <WebGoogleLogin />
         </div>
       </Panel>
     </OverlayContainer>
