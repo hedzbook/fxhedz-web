@@ -35,6 +35,11 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
 
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
+
         <Providers>
           {children}
         </Providers>

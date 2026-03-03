@@ -5,12 +5,8 @@ import PairCard from "@/components/PairCard"
 import AccountStrip from "@/components/AccountStrip"
 import VerticalSymbolButton from "@/components/VerticalSymbolButton"
 import PairDetail from "@/components/PairDetail"
-import AuthButton from "@/components/AuthButton"
-import { useSession } from "next-auth/react"
 import AccessOverlay from "@/components/AccessOverlay"
 import { generateDummySignals } from "@/lib/dummySignals"
-import { ensureDeviceIdentity } from "@/lib/device"
-import { signOut } from "next-auth/react"
 import { generateDummyDetail } from "@/lib/dummyDetail"
 import ControlPanel from "@/components/ControlPanel"
 import pkg from "../package.json"
@@ -86,13 +82,31 @@ export default function Page() {
     window.addEventListener("resize", check)
     return () => window.removeEventListener("resize", check)
   }, [])
+
   const [subActive, setSubActive] = useState<boolean | null>(null)
-  const { data: session, status } = useSession()
-  const email =
-    session?.user?.email ||
-    (typeof window !== "undefined"
-      ? (window as any).__NATIVE_EMAIL__
-      : null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [refreshToken, setRefreshToken] = useState<string | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  const [deviceLimit, setDeviceLimit] = useState<{
+    active: boolean
+    count?: number
+  }>({ active: false })
+
+  useEffect(() => {
+    function handler(e: any) {
+      setDeviceLimit({
+        active: true,
+        count: e.detail?.count
+      })
+    }
+
+    window.addEventListener("fxhedz-device-limit", handler)
+
+    return () =>
+      window.removeEventListener("fxhedz-device-limit", handler)
+  }, [])
 
   const isAndroid =
     typeof window !== "undefined" &&
@@ -103,15 +117,81 @@ export default function Page() {
     typeof window !== "undefined" &&
     (window as any).__HAS_NATIVE_TOKEN__ === true
 
+  useEffect(() => {
+
+    if (isAndroid) {
+      setAuthLoading(false)
+      return
+    }
+
+    const storedRefresh = localStorage.getItem("refreshToken")
+    const storedEmail = localStorage.getItem("email")
+    const storedDeviceId = localStorage.getItem("fxhedz_device_id")
+
+    if (!storedRefresh || !storedEmail || !storedDeviceId) {
+      setAuthLoading(false)
+      return
+    }
+
+    async function validate() {
+
+      try {
+
+        const res = await fetch("/api/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            refreshToken: storedRefresh,
+            email: storedEmail,
+            deviceId: storedDeviceId,
+            platform: "web"
+          })
+        })
+
+        if (res.status === 403) {
+          const data = await res.json()
+
+          setDeviceLimit({
+            active: true,
+            count: data.device_count
+          })
+
+          setAuthLoading(false)
+          return
+        }
+
+        if (!res.ok) {
+          localStorage.clear()
+          setAuthLoading(false)
+          return
+        }
+
+        const data = await res.json()
+
+        setAccessToken(data.accessToken)
+        setRefreshToken(storedRefresh)
+        setEmail(storedEmail)
+
+      } catch {
+        localStorage.clear()
+      }
+
+      setAuthLoading(false)
+    }
+
+    validate()
+
+  }, [])
+
   const isAuthenticated =
     isAndroid
       ? hasNativeToken
-      : status === "authenticated"
+      : !!accessToken
 
   const sessionExists =
     isAndroid
       ? hasNativeToken
-      : !!session
+      : !!refreshToken
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
   async function loadPreview(pair: string) {
@@ -240,7 +320,7 @@ export default function Page() {
 
   useEffect(() => {
 
-    if (status === "loading") return
+    if (authLoading) return
 
     if (!isAuthenticated) {
       setSignals(generateDummySignals())
@@ -256,7 +336,14 @@ export default function Page() {
 
     async function loadSignals() {
       try {
-        const res = await fetch(SIGNAL_API)
+        const res = await fetch(SIGNAL_API, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        })
+
+        if (!res.ok) return
+
         const json = await res.json()
         const incoming = json?.signals ?? {}
 
@@ -268,17 +355,17 @@ export default function Page() {
     const interval = setInterval(loadSignals, 2500)
     return () => clearInterval(interval)
 
-  }, [subActive, status, accessMeta])
+  }, [subActive, authLoading, accessToken])
 
   // =============================
   // CHECK SUBSCRIPTION STATUS
   // =============================
   useEffect(() => {
 
-    if (status === "loading") return
+    if (authLoading) return
 
     // Only block unauthenticated for WEB
-    if (!isAndroid && status === "unauthenticated") {
+    if (!isAndroid && !isAuthenticated) {
       setSubActive(false)
       return
     }
@@ -331,7 +418,12 @@ export default function Page() {
       try {
         const res = await fetch(
           `/api/subscription`,
-          { cache: "no-store" }
+          {
+            cache: "no-store",
+            headers: accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}
+          }
         )
 
         const data = await res.json()
@@ -350,7 +442,7 @@ export default function Page() {
 
     init()
 
-  }, [status, hasNativeToken])
+  }, [authLoading])
 
   // =============================
   // SUBSCRIPTION POLLING (LIVE SYNC)
@@ -362,7 +454,10 @@ export default function Page() {
     async function checkSubscription() {
       try {
         const res = await fetch("/api/subscription", {
-          cache: "no-store"
+          cache: "no-store",
+          headers: accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {}
         })
 
         const data = await res.json()
@@ -404,7 +499,11 @@ export default function Page() {
     async function refreshOpenPair() {
       try {
 
-        const res = await fetch(`/api/signals?pair=${pairKey}`)
+        const res = await fetch(`/api/signals?pair=${pairKey}`, {
+          headers: accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {}
+        })
         const json = await res.json()
         if (cancelled) return
 
@@ -422,7 +521,7 @@ export default function Page() {
       cancelled = true
       clearInterval(interval)
     }
-  }, [openPair, subActive, status])
+  }, [openPair, subActive, authLoading])
 
   function togglePair(pair: string) {
     // Toggle between open/close pair expansion
@@ -440,6 +539,23 @@ export default function Page() {
     const newIndex = instrumentOrder.indexOf(over.id)
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
+  }
+  async function logoutAllWebDevices() {
+    try {
+      const storedEmail = localStorage.getItem("email")
+
+      await fetch(process.env.NEXT_PUBLIC_GAS_AUTH_URL!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          logout_all_web: true,
+          email: storedEmail
+        })
+      })
+    } catch { }
+
+    localStorage.clear()
+    window.location.reload()
   }
   const pairsData = useMemo(() => {
     return instrumentOrder.map((pair) => {
@@ -604,7 +720,7 @@ export default function Page() {
                 signal={uiSignals?.[openPair]}
                 onClose={() => setOpenPair(null)}
                 isGuest={isGuest}
-                email={session?.user?.email || (window as any).__NATIVE_EMAIL__}
+                email={email || (window as any).__NATIVE_EMAIL__}
                 appInstruments={appInstruments}
                 setAppInstruments={setAppInstruments}
               />
@@ -855,7 +971,42 @@ export default function Page() {
         </div>
 
       </main>
-      {status !== "loading" && (
+      {deviceLimit.active && (
+        <div className="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
+          <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md text-center space-y-4">
+
+            <div className="text-lg font-semibold">
+              Device Restricted
+            </div>
+
+            <div className="text-sm text-neutral-400">
+              Maximum 2 web devices allowed.
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={logoutAllWebDevices}
+                className="flex-1 bg-neutral-700 hover:bg-neutral-600 py-2 rounded"
+              >
+                Logout All Devices
+              </button>
+
+              <button
+                onClick={() => {
+                  localStorage.clear()
+                  window.location.reload()
+                }}
+                className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded"
+              >
+                Logout
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {!deviceLimit.active && !authLoading && (
         <AccessOverlay sessionExists={sessionExists} />
       )}
     </div>
