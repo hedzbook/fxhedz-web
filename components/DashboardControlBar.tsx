@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from "react"
@@ -50,7 +51,7 @@ export default function DashboardControlBar({
     >
       <div className="flex items-center justify-between px-4 py-3">
 
-        {/* LEFT SIDE — VIEW CONTROLS */}
+        {/* LEFT SIDE â€” VIEW CONTROLS */}
         <div className="flex items-center gap-2">
 
           <Btn
@@ -73,7 +74,7 @@ export default function DashboardControlBar({
 
         </div>
 
-        {/* RIGHT SIDE — MENU */}
+        {/* RIGHT SIDE â€” MENU */}
         <button
           onClick={onMenu}
           className="w-9 h-9 flex items-center justify-center
@@ -81,7 +82,7 @@ export default function DashboardControlBar({
                      text-neutral-300 hover:text-white
                      transition-all duration-200"
         >
-          ☰
+          â˜°
         </button>
 
       </div>

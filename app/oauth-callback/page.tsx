@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect } from "react"
@@ -21,3 +22,4 @@ export default function OAuthCallback() {
 
   return <div className="text-white">Completing login...</div>
 }
+

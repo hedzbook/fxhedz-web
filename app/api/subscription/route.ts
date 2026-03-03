@@ -1,47 +1,19 @@
+
 import { NextRequest, NextResponse } from "next/server"
 import { verifyAccessToken } from "@/lib/jwt"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
 
 export async function GET(req: NextRequest) {
 
   const jwtUser = verifyAccessToken(req)
-  const session = await getServerSession(authOptions)
 
-  let deviceId: string | undefined
-  let email: string | undefined
-
-  // ===============================
-  // ANDROID (JWT)
-  // ===============================
-  if (jwtUser && typeof jwtUser === "object") {
-    deviceId = (jwtUser as any).deviceId
-    email = (jwtUser as any).email
-  }
-
-  // ===============================
-  // WEB (NextAuth Session)
-  // ===============================
-  if (!email && session?.user?.email) {
-    email = session.user.email
-  }
-
-  // ===============================
-  // DEVICE COOKIE FALLBACK
-  // ===============================
-  if (!deviceId) {
-    deviceId = req.cookies.get("fx_device")?.value
-  }
-
-  // ===============================
-  // REQUIRE IDENTITY
-  // ===============================
-  if (!email || !deviceId) {
+  if (!jwtUser || typeof jwtUser !== "object") {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }
     )
   }
+
+  const email = (jwtUser as any).email
 
   try {
     const res = await fetch(
@@ -55,9 +27,6 @@ export async function GET(req: NextRequest) {
 
     const data = await res.json()
 
-    // ===============================
-    // NORMALIZE PLAN
-    // ===============================
     const rawPlan =
       (data?.plan || data?.status || "").toLowerCase()
 
@@ -66,9 +35,6 @@ export async function GET(req: NextRequest) {
 
     const now = new Date()
 
-    // ===============================
-    // ENFORCE EXPIRY
-    // ===============================
     const isLivePlusActive =
       rawPlan === "live+" &&
       expiryRaw &&
@@ -78,20 +44,18 @@ export async function GET(req: NextRequest) {
       isLivePlusActive ? "live+" : "live"
 
     return NextResponse.json({
-      active: true,               // LIVE base is always active
+      active: true,
       blocked: false,
       status: finalPlan,
       expiry: expiryRaw ?? null
     })
 
-  } catch (err) {
-
+  } catch {
     return NextResponse.json({
       active: false,
       blocked: true,
       status: null,
       expiry: null
     })
-
   }
 }

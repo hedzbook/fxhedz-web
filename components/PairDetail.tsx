@@ -1,3 +1,4 @@
+
 "use client"
 
 import GlobalLightChart from "./GlobalLightChart"
@@ -87,7 +88,7 @@ export default function PairDetail({
         // Placeholder institutional weighting
         // You can replace these later with MT5-derived values
 
-        const technical = signal?.technicalScore ?? 0.4   // 0 → 1
+        const technical = signal?.technicalScore ?? 0.4   // 0 â†’ 1
         const macro = signal?.macroScore ?? 0.2
         const sentiment = signal?.sentimentScore ?? 0.3
         const volatility = signal?.volatilityScore ?? 0.1
@@ -98,7 +99,7 @@ export default function PairDetail({
             sentiment * 0.2 +
             volatility * 0.2
 
-        // Convert 0 → 1 scale to -100 → +100
+        // Convert 0 â†’ 1 scale to -100 â†’ +100
         const normalized = (weighted - 0.5) * 200
 
         return Math.max(-100, Math.min(100, normalized))
@@ -194,7 +195,7 @@ export default function PairDetail({
                 <Tab label="Statistics" active={tab === "performance"} onClick={() => setTab("performance")} />
             </div>
 
-            {/* CONTENT AREA — ONLY THIS SCROLLS */}
+            {/* CONTENT AREA â€” ONLY THIS SCROLLS */}
             <div className="flex-1 flex flex-col min-h-0">
 
                 {tab === "market" && (
@@ -399,7 +400,7 @@ export default function PairDetail({
                                             {h.direction}
                                         </div>
                                         <div className="text-xs text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                            {h.entry} → {h.exit}
+                                            {h.entry} â†’ {h.exit}
                                         </div>
                                     </div>
                                     <div className={h.pnl >= 0 ? "text-green-400" : "text-red-400"}>

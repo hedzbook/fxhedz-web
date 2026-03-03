@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -96,7 +97,7 @@ py-[clamp(2px,0.6vh,6px)]
         {signal && (
           <div className="flex flex-col w-full">
 
-            {/* ROW 1 â€” PAIR + DIRECTION */}
+            {/* ROW 1 Ã¢â‚¬â€ PAIR + DIRECTION */}
             <div className="flex justify-between items-center">
               <div className="font-semibold text-[clamp(11px,6.66px+1.354vw,24px)] leading-none">
                 {pair}
@@ -114,7 +115,7 @@ py-[clamp(2px,0.6vh,6px)]
               </div>
             </div>
 
-            {/* ROW 2 â€” LOTS + B/S COUNT */}
+            {/* ROW 2 Ã¢â‚¬â€ LOTS + B/S COUNT */}
             <div className="mt-[clamp(1px,0.4vw,6px)] flex justify-between items-center text-[clamp(9px,5.5px+1.0937vw,19.5px)] leading-none">
               <div
                 className={
@@ -133,7 +134,7 @@ py-[clamp(2px,0.6vh,6px)]
               </div>
             </div>
 
-            {/* ROW 3 â€” TRADE BAR */}
+            {/* ROW 3 Ã¢â‚¬â€ TRADE BAR */}
             <div className="mt-[clamp(1px,0.8vw,10px)]">
 <InlineTradeStrip
   signal={signal}
@@ -178,7 +179,7 @@ py-[clamp(2px,0.6vh,6px)]
                     {signal?.direction || "--"} {signal?.entry || ""}
                   </div>
                   <div className="text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-400">
-                    SL {signal?.sl || "--"} Â· TP {signal?.tp || "--"}
+                    SL {signal?.sl || "--"} Ã‚Â· TP {signal?.tp || "--"}
                   </div>
                 </div>
 
@@ -272,7 +273,7 @@ py-[clamp(2px,0.6vh,6px)]
                           {h.direction}
                         </div>
                         <div className="text-xs text-neutral-400">
-                          {h.entry} â†’ {h.exit}
+                          {h.entry} Ã¢â€ â€™ {h.exit}
                         </div>
                       </div>
                       <div className={h.pnl >= 0 ? "text-green-400" : "text-red-400"}>

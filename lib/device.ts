@@ -1,3 +1,4 @@
+
 export function ensureDeviceIdentity() {
   if (typeof window === "undefined") return null
 

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect } from "react"
@@ -37,7 +38,7 @@ async function completeLogin(idToken: string) {
     localStorage.setItem("fxhedz_device_id", deviceId)
   }
 
-  // 🔥 Retrieve stored Telegram ID
+  // ðŸ”¥ Retrieve stored Telegram ID
   const telegramChatId =
     localStorage.getItem("fx_tg_id") || ""
 

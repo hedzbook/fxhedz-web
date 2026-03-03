@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 🔹 Verify Google token
+    // ðŸ”¹ Verify Google token
     const client = new OAuth2Client()
 
     const ticket = await client.verifyIdToken({
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     const email = payload.email.toLowerCase()
 
-    // 🔹 Generate refresh token
+    // ðŸ”¹ Generate refresh token
     const refreshToken = crypto.randomBytes(64).toString("hex")
 
     const refreshHash = crypto
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       refreshExpires.getDate() + REFRESH_EXPIRES_DAYS
     )
 
-    // 🔹 Register device in GAS (also validates subscription)
+    // ðŸ”¹ Register device in GAS (also validates subscription)
     const gasRes = await fetch(process.env.GAS_AUTH_URL!, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 🔹 Save push token ONLY if subscription active
+    // ðŸ”¹ Save push token ONLY if subscription active
     if (pushToken) {
       await fetch(process.env.GAS_AUTH_URL!, {
         method: "POST",
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // 🔹 Issue access token
+    // ðŸ”¹ Issue access token
     const accessToken = jwt.sign(
       { email, deviceId },
       process.env.FXHEDZ_SECRET!,

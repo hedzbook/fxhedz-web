@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useRef } from "react"
@@ -38,13 +39,13 @@ export default function GlobalLightChart({
 
         const width = container.clientWidth
 
-        // 🔥 Responsive Font Clamp (9px → 14px)
+        // ðŸ”¥ Responsive Font Clamp (9px â†’ 14px)
         const clampedFontSize = Math.max(
             9,
             Math.min(14, Math.floor(width * 0.012))
         )
 
-        // 🔥 Responsive Bar Spacing
+        // ðŸ”¥ Responsive Bar Spacing
         const clampedBarSpacing = Math.max(
             6,
             Math.min(14, Math.floor(width * 0.01))
@@ -227,7 +228,7 @@ export default function GlobalLightChart({
 
                 const slLine = candleSeries.createPriceLine({
                     price: sl,
-                    color: "#F97316", // 🔥 Orange for hedge clarity
+                    color: "#F97316", // ðŸ”¥ Orange for hedge clarity
                     lineWidth: 1,
                     lineStyle: 2,
                     title: hedgeLabel
@@ -254,3 +255,4 @@ export default function GlobalLightChart({
 
     return null
 }
+

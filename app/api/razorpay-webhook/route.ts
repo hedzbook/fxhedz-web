@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No signature" }, { status: 400 })
   }
 
-  // 🔐 VERIFY WEBHOOK SIGNATURE
+  // ðŸ” VERIFY WEBHOOK SIGNATURE
   const expected = crypto
     .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
     .update(body)
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing email" }, { status: 400 })
   }
 
-  // 🔁 CALL GAS TO ACTIVATE
+  // ðŸ” CALL GAS TO ACTIVATE
   const gasRes = await fetch(process.env.GAS_AUTH_URL!, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -1,14 +1,21 @@
+
 import jwt from "jsonwebtoken"
 
-const SECRET = process.env.FXHEDZ_SECRET!
+const ACCESS_EXPIRES_IN = "15m"
 
 export function createAccessToken(payload: {
   email: string
-  deviceId: string
+  deviceId?: string
 }) {
-  return jwt.sign(payload, SECRET, {
-    expiresIn: "15m"
-  })
+  if (!process.env.FXHEDZ_SECRET) {
+    throw new Error("Missing FXHEDZ_SECRET")
+  }
+
+  return jwt.sign(
+    payload,
+    process.env.FXHEDZ_SECRET,
+    { expiresIn: ACCESS_EXPIRES_IN }
+  )
 }
 
 export function verifyAccessToken(req: Request) {
@@ -19,7 +26,7 @@ export function verifyAccessToken(req: Request) {
   const token = authHeader.replace("Bearer ", "")
 
   try {
-    return jwt.verify(token, SECRET)
+    return jwt.verify(token, process.env.FXHEDZ_SECRET!)
   } catch {
     return null
   }

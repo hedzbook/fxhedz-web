@@ -1,3 +1,4 @@
+
 export function generateDummyDetail(pair: string) {
 
   const history = [
@@ -21,3 +22,4 @@ export function generateDummyDetail(pair: string) {
     notes: "Institutional accumulation detected. Liquidity engineering active."
   }
 }
+
