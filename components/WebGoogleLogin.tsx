@@ -29,19 +29,29 @@ export default function WebGoogleLogin() {
 
   async function completeLogin(idToken: string) {
 
-    let deviceId: string | null = null
+let deviceId: string | null = null
 
-    const tg = (window as any)?.Telegram?.WebApp
+const tg = (window as any)?.Telegram?.WebApp
 
-    if (tg?.initDataUnsafe?.user?.id) {
-      deviceId = "tg_" + tg.initDataUnsafe.user.id
-    } else {
-      deviceId =
-        localStorage.getItem("fxhedz_device_id") ||
-        crypto.randomUUID()
+if (tg) {
+  try {
+    tg.ready()
 
-      localStorage.setItem("fxhedz_device_id", deviceId)
+    const tgUserId = tg.initDataUnsafe?.user?.id
+
+    if (tgUserId) {
+      deviceId = "tg_" + tgUserId
     }
+  } catch {}
+}
+
+if (!deviceId) {
+  deviceId =
+    localStorage.getItem("fxhedz_device_id") ||
+    crypto.randomUUID()
+
+  localStorage.setItem("fxhedz_device_id", deviceId)
+}
 
     const res = await fetch("/api/web-auth", {
       method: "POST",
