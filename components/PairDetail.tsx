@@ -235,20 +235,19 @@ export default function PairDetail({
                                 />
 
                                 <MiniBlock
-                                    label="Entry"
+                                    label="At"
                                     value={signal?.entry || "--"}
-                                />
-
-                                <MiniBlock
-                                    label="Stop Loss"
-                                    value={signal?.sl || "--"}
                                 />
 
                                 <MiniBlock
                                     label="Take Profit"
                                     value={signal?.tp || "--"}
                                 />
-
+                                
+                                <MiniBlock
+                                    label="Hedz Stop"
+                                    value={signal?.sl || "--"}
+                                />
                             </div>
 
                         </div>
