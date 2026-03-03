@@ -540,23 +540,21 @@ export default function Page() {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-  async function logoutAllWebDevices() {
-    try {
-      const storedEmail = localStorage.getItem("email")
-
-      await fetch(process.env.NEXT_PUBLIC_GAS_AUTH_URL!, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          logout_all_web: true,
-          email: storedEmail
-        })
-      })
-    } catch { }
-
-    localStorage.clear()
-    window.location.reload()
+async function logoutAllWebDevices() {
+  try {
+    await fetch("/api/logout-all-web", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+  } catch (e) {
+    console.error("Logout all failed", e)
   }
+
+  localStorage.clear()
+  window.location.reload()
+}
   const pairsData = useMemo(() => {
     return instrumentOrder.map((pair) => {
       const signal = uiSignals?.[pair]
