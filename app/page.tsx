@@ -601,16 +601,41 @@ export default function Page() {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-  function logoutCurrentSession() {
+async function logoutCurrentSession() {
 
-    if (typeof window !== "undefined" && window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage("LOGOUT_REQUEST")
-      return
-    }
+  const isAndroid =
+    typeof window !== "undefined" &&
+    !!(window as any).ReactNativeWebView
 
-    localStorage.clear()
-    window.location.reload()
+  const deviceId = localStorage.getItem("fxhedz_device_id")
+  const storedEmail = localStorage.getItem("email")
+
+  // Android handled natively
+  if (isAndroid) {
+    window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
+    return
   }
+
+  if (storedEmail && deviceId) {
+
+    try {
+      await fetch("/api/logout-device", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: storedEmail,
+          device_id: deviceId,
+          platform: "web"
+        })
+      })
+    } catch (e) {
+      console.log("Logout device failed", e)
+    }
+  }
+
+  localStorage.clear()
+  window.location.reload()
+}
 
   async function logoutAllWebDevices() {
 
