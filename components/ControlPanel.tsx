@@ -1,7 +1,6 @@
 "use client"
 
 import { useMemo } from "react"
-import { signOut, useSession } from "next-auth/react"
 
 type Props = {
     accessMeta: {
@@ -25,8 +24,6 @@ export default function ControlPanel({
     deviceId,
     version
 }: Props) {
-
-    const { data: session } = useSession()
 
     const isAndroid =
         typeof window !== "undefined" &&
@@ -65,7 +62,9 @@ export default function ControlPanel({
             (window as any).ReactNativeWebView.postMessage("LOGOUT_REQUEST")
             return
         }
-        signOut()
+
+        localStorage.clear()
+        window.location.reload()
     }
 
     const status = accessMeta?.status?.toLowerCase()
@@ -98,7 +97,7 @@ export default function ControlPanel({
                     value={
                         isAndroid
                             ? nativeEmail || "—"
-                            : session?.user?.email || "—"
+                            : localStorage.getItem("email") || "—"
                     }
                 />
 

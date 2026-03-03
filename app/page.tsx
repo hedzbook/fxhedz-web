@@ -404,7 +404,7 @@ export default function Page() {
       let id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
 
       if (!id) {
-        id = crypto.randomUUID()
+        id = window.crypto.randomUUID()
         localStorage.setItem("fxhedz_device_id", id)
       }
 
