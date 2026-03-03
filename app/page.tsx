@@ -148,17 +148,20 @@ export default function Page() {
           })
         })
 
-        if (res.status === 403) {
-          const data = await res.json()
+if (res.status === 403) {
 
-          setDeviceLimit({
-            active: true,
-            count: data.device_count
-          })
+  const data = await res.json()
 
-          setAuthLoading(false)
-          return
-        }
+  setEmail(storedEmail)
+
+  setDeviceLimit({
+    active: true,
+    count: data.device_count
+  })
+
+  setAuthLoading(false)
+  return
+}
 
         if (!res.ok) {
           localStorage.clear()
@@ -188,8 +191,9 @@ export default function Page() {
 // =======================================
 useEffect(() => {
 
-  if (isAndroid) return
-  if (!refreshToken || !email) return
+if (isAndroid) return
+if (deviceLimit.active) return
+if (!refreshToken || !email) return
 
   const interval = setInterval(async () => {
 
@@ -410,11 +414,12 @@ useEffect(() => {
 
     if (authLoading) return
 
-    // Only block unauthenticated for WEB
-    if (!isAndroid && !isAuthenticated) {
-      setSubActive(false)
-      return
-    }
+if (deviceLimit.active) return
+
+if (!isAndroid && !isAuthenticated) {
+  setSubActive(false)
+  return
+}
 
     // If Android and no native token → block
     if (isAndroid && !hasNativeToken) {
@@ -488,7 +493,7 @@ useEffect(() => {
 
     init()
 
-  }, [authLoading])
+  }, [authLoading, deviceLimit.active])
 
   // =============================
   // SUBSCRIPTION POLLING (LIVE SYNC)
@@ -587,21 +592,32 @@ useEffect(() => {
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
 async function logoutAllWebDevices() {
+
+  console.log("FUNCTION START")
+
+  const storedEmail =
+    email ||
+    localStorage.getItem("email")
+
+  console.log("Email found:", storedEmail)
+
+  if (!storedEmail) {
+    console.log("No email available")
+    return
+  }
+
+  alert("About to call API")
+
   try {
-
-    const storedEmail =
-      email ||
-      localStorage.getItem("email")
-
-    if (!storedEmail) return
-
-    await fetch("/api/logout-all-web", {
+    const res = await fetch("/api/logout-all-web", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: storedEmail
       })
     })
+
+    console.log("Response:", res.status)
 
   } catch (e) {
     console.error("Logout all failed", e)
