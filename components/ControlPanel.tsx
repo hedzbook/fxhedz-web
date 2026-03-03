@@ -10,6 +10,7 @@ type Props = {
     } | null
     deviceId?: string | null
     version: string
+    onLogout: () => void
 }
 
 const PLAN = {
@@ -22,7 +23,8 @@ const PLAN = {
 export default function ControlPanel({
     accessMeta,
     deviceId,
-    version
+    version,
+    onLogout
 }: Props) {
 
     const isAndroid =
@@ -55,16 +57,6 @@ export default function ControlPanel({
         }
 
         window.open(PLAN.razorpayLink, "_blank")
-    }
-
-    function handleLogout() {
-        if (isAndroid) {
-            (window as any).ReactNativeWebView.postMessage("LOGOUT_REQUEST")
-            return
-        }
-
-        localStorage.clear()
-        window.location.reload()
     }
 
     const status = accessMeta?.status?.toLowerCase()
@@ -171,7 +163,7 @@ export default function ControlPanel({
             {/* ================= LOGOUT ================= */}
             <div className="mt-auto pt-4 border-t border-neutral-800">
                 <button
-                    onClick={handleLogout}
+                    onClick={onLogout}
                     className="w-full text-red-500 font-semibold hover:text-red-400 transition-colors"
                 >
                     Sign Out

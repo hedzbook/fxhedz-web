@@ -94,28 +94,28 @@ export default function Page() {
     count?: number
   }>({ active: false })
 
-useEffect(() => {
+  useEffect(() => {
 
-  function handler(e: any) {
+    function handler(e: any) {
 
-    const storedEmail = localStorage.getItem("email")
+      const storedEmail = localStorage.getItem("email")
 
-    if (storedEmail) {
-      setEmail(storedEmail)
+      if (storedEmail) {
+        setEmail(storedEmail)
+      }
+
+      setDeviceLimit({
+        active: true,
+        count: e.detail?.count
+      })
     }
 
-    setDeviceLimit({
-      active: true,
-      count: e.detail?.count
-    })
-  }
+    window.addEventListener("fxhedz-device-limit", handler)
 
-  window.addEventListener("fxhedz-device-limit", handler)
+    return () =>
+      window.removeEventListener("fxhedz-device-limit", handler)
 
-  return () =>
-    window.removeEventListener("fxhedz-device-limit", handler)
-
-}, [])
+  }, [])
 
   const isAndroid =
     typeof window !== "undefined" &&
@@ -138,6 +138,7 @@ useEffect(() => {
     const storedDeviceId = localStorage.getItem("fxhedz_device_id")
 
     if (!storedRefresh || !storedEmail || !storedDeviceId) {
+      setEmail(storedEmail || null)
       setAuthLoading(false)
       return
     }
@@ -457,6 +458,7 @@ useEffect(() => {
           platform = "telegram"
           const tgUser = tg.initDataUnsafe.user
           document.cookie = `fx_tg_id=${tgUser.id}; path=/; max-age=31536000`
+          tg.ready()
         }
       } catch { }
 
@@ -599,39 +601,45 @@ useEffect(() => {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-async function logoutAllWebDevices() {
+  function logoutCurrentSession() {
 
-  if (!email) {
-    console.error("Logout-all attempted without email")
-    return
-  }
-
-  try {
-
-    const res = await fetch("/api/logout-all-web", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email })
-    })
-
-    if (!res.ok) {
-      console.error("Logout-all failed with status:", res.status)
+    if (typeof window !== "undefined" && window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage("LOGOUT_REQUEST")
       return
     }
 
-  } catch (e) {
-    console.error("Logout-all network error:", e)
-    return
+    localStorage.clear()
+    window.location.reload()
   }
 
-  // Clear local session
-  localStorage.clear()
+  async function logoutAllWebDevices() {
 
-  // Reload app (forces clean auth flow)
-  window.location.reload()
-}
+    if (!email) {
+      console.error("Logout-all attempted without email")
+      return
+    }
+
+    try {
+      const res = await fetch("/api/logout-all-web", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      })
+
+      if (!res.ok) {
+        console.error("Logout-all failed with status:", res.status)
+        return
+      }
+
+    } catch (e) {
+      console.error("Logout-all network error:", e)
+      return
+    }
+
+    logoutCurrentSession()
+  }
   const pairsData = useMemo(() => {
     return instrumentOrder.map((pair) => {
       const signal = uiSignals?.[pair]
@@ -950,6 +958,7 @@ async function logoutAllWebDevices() {
                   : null
               }
               version={`v${pkg.version}`}
+              onLogout={logoutCurrentSession}   // 👈 ADD THIS
             />
           </div>
         )}
@@ -1067,10 +1076,7 @@ async function logoutAllWebDevices() {
               </button>
 
               <button
-                onClick={() => {
-                  localStorage.clear()
-                  window.location.reload()
-                }}
+                onClick={logoutCurrentSession}
                 className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded"
               >
                 Logout
