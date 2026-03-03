@@ -462,12 +462,34 @@ export default function Page() {
         }
       } catch { }
 
-      let id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
+let id: string | null = null
 
-      if (!id) {
-        id = window.crypto.randomUUID()
-        localStorage.setItem("fxhedz_device_id", id)
-      }
+// ===============================
+// TELEGRAM DEVICE ID OVERRIDE
+// ===============================
+if (platform === "telegram") {
+  try {
+    const tg = (window as any)?.Telegram?.WebApp
+    const tgUserId = tg?.initDataUnsafe?.user?.id
+
+    if (tgUserId) {
+      id = String(tgUserId)
+      localStorage.setItem("fxhedz_device_id", id)
+    }
+  } catch {}
+}
+
+// ===============================
+// FALLBACK (WEB / ANDROID URL)
+// ===============================
+if (!id) {
+  id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
+
+  if (!id) {
+    id = window.crypto.randomUUID()
+    localStorage.setItem("fxhedz_device_id", id)
+  }
+}
 
       document.cookie = `fx_device=${id}; path=/; max-age=31536000`
       document.cookie = `fx_platform=${platform}; path=/; max-age=31536000`
