@@ -588,12 +588,21 @@ useEffect(() => {
   }
 async function logoutAllWebDevices() {
   try {
+
+    const storedEmail =
+      email ||
+      localStorage.getItem("email")
+
+    if (!storedEmail) return
+
     await fetch("/api/logout-all-web", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: storedEmail
+      })
     })
+
   } catch (e) {
     console.error("Logout all failed", e)
   }

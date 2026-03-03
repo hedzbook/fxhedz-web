@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { verifyAccessToken } from "@/lib/jwt"
 
 export async function POST(req: NextRequest) {
 
-  const jwtUser = verifyAccessToken(req)
+  const body = await req.json()
+  const email = (body?.email || "").toLowerCase().trim()
 
-  if (!jwtUser || typeof jwtUser !== "object") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!email) {
+    return NextResponse.json({ error: "Email required" }, { status: 400 })
   }
-
-  const email = (jwtUser as any).email
 
   await fetch(process.env.GAS_AUTH_URL!, {
     method: "POST",
