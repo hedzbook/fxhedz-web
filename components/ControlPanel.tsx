@@ -17,7 +17,7 @@ const PLAN = {
     label: "LIVE+ Monthly",
     price: "$9.99 / month",
     razorpayLink: "https://rzp.io/l/fxhedz_monthly", // replace with real link
-    playSku: "fxhedz_liveplus_monthly"
+    playSku: "fxhedz_liveplus"
 }
 
 export default function ControlPanel({
