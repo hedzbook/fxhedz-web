@@ -39,6 +39,21 @@ function PairCard({
   const [liveOrders, setLiveOrders] = useState<any[]>(orders ?? [])
   const [pnlCache, setPnlCache] = useState<Record<string, number>>({})
   const expanded = !!open
+  const [frozenExitPrice, setFrozenExitPrice] = useState<number | null>(null)
+
+const prevDirRef = React.useRef<TradeDirection>("--")
+
+useEffect(() => {
+  if (prevDirRef.current !== "EXIT" && liveDir === "EXIT" && signal?.price) {
+    setFrozenExitPrice(Number(signal.price))
+  }
+
+  if (prevDirRef.current === "EXIT" && liveDir !== "EXIT") {
+    setFrozenExitPrice(null)
+  }
+
+  prevDirRef.current = liveDir
+}, [liveDir, signal?.price])
 
   useEffect(() => setLiveDir(dir), [dir])
   useEffect(() => setLiveOrders(orders ?? []), [orders])
@@ -105,7 +120,13 @@ py-[clamp(2px,0.6vh,6px)]
 
             {/* ROW 2 â€” LOTS + B/S COUNT */}
             <div className="mt-[clamp(1px,0.4vw,6px)] flex justify-between items-center text-[clamp(9px,5.5px+1.0937vw,19.5px)] leading-none">
-              <div className="text-neutral-400">
+              <div
+                className={
+                  liveDir === "EXIT"
+                    ? "text-neutral-500"
+                    : "text-white"
+                }
+              >
                 {signal?.lots ?? "-"} LOTS
               </div>
 
@@ -118,10 +139,11 @@ py-[clamp(2px,0.6vh,6px)]
 
             {/* ROW 3 â€” TRADE BAR */}
             <div className="mt-[clamp(1px,0.8vw,10px)]">
-              <InlineTradeStrip
-                signal={signal}
-                direction={liveDir}
-              />
+<InlineTradeStrip
+  signal={signal}
+  direction={liveDir}
+  frozenExitPrice={frozenExitPrice}
+/>
             </div>
 
           </div>
@@ -353,7 +375,15 @@ function Metric({ label, value }: any) {
    INLINE STRIP (MIN MODE)
 ======================================================= */
 
-function InlineTradeStrip({ signal, direction }: any) {
+function InlineTradeStrip({
+  signal,
+  direction,
+  frozenExitPrice
+}: {
+  signal: any
+  direction?: TradeDirection
+  frozenExitPrice?: number | null
+}) {
   if (!signal) return null
 
   const sl = Number(signal?.sl)
@@ -361,49 +391,50 @@ function InlineTradeStrip({ signal, direction }: any) {
   const entry = Number(signal?.entry)
   const price = Number(signal?.price || entry)
 
-if (direction === "EXIT") {
+  const labelColor =
+    direction === "EXIT"
+      ? "text-neutral-500"
+      : "text-white"
 
-  const exitPrice = signal?.price ?? "-"
+  if (direction === "EXIT") {
 
-  return (
-    <div className="flex flex-col w-full gap-[clamp(1px,0.5vw,6px)]">
+    const exitPrice = frozenExitPrice ?? "-"
 
-      <div className="relative w-full h-[clamp(2px,0.35vw,6px)]">
+    return (
+      <div className="flex flex-col w-full gap-[clamp(1px,0.5vw,6px)]">
 
-        <div className="absolute inset-0 bg-neutral-800 rounded-full" />
+        <div className="relative w-full h-[clamp(2px,0.35vw,6px)]">
 
-<div className="absolute left-0 h-full w-1/2 bg-red-500/30" />
-<div className="absolute right-0 h-full w-1/2 bg-green-500/30" />
+          <div className="absolute inset-0 bg-neutral-800 rounded-full" />
 
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full border border-neutral-500 bg-black" />
+          <div className="absolute left-0 h-full w-1/2 bg-red-500/30" />
+          <div className="absolute right-0 h-full w-1/2 bg-green-500/30" />
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full bg-neutral-500" />
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full border border-neutral-500 bg-black" />
 
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full border border-neutral-500 bg-black" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full bg-neutral-500" />
+
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full border border-neutral-500 bg-black" />
+
+        </div>
+
+        <div className={`flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] ${labelColor}`}>
+          <span>{exitPrice}</span>
+          <span>{exitPrice}</span>
+          <span>{exitPrice}</span>
+        </div>
 
       </div>
+    )
+  }
 
-      <div className="flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-400">
-        <span>{exitPrice}</span>
-        <span>{exitPrice}</span>
-        <span>{exitPrice}</span>
-      </div>
-
-    </div>
-  )
-}
-
-  if (direction !== "EXIT" && (!signal?.entry || !sl || !tp)) return null
+  if (!signal?.entry || !sl || !tp) return null
 
   const isHedged = direction === "HEDGED"
 
   let pricePercent = 50
 
-  if (direction === "LIVE+") {
-    pricePercent = 50
-  }
-
-  if (!isHedged && direction !== "LIVE+") {
+  if (!isHedged) {
     if (direction === "BUY") {
       const leftRange = Math.abs(entry - sl)
       const rightRange = Math.abs(tp - entry)
@@ -518,7 +549,7 @@ if (direction === "EXIT") {
         </div>
       </div>
 
-      <div className="flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-400">
+      <div className={`flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] ${labelColor}`}>
         <span>{sl}</span>
         <span>{entry}</span>
         <span>{tp}</span>
@@ -536,7 +567,7 @@ function TradeBar({
   direction
 }: {
   signal: any
-  direction?: "BUY" | "SELL" | "HEDGED" | "EXIT" | "--"
+  direction?: TradeDirection
 }) {
 
   const sl = Number(signal?.sl)
@@ -578,6 +609,8 @@ function TradeBar({
     direction === "BUY"
       ? price >= entry
       : price <= entry
+
+  const labelColor = "text-white"
 
   return (
     <div className="mt-3 select-none">
@@ -647,7 +680,7 @@ function TradeBar({
 
       </div>
 
-      <div className="flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-400 mt-1">
+      <div className={`flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] ${labelColor}`}>
         <span>{sl}</span>
         <span>{entry}</span>
         <span>{tp}</span>
