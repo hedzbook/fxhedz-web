@@ -11,6 +11,13 @@ export async function POST(req: NextRequest) {
   const deviceId = body.deviceId
   const telegramChatId = body.telegram_chat_id || ""
 
+  if (telegramChatId) {
+  return NextResponse.json({
+    debug: "TELEGRAM CHAT ID RECEIVED",
+    value: telegramChatId
+  })
+}
+
   if (!idToken || !deviceId) {
     return NextResponse.json({ error: "invalid_input" }, { status: 400 })
   }

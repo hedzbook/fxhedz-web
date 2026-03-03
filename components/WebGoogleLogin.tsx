@@ -27,81 +27,82 @@ export default function WebGoogleLogin() {
 
   }, [])
 
-  async function completeLogin(idToken: string) {
+async function completeLogin(idToken: string) {
 
-let deviceId: string | null = null
+  let deviceId =
+    localStorage.getItem("fxhedz_device_id")
 
-const tg = (window as any)?.Telegram?.WebApp
+  if (!deviceId) {
+    deviceId = crypto.randomUUID()
+    localStorage.setItem("fxhedz_device_id", deviceId)
+  }
 
-if (tg) {
-  try {
-    tg.ready()
+  // 🔥 Retrieve stored Telegram ID
+  const telegramChatId =
+    localStorage.getItem("fx_tg_id") || ""
 
-    const tgUserId = tg.initDataUnsafe?.user?.id
+  alert("TELEGRAM ID: " + telegramChatId)
 
-    if (tgUserId) {
-      deviceId = "tg_" + tgUserId
-    }
-  } catch {}
-}
-
-if (!deviceId) {
-  deviceId =
-    localStorage.getItem("fxhedz_device_id") ||
-    crypto.randomUUID()
-
-  localStorage.setItem("fxhedz_device_id", deviceId)
-}
-
-    const res = await fetch("/api/web-auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idToken, deviceId })
+  const res = await fetch("/api/web-auth", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idToken,
+      deviceId,
+      telegram_chat_id: telegramChatId
     })
+  })
 
-    const data = await res.json()
+  const data = await res.json()
 
-    if (res.status === 403 && data.device_limit) {
-      localStorage.setItem("email", data.email)
-      localStorage.setItem("fxhedz_device_id", deviceId)
-
-      window.dispatchEvent(
-        new CustomEvent("fxhedz-device-limit", {
-          detail: { count: data.device_count }
-        })
-      )
-
-      return
-    }
-
-    localStorage.setItem("refreshToken", data.refreshToken)
+  if (res.status === 403 && data.device_limit) {
     localStorage.setItem("email", data.email)
     localStorage.setItem("fxhedz_device_id", deviceId)
 
-    window.location.reload()
+    window.dispatchEvent(
+      new CustomEvent("fxhedz-device-limit", {
+        detail: { count: data.device_count }
+      })
+    )
+    return
   }
+
+  localStorage.setItem("refreshToken", data.refreshToken)
+  localStorage.setItem("email", data.email)
+
+  window.location.reload()
+}
 
   async function handleCredentialResponse(response: any) {
     await completeLogin(response.credential)
   }
 
-  function startTelegramGoogleFlow() {
+function startTelegramGoogleFlow() {
 
-    const redirectUri =
-      window.location.origin + "/oauth-callback"
+  try {
+    const tg = (window as any)?.Telegram?.WebApp
+    const tgUserId = tg?.initDataUnsafe?.user?.id
 
-    const url =
-      "https://accounts.google.com/o/oauth2/v2/auth?" +
-      new URLSearchParams({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-        redirect_uri: redirectUri,
-        response_type: "id_token",
-        scope: "openid email profile",
-        nonce: crypto.randomUUID()
-      }).toString()
+    if (tgUserId) {
+      localStorage.setItem("fx_tg_id", String(tgUserId))
+    }
+  } catch {}
 
-    window.location.href = url
-  }
+  const redirectUri =
+    window.location.origin + "/oauth-callback"
+
+  const url =
+    "https://accounts.google.com/o/oauth2/v2/auth?" +
+    new URLSearchParams({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+      redirect_uri: redirectUri,
+      response_type: "id_token",
+      scope: "openid email profile",
+      nonce: crypto.randomUUID()
+    }).toString()
+
+  window.location.href = url
+}
 
   if (isTelegram) {
     return (
