@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
 import { verifyAccessToken } from "@/lib/jwt"
 
 const GAS_BASE =
@@ -8,18 +6,20 @@ const GAS_BASE =
 
 export async function GET(req: NextRequest) {
 
+  // ============================
+  // REQUIRE JWT
+  // ============================
+
   const jwtUser = verifyAccessToken(req)
 
-  let email: string | null = null
-
-  if (jwtUser && typeof jwtUser === "object") {
-    email = (jwtUser as any).email
+  if (!jwtUser || typeof jwtUser !== "object") {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    )
   }
 
-  if (!email) {
-    const session = await getServerSession(authOptions)
-    email = session?.user?.email || null
-  }
+  const email = (jwtUser as any).email
 
   if (!email) {
     return NextResponse.json(
@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+
     const pair = req.nextUrl.searchParams.get("pair")
 
     const url = pair
@@ -36,7 +37,16 @@ export async function GET(req: NextRequest) {
       : `${GAS_BASE}?secret=${process.env.GAS_SECRET}&email=${encodeURIComponent(email)}`
 
     const res = await fetch(url, { cache: "no-store" })
+
+    if (!res.ok) {
+      throw new Error("GAS failed")
+    }
+
     const json = await res.json()
+
+    // ============================
+    // SINGLE PAIR RESPONSE
+    // ============================
 
     if (pair && json?.signals?.[pair]) {
       return NextResponse.json({
@@ -48,13 +58,15 @@ export async function GET(req: NextRequest) {
         active: json.active,
         plan: json.plan,
         expiry: json.expiry,
-
-        // 🔥 ADD THESE:
         appInstruments: json.appInstruments || [],
         webInstruments: json.webInstruments || [],
         telegramInstruments: json.telegramInstruments || []
       })
     }
+
+    // ============================
+    // FULL RESPONSE
+    // ============================
 
     return NextResponse.json({
       ...json,
