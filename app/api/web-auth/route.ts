@@ -43,25 +43,20 @@ export async function POST(req: NextRequest) {
 
   const gasData = await gasRes.json()
   if (!gasRes.ok) {
-  return NextResponse.json(
-    { error: "gas_error" },
-    { status: 500 }
-  )
-}
-if (!gasRes.ok) {
-  return NextResponse.json(
-    { error: "gas_error" },
-    { status: 500 }
-  )
-}
+    return NextResponse.json(
+      { error: "gas_error" },
+      { status: 500 }
+    )
+  }
   if (gasData.device_limit) {
     return NextResponse.json({
       device_limit: true,
-      device_count: gasData.device_count
+      device_count: gasData.device_count,
+      email
     }, { status: 403 })
   }
 
- const accessToken = createAccessToken({ email, deviceId })
+  const accessToken = createAccessToken({ email, deviceId })
 
   return NextResponse.json({
     accessToken,

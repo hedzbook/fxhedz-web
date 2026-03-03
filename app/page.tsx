@@ -590,30 +590,36 @@ export default function Page() {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-  async function logoutAllWebDevices() {
+async function logoutAllWebDevices() {
 
-    if (!email) {
-      console.error("No email available")
-      return
-    }
+  console.log("Logout button clicked")
 
-    try {
-      await fetch("/api/logout-all-web", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email
-        })
-      })
-    } catch (e) {
-      console.error("Logout all failed", e)
-    }
-
-    localStorage.clear()
-    window.location.reload()
+  if (!email) {
+    console.log("Email state:", email)
+    alert("No email in state")
+    return
   }
+
+  console.log("Sending request with email:", email)
+
+  try {
+
+    const res = await fetch("/api/logout-all-web", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email })
+    })
+
+    console.log("Response status:", res.status)
+
+  } catch (e) {
+    console.error("Fetch failed", e)
+  }
+
+  alert("Completed request")
+}
   const pairsData = useMemo(() => {
     return instrumentOrder.map((pair) => {
       const signal = uiSignals?.[pair]

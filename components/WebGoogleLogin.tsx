@@ -39,14 +39,20 @@ export default function WebGoogleLogin() {
 
         const data = await res.json()
 
-        if (res.status === 403 && data.device_limit) {
-            window.dispatchEvent(
-                new CustomEvent("fxhedz-device-limit", {
-                    detail: { count: data.device_count }
-                })
-            )
-            return
-        }
+if (res.status === 403 && data.device_limit) {
+
+    // Persist identity even if blocked
+    localStorage.setItem("email", data.email)
+    localStorage.setItem("fxhedz_device_id", deviceId)
+
+    window.dispatchEvent(
+        new CustomEvent("fxhedz-device-limit", {
+            detail: { count: data.device_count }
+        })
+    )
+
+    return
+}
 
         localStorage.setItem("refreshToken", data.refreshToken)
         localStorage.setItem("email", data.email)
