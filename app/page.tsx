@@ -608,7 +608,11 @@ async function logoutCurrentSession() {
     !!(window as any).ReactNativeWebView
 
   const deviceId = localStorage.getItem("fxhedz_device_id")
-  const storedEmail = localStorage.getItem("email")
+
+  const storedEmail =
+    localStorage.getItem("email") ||
+    (window as any).__NATIVE_EMAIL__ ||
+    null
 
   // Android handled natively
   if (isAndroid) {
@@ -617,7 +621,6 @@ async function logoutCurrentSession() {
   }
 
   if (storedEmail && deviceId) {
-
     try {
       await fetch("/api/logout-device", {
         method: "POST",
