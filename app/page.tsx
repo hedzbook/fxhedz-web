@@ -94,19 +94,28 @@ export default function Page() {
     count?: number
   }>({ active: false })
 
-  useEffect(() => {
-    function handler(e: any) {
-      setDeviceLimit({
-        active: true,
-        count: e.detail?.count
-      })
+useEffect(() => {
+
+  function handler(e: any) {
+
+    const storedEmail = localStorage.getItem("email")
+
+    if (storedEmail) {
+      setEmail(storedEmail)
     }
 
-    window.addEventListener("fxhedz-device-limit", handler)
+    setDeviceLimit({
+      active: true,
+      count: e.detail?.count
+    })
+  }
 
-    return () =>
-      window.removeEventListener("fxhedz-device-limit", handler)
-  }, [])
+  window.addEventListener("fxhedz-device-limit", handler)
+
+  return () =>
+    window.removeEventListener("fxhedz-device-limit", handler)
+
+}, [])
 
   const isAndroid =
     typeof window !== "undefined" &&
@@ -592,15 +601,10 @@ export default function Page() {
   }
 async function logoutAllWebDevices() {
 
-  console.log("Logout button clicked")
-
   if (!email) {
-    console.log("Email state:", email)
-    alert("No email in state")
+    console.error("Logout-all attempted without email")
     return
   }
-
-  console.log("Sending request with email:", email)
 
   try {
 
@@ -612,13 +616,21 @@ async function logoutAllWebDevices() {
       body: JSON.stringify({ email })
     })
 
-    console.log("Response status:", res.status)
+    if (!res.ok) {
+      console.error("Logout-all failed with status:", res.status)
+      return
+    }
 
   } catch (e) {
-    console.error("Fetch failed", e)
+    console.error("Logout-all network error:", e)
+    return
   }
 
-  alert("Completed request")
+  // Clear local session
+  localStorage.clear()
+
+  // Reload app (forces clean auth flow)
+  window.location.reload()
 }
   const pairsData = useMemo(() => {
     return instrumentOrder.map((pair) => {
