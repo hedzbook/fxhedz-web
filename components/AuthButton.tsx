@@ -40,7 +40,7 @@ const hasNativeToken =
         }}
         className="
           flex items-center justify-center gap-3 
-          w-full max-w-[clamp(140px,65vw,200px)]
+          w-full max-w-[clamp(140px,65vw,240px)]
 py-[clamp(6px,1.8vh,10px)]
 px-[clamp(10px,3vw,18px)]
 text-[clamp(9px,5.5px+1.0937vw,19.5px)]

@@ -50,7 +50,7 @@ function Panel({ children }: any) {
   return (
     <div
       className="
-        w-full max-w-[clamp(220px,80vw,340px)]
+        w-full max-w-[clamp(220px,80vw,370px)]
         px-[clamp(12px,3vw,22px)]
         py-[clamp(12px,3vh,24px)]
         bg-[#0d0d0d]

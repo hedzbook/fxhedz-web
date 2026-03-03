@@ -53,8 +53,8 @@ function PairCard({
   }, [liveOrders])
 
   return (
-<div
-  className={`
+    <div
+      className={`
     h-full
     text-[clamp(11px,6.66px+1.354vw,24px)]
     relative
@@ -64,7 +64,7 @@ function PairCard({
     ${viewMode === "MIN" && !expanded ? "justify-center" : ""}
     ${expanded ? "z-20 shadow-xl" : "z-0"}
   `}
->
+    >
 
       {/* ================= HEADER ================== */}
       <div
@@ -354,14 +354,46 @@ function Metric({ label, value }: any) {
 ======================================================= */
 
 function InlineTradeStrip({ signal, direction }: any) {
-  if (!signal?.entry || direction === "EXIT") return null
+  if (!signal) return null
 
   const sl = Number(signal?.sl)
   const tp = Number(signal?.tp)
   const entry = Number(signal?.entry)
   const price = Number(signal?.price || entry)
 
-  if (!sl || !tp) return null
+if (direction === "EXIT") {
+
+  const exitPrice = signal?.price ?? "-"
+
+  return (
+    <div className="flex flex-col w-full gap-[clamp(1px,0.5vw,6px)]">
+
+      <div className="relative w-full h-[clamp(2px,0.35vw,6px)]">
+
+        <div className="absolute inset-0 bg-neutral-800 rounded-full" />
+
+<div className="absolute left-0 h-full w-1/2 bg-red-500/30" />
+<div className="absolute right-0 h-full w-1/2 bg-green-500/30" />
+
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full border border-neutral-500 bg-black" />
+
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full bg-neutral-500" />
+
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[clamp(6px,1.3vw,28px)] h-[clamp(6px,1.3vw,28px)] rounded-full border border-neutral-500 bg-black" />
+
+      </div>
+
+      <div className="flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-400">
+        <span>{exitPrice}</span>
+        <span>{exitPrice}</span>
+        <span>{exitPrice}</span>
+      </div>
+
+    </div>
+  )
+}
+
+  if (direction !== "EXIT" && (!signal?.entry || !sl || !tp)) return null
 
   const isHedged = direction === "HEDGED"
 
