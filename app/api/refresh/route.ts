@@ -39,16 +39,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (gasData.device_limit) {
-      return NextResponse.json(
-        {
-          device_limit: true,
-          device_count: gasData.device_count
-        },
-        { status: 403 }
-      )
-    }
-
     if (!gasData.valid) {
       return NextResponse.json(
         { error: "Invalid refresh token" },
