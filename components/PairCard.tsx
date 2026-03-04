@@ -4,31 +4,6 @@
 import React, { useState, useEffect } from "react"
 import GlobalLightChart from "./GlobalLightChart"
 
-function PairCardSkeleton() {
-  return (
-    <div className="h-full border border-neutral-800 bg-neutral-900 flex flex-col justify-center px-3 animate-pulse">
-
-      {/* ROW 1 */}
-      <div className="flex justify-between items-center mb-[clamp(2px,0.5vw,6px)]">
-        <div className="h-[clamp(12px,1.3vw,20px)] w-[clamp(40px,5vw,90px)] bg-neutral-800 rounded"></div>
-        <div className="h-[clamp(12px,1.3vw,20px)] w-[clamp(30px,4vw,70px)] bg-neutral-800 rounded"></div>
-      </div>
-
-      {/* ROW 2 */}
-      <div className="flex justify-between items-center mb-[clamp(2px,0.5vw,6px)]">
-        <div className="h-[clamp(10px,1vw,18px)] w-[clamp(60px,6vw,110px)] bg-neutral-800 rounded"></div>
-        <div className="h-[clamp(10px,1vw,18px)] w-[clamp(40px,5vw,80px)] bg-neutral-800 rounded"></div>
-      </div>
-
-      {/* TRADE BAR */}
-      <div className="mt-[clamp(1px,0.6vw,8px)]">
-        <div className="h-[clamp(2px,0.35vw,6px)] w-full bg-neutral-800 rounded"></div>
-      </div>
-
-    </div>
-  )
-}
-
 type TradeDirection = "BUY" | "SELL" | "HEDGED" | "EXIT" | "--"
 type ViewMode = "MIN" | "MAX"
 
@@ -56,13 +31,38 @@ function PairCard({
   history,
   orders,
   performance,
-  notes,
-  isGuest
+  notes
 }: Props) {
 
-if (!signal && !isGuest) {
-  return <PairCardSkeleton />
+// ================= SKELETON LOADING =================
+if (!signal || direction === "--") {
+  return (
+    <div
+      className="
+        h-full
+        border border-neutral-800
+        bg-neutral-900
+        animate-pulse
+        flex flex-col
+        justify-center
+        px-3
+      "
+    >
+      <div className="flex justify-between items-center mb-2">
+        <div className="h-4 w-16 bg-neutral-800 rounded"></div>
+        <div className="h-4 w-12 bg-neutral-800 rounded"></div>
+      </div>
+
+      <div className="flex justify-between items-center mb-2">
+        <div className="h-3 w-20 bg-neutral-800 rounded"></div>
+        <div className="h-3 w-16 bg-neutral-800 rounded"></div>
+      </div>
+
+      <div className="h-2 w-full bg-neutral-800 rounded"></div>
+    </div>
+  )
 }
+
   const dir: TradeDirection = direction ?? "--"
   const [liveDir, setLiveDir] = useState<TradeDirection>(dir)
   const [tab, setTab] = useState<"market" | "updates" | "history" | "performance">("market")
