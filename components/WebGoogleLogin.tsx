@@ -88,10 +88,13 @@ if (res.status === 403 && data.device_limit) {
     localStorage.removeItem("fx_device_limit")
     localStorage.removeItem("fx_device_limit_count")
 
-    localStorage.setItem("refreshToken", data.refreshToken)
-    localStorage.setItem("email", data.email)
+localStorage.setItem("refreshToken", data.refreshToken)
+localStorage.setItem("email", data.email)
 
-    window.location.reload()
+// trigger loading UI immediately
+localStorage.setItem("fxhedz_loading", "true")
+
+window.location.reload()
   }
 
   async function handleCredentialResponse(response: any) {

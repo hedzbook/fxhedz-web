@@ -64,7 +64,6 @@ type SubscriptionMeta = {
 
 export default function Page() {
 
-  const [signalsLoading, setSignalsLoading] = useState(true)
   const [appReady, setAppReady] = useState(false)
   const dummySignals = useMemo(() => generateDummySignals(), [])
   const [signals, setSignals] = useState<any>(dummySignals)
@@ -137,30 +136,33 @@ export default function Page() {
   const [refreshToken, setRefreshToken] = useState<string | null>(null)
   const [email, setEmail] = useState<string | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
-
+  const [signalsLoading, setSignalsLoading] = useState(
+    typeof window !== "undefined" &&
+    localStorage.getItem("fxhedz_loading") === "true"
+  )
   const [deviceLimit, setDeviceLimit] = useState<{
     active: boolean
     count?: number
   }>({ active: false })
 
-useEffect(() => {
+  useEffect(() => {
 
-  const limit = localStorage.getItem("fx_device_limit")
+    const limit = localStorage.getItem("fx_device_limit")
 
-  if (limit === "true") {
+    if (limit === "true") {
 
-    const count = localStorage.getItem("fx_device_limit_count")
+      const count = localStorage.getItem("fx_device_limit_count")
 
-    setDeviceLimit({
-      active: true,
-      count: count ? Number(count) : undefined
-    })
+      setDeviceLimit({
+        active: true,
+        count: count ? Number(count) : undefined
+      })
 
-  }
+    }
 
-  setAppReady(true)
+    setAppReady(true)
 
-}, [])
+  }, [])
 
   useEffect(() => {
 
@@ -472,28 +474,31 @@ useEffect(() => {
 
     if (subActive === null) return
 
-async function loadSignals() {
+    async function loadSignals() {
 
-  try {
+      try {
 
-    const res = await fetch(SIGNAL_API, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    })
+        const res = await fetch(SIGNAL_API, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        })
 
-    if (!res.ok) return
+        if (!res.ok) return
 
-    const json = await res.json()
-    const incoming = json?.signals ?? {}
+        const json = await res.json()
+        const incoming = json?.signals ?? {}
 
-    setSignals(incoming)
+        setSignals(incoming)
 
-    // signals ready
-    setSignalsLoading(false)
+        setSignalsLoading(false)
+        localStorage.removeItem("fxhedz_loading")
 
-  } catch { }
-}
+        // signals ready
+        setSignalsLoading(false)
+
+      } catch { }
+    }
 
     loadSignals()
     const interval = setInterval(loadSignals, 2500)
@@ -1021,14 +1026,16 @@ async function loadSignals() {
                         (isLive && isLivePair)
                       )
 
-const displaySignal =
-  signalsLoading
-    ? null
-    : !isAuthenticated
-      ? dummySignal
-      : canAccess
-        ? (realSignal ?? dummySignal)
-        : dummySignal
+                    const displaySignal =
+                      !isAuthenticated
+                        ? dummySignal
+                        : !subscriptionReady
+                          ? dummySignal
+                          : signalsLoading
+                            ? null
+                            : canAccess
+                              ? (realSignal ?? dummySignal)
+                              : dummySignal
 
                     const displayDirection =
                       !isAuthenticated
@@ -1230,12 +1237,12 @@ const displaySignal =
         </div>
 
       </main>
-{appReady && !authLoading && (
-  <AccessOverlay
-    sessionExists={sessionExists}
-    deviceLimited={deviceLimit.active}
-  />
-)}
+      {appReady && !authLoading && (
+        <AccessOverlay
+          sessionExists={sessionExists}
+          deviceLimited={deviceLimit.active}
+        />
+      )}
     </div>
   )
 }
