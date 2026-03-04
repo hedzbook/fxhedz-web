@@ -55,26 +55,23 @@ export default function WebGoogleLogin() {
     // ===============================
     // DEVICE LIMIT
     // ===============================
-    if (res.status === 403 && data?.device_limit) {
+if (res.status === 403 && data.device_limit) {
 
-      localStorage.setItem("email", data.email)
-      localStorage.setItem("fxhedz_device_id", deviceId)
+  localStorage.setItem("email", data.email)
+  localStorage.setItem("fxhedz_device_id", deviceId)
 
-      // Persist device limit across reload
-      localStorage.setItem("fx_device_limit", "true")
-      localStorage.setItem(
-        "fx_device_limit_count",
-        String(data.device_count || 0)
-      )
+  // persist device limit
+  localStorage.setItem("fx_device_limit", "true")
+  localStorage.setItem("fx_device_limit_count", String(data.device_count))
 
-      window.dispatchEvent(
-        new CustomEvent("fxhedz-device-limit", {
-          detail: { count: data.device_count }
-        })
-      )
+  window.dispatchEvent(
+    new CustomEvent("fxhedz-device-limit", {
+      detail: { count: data.device_count }
+    })
+  )
 
-      return
-    }
+  return
+}
 
     // ===============================
     // ANY OTHER ERROR
