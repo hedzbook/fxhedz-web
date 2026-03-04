@@ -127,42 +127,63 @@ export default function Page() {
     typeof window !== "undefined" &&
     (window as any).__HAS_NATIVE_TOKEN__ === true
 
-  useEffect(() => {
+useEffect(() => {
 
-    const isTelegram =
-      typeof window !== "undefined" &&
-      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+  // ===============================
+  // TELEGRAM AUTH (REAL AUTH, NOT BYPASS)
+  // ===============================
+  const tgUserId =
+    typeof window !== "undefined" &&
+    (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-    // ===============================
-    // 🔥 TELEGRAM BYPASS (ADD THIS)
-    // ===============================
-    if (isTelegram) {
+  if (tgUserId) {
 
-      const tg = (window as any).Telegram.WebApp
-      const tgUser = tg.initDataUnsafe.user
+    async function telegramAuth() {
+      try {
 
-      // Store Telegram ID as device ID
-      localStorage.setItem("fxhedz_device_id", String(tgUser.id))
+        const res = await fetch("/api/native-auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            telegram_chat_id: String(tgUserId),
+            platform: "telegram"
+          })
+        })
 
-      // Set fake refresh token so overlay disappears
-      setRefreshToken("telegram-session")
+        if (!res.ok) {
+          setAuthLoading(false)
+          return
+        }
 
-      // Telegram does not use JWT access token
-      setAccessToken("telegram-session")
+        const data = await res.json()
 
-      // Mark auth as complete
+        // Mark as authenticated
+        setRefreshToken("telegram-session")
+        setAccessToken("telegram-session")
+
+        // Optional: store resolved email if backend returns it
+        if (data?.email) {
+          setEmail(data.email)
+        }
+
+      } catch (e) {
+        console.log("Telegram auth failed", e)
+      }
+
       setAuthLoading(false)
-
-      return
     }
 
-    // ===============================
-    // ANDROID
-    // ===============================
-    if (isAndroid) {
-      setAuthLoading(false)
-      return
-    }
+    telegramAuth()
+    return
+  }
+
+  // ===============================
+  // ANDROID
+  // ===============================
+  if (isAndroid) {
+    setAuthLoading(false)
+    return
+  }
 
     // ===============================
     // NORMAL WEB FLOW
