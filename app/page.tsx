@@ -559,6 +559,7 @@ if (!id) {
         })
 
         setSubActive(Boolean(data?.active))
+        setRefreshToken("telegram_session")
 
       } catch { }
     }
