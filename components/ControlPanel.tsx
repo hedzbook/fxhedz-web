@@ -128,9 +128,26 @@ export default function ControlPanel({
 
                 ) : (
 
-                    <div className="w-full py-3 bg-emerald-600 rounded-md font-semibold text-center">
-                        LIVE+ ACTIVE
-                    </div>
+                    <>
+                        <div className="w-full py-3 bg-emerald-600 rounded-md font-semibold text-center">
+                            LIVE+ ACTIVE
+                        </div>
+
+                        {accessMeta?.expiry && (
+                            <>
+                                <Row
+                                    label="Expiry"
+                                    value={new Date(accessMeta.expiry).toLocaleDateString()}
+                                />
+
+                                <Row
+                                    label="Days Left"
+                                    value={daysLeft?.toString() ?? "0"}
+                                    highlight={daysLeft && daysLeft <= 3 ? "red" : "green"}
+                                />
+                            </>
+                        )}
+                    </>
 
                 )}
 
@@ -149,16 +166,6 @@ export default function ControlPanel({
                 <Row label="Last Sync" value="Live" />
 
             </Block>
-
-            {/* ================= LOGOUT ================= */}
-            <div className="mt-auto pt-4 border-t border-neutral-800">
-                <button
-                    onClick={onLogout}
-                    className="w-full text-red-500 font-semibold hover:text-red-400 transition-colors"
-                >
-                    Sign Out
-                </button>
-            </div>
 
             {/* ================= SUPPORT BLOCK ================= */}
             <Block title="Support">
