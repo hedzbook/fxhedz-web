@@ -322,8 +322,10 @@ export default function Page() {
         ? hasNativeToken
         : !!accessToken
 
-  const sessionExists =
-    isAndroid
+const sessionExists =
+  isTelegram
+    ? true
+    : isAndroid
       ? hasNativeToken
       : !!refreshToken
   const [accessMeta, setAccessMeta] =
