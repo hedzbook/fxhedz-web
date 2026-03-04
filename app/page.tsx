@@ -241,21 +241,6 @@ export default function Page() {
           return
         }
 
-        if (res.status === 403) {
-          const data = await res.json()
-
-          setEmail(storedEmail)
-          setRefreshToken(storedRefresh)
-
-          setDeviceLimit({
-            active: true,
-            count: data.device_count
-          })
-
-          setAuthLoading(false)
-          return
-        }
-
         const data = await res.json()
 
         setAccessToken(data.accessToken)

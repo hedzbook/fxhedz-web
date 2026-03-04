@@ -88,8 +88,8 @@ export default function ControlPanel({
                     label="Email"
                     value={
                         isAndroid
-                            ? nativeEmail || "â€”"
-                            : localStorage.getItem("email") || "â€”"
+                            ? nativeEmail || "—"
+                            : localStorage.getItem("email") || "—"
                     }
                 />
 
@@ -159,7 +159,7 @@ export default function ControlPanel({
                     Sign Out
                 </button>
             </div>
-            
+
             {/* ================= SUPPORT BLOCK ================= */}
             <Block title="Support">
 
