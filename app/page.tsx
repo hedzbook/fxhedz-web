@@ -132,32 +132,32 @@ export default function Page() {
     // ===============================
     // 🔥 TELEGRAM SESSION RESTORE
     // ===============================
-const tgUserId =
-  typeof window !== "undefined" &&
-  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+    const tgUserId =
+      typeof window !== "undefined" &&
+      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-const tgLoggedOut =
-  typeof window !== "undefined" &&
-  localStorage.getItem("tg_logged_out") === "1"
+    const tgLoggedOut =
+      typeof window !== "undefined" &&
+      localStorage.getItem("tg_logged_out") === "1"
 
-if (tgUserId && !tgLoggedOut) {
+    if (tgUserId && !tgLoggedOut) {
 
-  async function bootstrapTelegram() {
+      async function bootstrapTelegram() {
 
-    try {
+        try {
 
-setAuthLoading(false)
-      
-    } catch (e) {
-      console.log("Telegram bootstrap failed", e)
+          setAuthLoading(false)
+
+        } catch (e) {
+          console.log("Telegram bootstrap failed", e)
+        }
+
+        setAuthLoading(false)
+      }
+
+      bootstrapTelegram()
+      return
     }
-
-    setAuthLoading(false)
-  }
-
-  bootstrapTelegram()
-  return
-}
 
     // ===============================
     // ANDROID
@@ -285,19 +285,19 @@ setAuthLoading(false)
     typeof window !== "undefined" &&
     !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-const isAuthenticated =
-  isTelegram
-    ? subActive === true
-    : isAndroid
-      ? hasNativeToken
-      : !!accessToken
+  const isAuthenticated =
+    isTelegram
+      ? subActive === true
+      : isAndroid
+        ? hasNativeToken
+        : !!accessToken
 
-const sessionExists =
-  isTelegram
-    ? true
-    : isAndroid
-      ? hasNativeToken
-      : !!refreshToken
+  const sessionExists =
+    isTelegram
+      ? true
+      : isAndroid
+        ? hasNativeToken
+        : !!refreshToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
@@ -690,11 +690,11 @@ const sessionExists =
     const tgId =
       (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-if (tgId) {
-  localStorage.setItem("tg_logged_out", "1")
-  window.location.reload()
-  return
-}
+    if (tgId) {
+      localStorage.setItem("tg_logged_out", "1")
+      window.location.reload()
+      return
+    }
 
     const isAndroid =
       typeof window !== "undefined" &&
@@ -728,6 +728,12 @@ if (tgId) {
         console.log("Logout device failed", e)
       }
     }
+
+    setAccessToken(null)
+    setRefreshToken(null)
+    setEmail(null)
+    setSubActive(false)
+    setAccessMeta(null)
 
     localStorage.clear()
     window.location.reload()
