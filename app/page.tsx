@@ -129,10 +129,44 @@ export default function Page() {
 
   useEffect(() => {
 
+    const isTelegram =
+      typeof window !== "undefined" &&
+      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+
+    // ===============================
+    // 🔥 TELEGRAM BYPASS (ADD THIS)
+    // ===============================
+    if (isTelegram) {
+
+      const tg = (window as any).Telegram.WebApp
+      const tgUser = tg.initDataUnsafe.user
+
+      // Store Telegram ID as device ID
+      localStorage.setItem("fxhedz_device_id", String(tgUser.id))
+
+      // Set fake refresh token so overlay disappears
+      setRefreshToken("telegram-session")
+
+      // Telegram does not use JWT access token
+      setAccessToken("telegram-session")
+
+      // Mark auth as complete
+      setAuthLoading(false)
+
+      return
+    }
+
+    // ===============================
+    // ANDROID
+    // ===============================
     if (isAndroid) {
       setAuthLoading(false)
       return
     }
+
+    // ===============================
+    // NORMAL WEB FLOW
+    // ===============================
 
     const storedRefresh = localStorage.getItem("refreshToken")
     const storedEmail = localStorage.getItem("email")
@@ -463,34 +497,34 @@ export default function Page() {
         }
       } catch { }
 
-let id: string | null = null
+      let id: string | null = null
 
-// ===============================
-// TELEGRAM DEVICE ID OVERRIDE
-// ===============================
-if (platform === "telegram") {
-  try {
-    const tg = (window as any)?.Telegram?.WebApp
-    const tgUserId = tg?.initDataUnsafe?.user?.id
+      // ===============================
+      // TELEGRAM DEVICE ID OVERRIDE
+      // ===============================
+      if (platform === "telegram") {
+        try {
+          const tg = (window as any)?.Telegram?.WebApp
+          const tgUserId = tg?.initDataUnsafe?.user?.id
 
-    if (tgUserId) {
-      id = String(tgUserId)
-      localStorage.setItem("fxhedz_device_id", id)
-    }
-  } catch {}
-}
+          if (tgUserId) {
+            id = String(tgUserId)
+            localStorage.setItem("fxhedz_device_id", id)
+          }
+        } catch { }
+      }
 
-// ===============================
-// FALLBACK (WEB / ANDROID URL)
-// ===============================
-if (!id) {
-  id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
+      // ===============================
+      // FALLBACK (WEB / ANDROID URL)
+      // ===============================
+      if (!id) {
+        id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
 
-  if (!id) {
-    id = window.crypto.randomUUID()
-    localStorage.setItem("fxhedz_device_id", id)
-  }
-}
+        if (!id) {
+          id = window.crypto.randomUUID()
+          localStorage.setItem("fxhedz_device_id", id)
+        }
+      }
 
       document.cookie = `fx_device=${id}; path=/; max-age=31536000`
       document.cookie = `fx_platform=${platform}; path=/; max-age=31536000`
@@ -624,44 +658,44 @@ if (!id) {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-async function logoutCurrentSession() {
+  async function logoutCurrentSession() {
 
-  const isAndroid =
-    typeof window !== "undefined" &&
-    !!(window as any).ReactNativeWebView
+    const isAndroid =
+      typeof window !== "undefined" &&
+      !!(window as any).ReactNativeWebView
 
-  const deviceId = localStorage.getItem("fxhedz_device_id")
+    const deviceId = localStorage.getItem("fxhedz_device_id")
 
-  const storedEmail =
-    localStorage.getItem("email") ||
-    (window as any).__NATIVE_EMAIL__ ||
-    null
+    const storedEmail =
+      localStorage.getItem("email") ||
+      (window as any).__NATIVE_EMAIL__ ||
+      null
 
-  // Android handled natively
-  if (isAndroid) {
-    window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
-    return
-  }
-
-  if (storedEmail && deviceId) {
-    try {
-      await fetch("/api/logout-device", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: storedEmail,
-          device_id: deviceId,
-          platform: "web"
-        })
-      })
-    } catch (e) {
-      console.log("Logout device failed", e)
+    // Android handled natively
+    if (isAndroid) {
+      window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
+      return
     }
-  }
 
-  localStorage.clear()
-  window.location.reload()
-}
+    if (storedEmail && deviceId) {
+      try {
+        await fetch("/api/logout-device", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: storedEmail,
+            device_id: deviceId,
+            platform: "web"
+          })
+        })
+      } catch (e) {
+        console.log("Logout device failed", e)
+      }
+    }
+
+    localStorage.clear()
+    window.location.reload()
+  }
 
   async function logoutAllWebDevices() {
 
