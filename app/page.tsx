@@ -1221,12 +1221,9 @@ if (deviceLimit.active) {
         </div>
 
       </main>
-      {!authLoading && !deviceLimit.active && (
-        <AccessOverlay
-          sessionExists={sessionExists}
-          deviceLimited={deviceLimit.active}
-        />
-      )}
+{!authLoading && !deviceLimit.active && !sessionExists && (
+  <AccessOverlay sessionExists={false} />
+)}
     </div>
   )
 }
