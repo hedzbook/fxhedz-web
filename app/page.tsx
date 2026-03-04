@@ -129,47 +129,10 @@ export default function Page() {
 
   useEffect(() => {
 
-    // ===============================
-    // 🔥 TELEGRAM SESSION RESTORE
-    // ===============================
-    const tgUserId =
-      typeof window !== "undefined" &&
-      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-
-    const tgLoggedOut =
-      typeof window !== "undefined" &&
-      localStorage.getItem("tg_logged_out") === "1"
-
-    if (tgUserId && !tgLoggedOut) {
-
-      async function bootstrapTelegram() {
-
-        try {
-
-          setAuthLoading(false)
-
-        } catch (e) {
-          console.log("Telegram bootstrap failed", e)
-        }
-
-        setAuthLoading(false)
-      }
-
-      bootstrapTelegram()
-      return
-    }
-
-    // ===============================
-    // ANDROID
-    // ===============================
     if (isAndroid) {
       setAuthLoading(false)
       return
     }
-
-    // ===============================
-    // NORMAL WEB FLOW
-    // ===============================
 
     const storedRefresh = localStorage.getItem("refreshToken")
     const storedEmail = localStorage.getItem("email")
@@ -281,24 +244,15 @@ export default function Page() {
 
   }, [refreshToken, email])
 
-  const isTelegram =
-    typeof window !== "undefined" &&
-    !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-
   const isAuthenticated =
-    isTelegram
-      ? subActive === true
-      : isAndroid
-        ? hasNativeToken
-        : !!accessToken
+    isAndroid
+      ? hasNativeToken
+      : !!accessToken
 
   const sessionExists =
-    isTelegram
-      ? true
-      : isAndroid
-        ? hasNativeToken
-        : !!accessToken
-
+    isAndroid
+      ? hasNativeToken
+      : !!refreshToken
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
   async function loadPreview(pair: string) {
@@ -443,20 +397,11 @@ export default function Page() {
 
     async function loadSignals() {
       try {
-
-        const headers: Record<string, string> = {}
-
-        const tgId =
-          (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-
-        if (tgId) {
-          headers["x-telegram-id"] = String(tgId)
-          headers["x-platform"] = "telegram"
-        } else if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`
-        }
-
-        const res = await fetch(SIGNAL_API, { headers })
+        const res = await fetch(SIGNAL_API, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        })
 
         if (!res.ok) return
 
@@ -464,7 +409,6 @@ export default function Page() {
         const incoming = json?.signals ?? {}
 
         setSignals(incoming)
-
       } catch { }
     }
 
@@ -482,7 +426,7 @@ export default function Page() {
     if (authLoading) return
 
     // Only block unauthenticated for WEB
-    if (!isAndroid && !isTelegram && !isAuthenticated) {
+    if (!isAndroid && !isAuthenticated) {
       setSubActive(false)
       return
     }
@@ -519,19 +463,34 @@ export default function Page() {
         }
       } catch { }
 
-      let id: string | null = null
+let id: string | null = null
 
-      // ===============================
-      // FALLBACK (WEB / ANDROID URL)
-      // ===============================
-      if (!id) {
-        id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
+// ===============================
+// TELEGRAM DEVICE ID OVERRIDE
+// ===============================
+if (platform === "telegram") {
+  try {
+    const tg = (window as any)?.Telegram?.WebApp
+    const tgUserId = tg?.initDataUnsafe?.user?.id
 
-        if (!id) {
-          id = window.crypto.randomUUID()
-          localStorage.setItem("fxhedz_device_id", id)
-        }
-      }
+    if (tgUserId) {
+      id = String(tgUserId)
+      localStorage.setItem("fxhedz_device_id", id)
+    }
+  } catch {}
+}
+
+// ===============================
+// FALLBACK (WEB / ANDROID URL)
+// ===============================
+if (!id) {
+  id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
+
+  if (!id) {
+    id = window.crypto.randomUUID()
+    localStorage.setItem("fxhedz_device_id", id)
+  }
+}
 
       document.cookie = `fx_device=${id}; path=/; max-age=31536000`
       document.cookie = `fx_platform=${platform}; path=/; max-age=31536000`
@@ -541,23 +500,13 @@ export default function Page() {
       // ===============================
 
       try {
-        const headers: Record<string, string> = {}
-
-        const tgId =
-          (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-
-        if (tgId) {
-          headers["x-telegram-id"] = String(tgId)
-          headers["x-platform"] = "telegram"
-        } else if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`
-        }
-
         const res = await fetch(
           `/api/subscription`,
           {
             cache: "no-store",
-            headers
+            headers: accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {}
           }
         )
 
@@ -584,25 +533,15 @@ export default function Page() {
   // =============================
   useEffect(() => {
 
-    if (!isAndroid && !isTelegram && !isAuthenticated) return
+    if (!isAndroid && !isAuthenticated) return
 
     async function checkSubscription() {
       try {
-        const headers: Record<string, string> = {}
-
-        const tgId =
-          (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-
-        if (tgId) {
-          headers["x-telegram-id"] = String(tgId)
-          headers["x-platform"] = "telegram"
-        } else if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`
-        }
-
         const res = await fetch("/api/subscription", {
           cache: "no-store",
-          headers
+          headers: accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {}
         })
 
         const data = await res.json()
@@ -685,59 +624,44 @@ export default function Page() {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-  async function logoutCurrentSession() {
+async function logoutCurrentSession() {
 
-    const tgId =
-      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+  const isAndroid =
+    typeof window !== "undefined" &&
+    !!(window as any).ReactNativeWebView
 
-    if (tgId) {
-      localStorage.setItem("tg_logged_out", "1")
-      window.location.reload()
-      return
-    }
+  const deviceId = localStorage.getItem("fxhedz_device_id")
 
-    const isAndroid =
-      typeof window !== "undefined" &&
-      !!(window as any).ReactNativeWebView
+  const storedEmail =
+    localStorage.getItem("email") ||
+    (window as any).__NATIVE_EMAIL__ ||
+    null
 
-    const deviceId = localStorage.getItem("fxhedz_device_id")
-
-    const storedEmail =
-      localStorage.getItem("email") ||
-      (window as any).__NATIVE_EMAIL__ ||
-      null
-
-    // Android handled natively
-    if (isAndroid) {
-      window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
-      return
-    }
-
-    if (storedEmail && deviceId) {
-      try {
-        await fetch("/api/logout-device", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: storedEmail,
-            device_id: deviceId,
-            platform: "web"
-          })
-        })
-      } catch (e) {
-        console.log("Logout device failed", e)
-      }
-    }
-
-    setAccessToken(null)
-    setRefreshToken(null)
-    setEmail(null)
-    setSubActive(false)
-    setAccessMeta(null)
-
-    localStorage.clear()
-    window.location.reload()
+  // Android handled natively
+  if (isAndroid) {
+    window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
+    return
   }
+
+  if (storedEmail && deviceId) {
+    try {
+      await fetch("/api/logout-device", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: storedEmail,
+          device_id: deviceId,
+          platform: "web"
+        })
+      })
+    } catch (e) {
+      console.log("Logout device failed", e)
+    }
+  }
+
+  localStorage.clear()
+  window.location.reload()
+}
 
   async function logoutAllWebDevices() {
 
