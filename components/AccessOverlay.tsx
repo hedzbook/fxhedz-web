@@ -5,14 +5,15 @@ import WebGoogleLogin from "./WebGoogleLogin"
 
 type Props = {
   sessionExists: boolean
+  deviceLimited?: boolean
 }
 
-export default function AccessOverlay({ sessionExists }: Props) {
+export default function AccessOverlay({ sessionExists, deviceLimited }: Props) {
 
-  // If logged in â†’ no overlay at all
+  if (deviceLimited) return null
+
   if (sessionExists) return null
 
-  // If NOT logged in â†’ show login panel
   return (
     <OverlayContainer>
       <Panel>

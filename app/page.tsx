@@ -77,19 +77,19 @@ export default function Page() {
     typeof window !== "undefined" &&
     !!(window as any).ReactNativeWebView
 
-const cookiePlatform =
-  typeof document !== "undefined"
-    ? document.cookie
+  const cookiePlatform =
+    typeof document !== "undefined"
+      ? document.cookie
         .split("; ")
         .find(r => r.startsWith("fx_platform="))
         ?.split("=")[1]
-    : null
+      : null
 
-const platform =
-  cookiePlatform === "android" ||
-  cookiePlatform === "telegram"
-    ? cookiePlatform
-    : "web"
+  const platform =
+    cookiePlatform === "android" ||
+      cookiePlatform === "telegram"
+      ? cookiePlatform
+      : "web"
 
   // =======================================
   // DEVICE ID INITIALIZATION (MUST RUN FIRST)
@@ -142,17 +142,17 @@ const platform =
   }>({ active: false })
 
   useEffect(() => {
-  const limit = localStorage.getItem("fx_device_limit")
+    const limit = localStorage.getItem("fx_device_limit")
 
-  if (limit === "true") {
-    const count = localStorage.getItem("fx_device_limit_count")
+    if (limit === "true") {
+      const count = localStorage.getItem("fx_device_limit_count")
 
-    setDeviceLimit({
-      active: true,
-      count: count ? Number(count) : undefined
-    })
-  }
-}, [])
+      setDeviceLimit({
+        active: true,
+        count: count ? Number(count) : undefined
+      })
+    }
+  }, [])
 
   useEffect(() => {
 
@@ -193,16 +193,16 @@ const platform =
     const storedEmail = localStorage.getItem("email")
     const storedDeviceId = localStorage.getItem("fxhedz_device_id")
 
-if (
-  !storedRefresh ||
-  storedRefresh === "undefined" ||
-  !storedEmail
-) {
-  localStorage.removeItem("refreshToken")
-  setEmail(storedEmail || null)
-  setAuthLoading(false)
-  return
-}
+    if (
+      !storedRefresh ||
+      storedRefresh === "undefined" ||
+      !storedEmail
+    ) {
+      localStorage.removeItem("refreshToken")
+      setEmail(storedEmail || null)
+      setAuthLoading(false)
+      return
+    }
 
     async function validate() {
 
@@ -235,26 +235,26 @@ if (
           return
         }
 
-if (res.status === 401) {
-  localStorage.clear()
-  setAuthLoading(false)
-  return
-}
+        if (res.status === 401) {
+          localStorage.clear()
+          setAuthLoading(false)
+          return
+        }
 
-if (res.status === 403) {
-  const data = await res.json()
+        if (res.status === 403) {
+          const data = await res.json()
 
-  setEmail(storedEmail)
-  setRefreshToken(storedRefresh)
+          setEmail(storedEmail)
+          setRefreshToken(storedRefresh)
 
-  setDeviceLimit({
-    active: true,
-    count: data.device_count
-  })
+          setDeviceLimit({
+            active: true,
+            count: data.device_count
+          })
 
-  setAuthLoading(false)
-  return
-}
+          setAuthLoading(false)
+          return
+        }
 
         const data = await res.json()
 
@@ -324,10 +324,10 @@ if (res.status === 403) {
       ? hasNativeToken
       : !!accessToken
 
-const sessionExists =
-  isAndroid
-    ? hasNativeToken
-    : !!refreshToken
+  const sessionExists =
+    isAndroid
+      ? hasNativeToken
+      : !!refreshToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
@@ -736,7 +736,7 @@ const sessionExists =
 
 
     localStorage.removeItem("fx_device_limit")
-localStorage.removeItem("fx_device_limit_count")
+    localStorage.removeItem("fx_device_limit_count")
     localStorage.clear()
     window.location.reload()
   }
@@ -1216,8 +1216,11 @@ localStorage.removeItem("fx_device_limit_count")
         </div>
       )}
 
-      {!deviceLimit.active && !authLoading && (
-        <AccessOverlay sessionExists={sessionExists} />
+      {!authLoading && !deviceLimit.active && (
+        <AccessOverlay
+          sessionExists={sessionExists}
+          deviceLimited={deviceLimit.active}
+        />
       )}
     </div>
   )
