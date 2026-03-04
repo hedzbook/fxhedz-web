@@ -132,62 +132,27 @@ export default function Page() {
     // ===============================
     // 🔥 TELEGRAM SESSION RESTORE
     // ===============================
-    const tgSession =
-      typeof window !== "undefined" &&
-      localStorage.getItem("fxhedz_tg_session") === "1"
+const tgSession =
+  typeof window !== "undefined" &&
+  localStorage.getItem("fxhedz_tg_session") === "1"
 
-    const tgUserId =
-      typeof window !== "undefined" &&
-      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+const tgUserId =
+  typeof window !== "undefined" &&
+  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-    if (tgSession && tgUserId) {
-      setRefreshToken("telegram-session")
-      setAccessToken("telegram-auth")
-      setAuthLoading(false)
-      return
-    }
+// Only restore existing Telegram session
+if (tgSession && tgUserId) {
+  setRefreshToken("telegram-session")
+  setAccessToken("telegram-auth")
+  setAuthLoading(false)
+  return
+}
 
-    if (tgUserId) {
-
-      async function telegramAuth() {
-        try {
-
-          const res = await fetch("/api/native-auth", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              telegram_chat_id: String(tgUserId),
-              platform: "telegram"
-            })
-          })
-
-          if (!res.ok) {
-            setAuthLoading(false)
-            return
-          }
-
-          const data = await res.json()
-
-          // Mark as authenticated
-          localStorage.setItem("fxhedz_tg_session", "1")
-          setRefreshToken("telegram-session")
-          setAccessToken("telegram-auth")
-
-          // Optional: store resolved email if backend returns it
-          if (data?.email) {
-            setEmail(data.email)
-          }
-
-        } catch (e) {
-          console.log("Telegram auth failed", e)
-        }
-
-        setAuthLoading(false)
-      }
-
-      telegramAuth()
-      return
-    }
+// If Telegram present but no session → treat as unauthenticated
+if (tgUserId && !tgSession) {
+  setAuthLoading(false)
+  return
+}
 
     // ===============================
     // ANDROID
