@@ -294,10 +294,10 @@ export default function Page() {
 
   const sessionExists =
     isTelegram
-      ? true
+      ? false
       : isAndroid
         ? hasNativeToken
-        : !!refreshToken
+        : !!accessToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
