@@ -64,6 +64,7 @@ type SubscriptionMeta = {
 
 export default function Page() {
 
+  const [appReady, setAppReady] = useState(false)
   const dummySignals = useMemo(() => generateDummySignals(), [])
   const [signals, setSignals] = useState<any>(dummySignals)
   const [pairData, setPairData] = useState<any>({})
@@ -141,18 +142,24 @@ export default function Page() {
     count?: number
   }>({ active: false })
 
-  useEffect(() => {
-    const limit = localStorage.getItem("fx_device_limit")
+useEffect(() => {
 
-    if (limit === "true") {
-      const count = localStorage.getItem("fx_device_limit_count")
+  const limit = localStorage.getItem("fx_device_limit")
 
-      setDeviceLimit({
-        active: true,
-        count: count ? Number(count) : undefined
-      })
-    }
-  }, [])
+  if (limit === "true") {
+
+    const count = localStorage.getItem("fx_device_limit_count")
+
+    setDeviceLimit({
+      active: true,
+      count: count ? Number(count) : undefined
+    })
+
+  }
+
+  setAppReady(true)
+
+}, [])
 
   useEffect(() => {
 
@@ -219,28 +226,28 @@ export default function Page() {
           })
         })
 
-if (res.status === 403) {
+        if (res.status === 403) {
 
-  const data = await res.json()
+          const data = await res.json()
 
-  setEmail(storedEmail)
-  setRefreshToken(storedRefresh)
+          setEmail(storedEmail)
+          setRefreshToken(storedRefresh)
 
-  // Persist device limit
-  localStorage.setItem("fx_device_limit", "true")
-  localStorage.setItem(
-    "fx_device_limit_count",
-    String(data.device_count || 2)
-  )
+          // Persist device limit
+          localStorage.setItem("fx_device_limit", "true")
+          localStorage.setItem(
+            "fx_device_limit_count",
+            String(data.device_count || 2)
+          )
 
-  setDeviceLimit({
-    active: true,
-    count: data.device_count
-  })
+          setDeviceLimit({
+            active: true,
+            count: data.device_count
+          })
 
-  setAuthLoading(false)
-  return
-}
+          setAuthLoading(false)
+          return
+        }
 
         if (res.status === 401) {
           localStorage.clear()
@@ -772,42 +779,42 @@ if (res.status === 403) {
   const isGuest =
     !isAuthenticated
 
-    // =======================================
-// HARD BLOCK: DEVICE LIMIT
-// =======================================
-if (deviceLimit.active) {
-  return (
-    <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center">
-      <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md text-center space-y-4">
+  // =======================================
+  // HARD BLOCK: DEVICE LIMIT
+  // =======================================
+  if (deviceLimit.active) {
+    return (
+      <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center">
+        <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md text-center space-y-4">
 
-        <div className="text-lg font-semibold">
-          Device Restricted
+          <div className="text-lg font-semibold">
+            Device Restricted
+          </div>
+
+          <div className="text-sm text-neutral-400">
+            Maximum 2 web devices allowed.
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={logoutAllWebDevices}
+              className="flex-1 bg-neutral-700 hover:bg-neutral-600 py-2 rounded"
+            >
+              Logout All Devices
+            </button>
+
+            <button
+              onClick={logoutCurrentSession}
+              className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded"
+            >
+              Logout
+            </button>
+          </div>
+
         </div>
-
-        <div className="text-sm text-neutral-400">
-          Maximum 2 web devices allowed.
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={logoutAllWebDevices}
-            className="flex-1 bg-neutral-700 hover:bg-neutral-600 py-2 rounded"
-          >
-            Logout All Devices
-          </button>
-
-          <button
-            onClick={logoutCurrentSession}
-            className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded"
-          >
-            Logout
-          </button>
-        </div>
-
       </div>
-    </div>
-  )
-}
+    )
+  }
 
   const plan = accessMeta?.status?.toLowerCase()
 
@@ -1213,7 +1220,7 @@ if (deviceLimit.active) {
         </div>
 
       </main>
-{!authLoading && (
+{appReady && !authLoading && (
   <AccessOverlay
     sessionExists={sessionExists}
     deviceLimited={deviceLimit.active}
