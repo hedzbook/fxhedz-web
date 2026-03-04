@@ -73,6 +73,49 @@ export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [appInstruments, setAppInstruments] = useState<string[]>([])
+  const isAndroid =
+    typeof window !== "undefined" &&
+    !!(window as any).ReactNativeWebView
+
+  const isTelegram =
+    typeof window !== "undefined" &&
+    !!(window as any)?.Telegram?.WebApp
+
+  const platform =
+    isAndroid
+      ? "android"
+      : isTelegram
+        ? "telegram"
+        : "web"
+
+  // =======================================
+  // DEVICE ID INITIALIZATION (MUST RUN FIRST)
+  // =======================================
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    let id = localStorage.getItem("fxhedz_device_id")
+
+    if (!id) {
+
+      if (platform === "telegram") {
+        try {
+          const tg = (window as any)?.Telegram?.WebApp
+          const tgUserId = tg?.initDataUnsafe?.user?.id
+
+          if (tgUserId) {
+            id = String(tgUserId)
+          }
+        } catch { }
+      }
+
+      if (!id) {
+        id = window.crypto.randomUUID()
+      }
+
+      localStorage.setItem("fxhedz_device_id", id)
+    }
+  }, [platform])
 
   useEffect(() => {
     function check() {
@@ -118,10 +161,6 @@ export default function Page() {
 
   }, [])
 
-  const isAndroid =
-    typeof window !== "undefined" &&
-    !!(window as any).ReactNativeWebView
-
   const hasNativeToken =
     isAndroid &&
     typeof window !== "undefined" &&
@@ -138,7 +177,7 @@ export default function Page() {
     const storedEmail = localStorage.getItem("email")
     const storedDeviceId = localStorage.getItem("fxhedz_device_id")
 
-    if (!storedRefresh || !storedEmail || !storedDeviceId) {
+    if (!storedRefresh || !storedEmail) {
       setEmail(storedEmail || null)
       setAuthLoading(false)
       return
@@ -155,7 +194,7 @@ export default function Page() {
             refreshToken: storedRefresh,
             email: storedEmail,
             deviceId: storedDeviceId,
-            platform: "web"
+            platform
           })
         })
 
@@ -217,7 +256,7 @@ export default function Page() {
             refreshToken,
             email,
             deviceId: localStorage.getItem("fxhedz_device_id"),
-            platform: "web"
+            platform
           })
         })
 
@@ -249,16 +288,12 @@ export default function Page() {
       ? hasNativeToken
       : !!accessToken
 
-const isTelegram =
-  typeof window !== "undefined" &&
-  !!(window as any)?.Telegram?.WebApp
-
-const sessionExists =
-  isAndroid
-    ? hasNativeToken
-    : isTelegram
-      ? !!email
-      : !!refreshToken
+  const sessionExists =
+    isAndroid
+      ? hasNativeToken
+      : isTelegram
+        ? !!email
+        : !!refreshToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
@@ -433,11 +468,10 @@ const sessionExists =
     if (authLoading) return
 
     // Only block unauthenticated for WEB
-    if (!isAndroid && !isAuthenticated) {
+    if (platform === "web" && !isAuthenticated) {
       setSubActive(false)
       return
     }
-
     // If Android and no native token â†’ block
     if (isAndroid && !hasNativeToken) {
       setSubActive(false)
@@ -470,34 +504,34 @@ const sessionExists =
         }
       } catch { }
 
-let id: string | null = null
+      let id: string | null = null
 
-// ===============================
-// TELEGRAM DEVICE ID OVERRIDE
-// ===============================
-if (platform === "telegram") {
-  try {
-    const tg = (window as any)?.Telegram?.WebApp
-    const tgUserId = tg?.initDataUnsafe?.user?.id
+      // ===============================
+      // TELEGRAM DEVICE ID OVERRIDE
+      // ===============================
+      if (platform === "telegram") {
+        try {
+          const tg = (window as any)?.Telegram?.WebApp
+          const tgUserId = tg?.initDataUnsafe?.user?.id
 
-    if (tgUserId) {
-      id = String(tgUserId)
-      localStorage.setItem("fxhedz_device_id", id)
-    }
-  } catch {}
-}
+          if (tgUserId) {
+            id = String(tgUserId)
+            localStorage.setItem("fxhedz_device_id", id)
+          }
+        } catch { }
+      }
 
-// ===============================
-// FALLBACK (WEB / ANDROID URL)
-// ===============================
-if (!id) {
-  id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
+      // ===============================
+      // FALLBACK (WEB / ANDROID URL)
+      // ===============================
+      if (!id) {
+        id = urlDeviceId || localStorage.getItem("fxhedz_device_id")
 
-  if (!id) {
-    id = window.crypto.randomUUID()
-    localStorage.setItem("fxhedz_device_id", id)
-  }
-}
+        if (!id) {
+          id = window.crypto.randomUUID()
+          localStorage.setItem("fxhedz_device_id", id)
+        }
+      }
 
       document.cookie = `fx_device=${id}; path=/; max-age=31536000`
       document.cookie = `fx_platform=${platform}; path=/; max-age=31536000`
@@ -559,7 +593,6 @@ if (!id) {
         })
 
         setSubActive(Boolean(data?.active))
-        setRefreshToken("telegram_session")
 
       } catch { }
     }
@@ -632,44 +665,44 @@ if (!id) {
 
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
-async function logoutCurrentSession() {
+  async function logoutCurrentSession() {
 
-  const isAndroid =
-    typeof window !== "undefined" &&
-    !!(window as any).ReactNativeWebView
+    const isAndroid =
+      typeof window !== "undefined" &&
+      !!(window as any).ReactNativeWebView
 
-  const deviceId = localStorage.getItem("fxhedz_device_id")
+    const deviceId = localStorage.getItem("fxhedz_device_id")
 
-  const storedEmail =
-    localStorage.getItem("email") ||
-    (window as any).__NATIVE_EMAIL__ ||
-    null
+    const storedEmail =
+      localStorage.getItem("email") ||
+      (window as any).__NATIVE_EMAIL__ ||
+      null
 
-  // Android handled natively
-  if (isAndroid) {
-    window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
-    return
-  }
-
-  if (storedEmail && deviceId) {
-    try {
-      await fetch("/api/logout-device", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: storedEmail,
-          device_id: deviceId,
-          platform: "web"
-        })
-      })
-    } catch (e) {
-      console.log("Logout device failed", e)
+    // Android handled natively
+    if (isAndroid) {
+      window.ReactNativeWebView?.postMessage("LOGOUT_REQUEST")
+      return
     }
-  }
 
-  localStorage.clear()
-  window.location.reload()
-}
+    if (storedEmail && deviceId) {
+      try {
+        await fetch("/api/logout-device", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: storedEmail,
+            device_id: deviceId,
+            platform
+          })
+        })
+      } catch (e) {
+        console.log("Logout device failed", e)
+      }
+    }
+
+    localStorage.clear()
+    window.location.reload()
+  }
 
   async function logoutAllWebDevices() {
 
