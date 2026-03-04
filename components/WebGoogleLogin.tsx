@@ -28,100 +28,105 @@ export default function WebGoogleLogin() {
 
   }, [])
 
-async function completeLogin(idToken: string) {
+  async function completeLogin(idToken: string) {
 
-  let deviceId =
-    localStorage.getItem("fxhedz_device_id")
+    let deviceId = localStorage.getItem("fxhedz_device_id")
 
-  if (!deviceId) {
-    deviceId = crypto.randomUUID()
-    localStorage.setItem("fxhedz_device_id", deviceId)
-  }
+    if (!deviceId) {
+      deviceId = crypto.randomUUID()
+      localStorage.setItem("fxhedz_device_id", deviceId)
+    }
 
-  // ðŸ”¥ Retrieve stored Telegram ID
-  const telegramChatId =
-    localStorage.getItem("fx_tg_id") || ""
+    const telegramChatId =
+      localStorage.getItem("fx_tg_id") || ""
 
-  alert("TELEGRAM ID: " + telegramChatId)
-
-  const res = await fetch("/api/web-auth", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      idToken,
-      deviceId,
-      telegram_chat_id: telegramChatId
+    const res = await fetch("/api/web-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idToken,
+        deviceId,
+        telegram_chat_id: telegramChatId
+      })
     })
-  })
 
-  if (!res.ok) {
-  const data = await res.json()
+    const data = await res.json()
 
-  if (res.status === 403 && data.device_limit) {
+    // ===============================
+    // DEVICE LIMIT
+    // ===============================
+    if (res.status === 403 && data?.device_limit) {
+
+      localStorage.setItem("email", data.email)
+      localStorage.setItem("fxhedz_device_id", deviceId)
+
+      // Persist device limit across reload
+      localStorage.setItem("fx_device_limit", "true")
+      localStorage.setItem(
+        "fx_device_limit_count",
+        String(data.device_count || 0)
+      )
+
+      window.dispatchEvent(
+        new CustomEvent("fxhedz-device-limit", {
+          detail: { count: data.device_count }
+        })
+      )
+
+      return
+    }
+
+    // ===============================
+    // ANY OTHER ERROR
+    // ===============================
+    if (!res.ok) {
+      return
+    }
+
+    // ===============================
+    // SUCCESS LOGIN
+    // ===============================
+
+    // Clear any previous device-limit state
+    localStorage.removeItem("fx_device_limit")
+    localStorage.removeItem("fx_device_limit_count")
+
+    localStorage.setItem("refreshToken", data.refreshToken)
     localStorage.setItem("email", data.email)
-    localStorage.setItem("fxhedz_device_id", deviceId)
 
-    window.dispatchEvent(
-      new CustomEvent("fxhedz-device-limit", {
-        detail: { count: data.device_count }
-      })
-    )
-    return
+    window.location.reload()
   }
-
-  return
-}
-
-const data = await res.json()
-
-  if (res.status === 403 && data.device_limit) {
-    localStorage.setItem("email", data.email)
-    localStorage.setItem("fxhedz_device_id", deviceId)
-
-    window.dispatchEvent(
-      new CustomEvent("fxhedz-device-limit", {
-        detail: { count: data.device_count }
-      })
-    )
-    return
-  }
-
-  localStorage.setItem("refreshToken", data.refreshToken)
-  localStorage.setItem("email", data.email)
-
-  window.location.reload()
-}
 
   async function handleCredentialResponse(response: any) {
     await completeLogin(response.credential)
   }
 
-function startTelegramGoogleFlow() {
+  function startTelegramGoogleFlow() {
 
-  try {
-    const tg = (window as any)?.Telegram?.WebApp
-    const tgUserId = tg?.initDataUnsafe?.user?.id
+    try {
+      const tg = (window as any)?.Telegram?.WebApp
+      const tgUserId = tg?.initDataUnsafe?.user?.id
 
-    if (tgUserId) {
-      localStorage.setItem("fx_tg_id", String(tgUserId))
-    }
-  } catch {}
+      if (tgUserId) {
+        localStorage.setItem("fx_tg_id", String(tgUserId))
+      }
+    } catch { }
 
-  const redirectUri =
-    window.location.origin + "/oauth-callback"
+    const redirectUri =
+      window.location.origin + "/oauth-callback"
 
-  const url =
-    "https://accounts.google.com/o/oauth2/v2/auth?" +
-    new URLSearchParams({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      redirect_uri: redirectUri,
-      response_type: "id_token",
-      scope: "openid email profile",
-      nonce: crypto.randomUUID()
-    }).toString()
+    const url =
+      "https://accounts.google.com/o/oauth2/v2/auth?" +
+      new URLSearchParams({
+        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+        redirect_uri: redirectUri,
+        response_type: "id_token",
+        scope: "openid email profile",
+        nonce: crypto.randomUUID()
+      }).toString()
 
-  window.location.href = url
-}
+    window.location.href = url
+  }
 
   if (isTelegram) {
     return (
