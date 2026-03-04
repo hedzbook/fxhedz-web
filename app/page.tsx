@@ -315,19 +315,24 @@ export default function Page() {
     typeof window !== "undefined" &&
     !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-  const isAuthenticated =
-    isTelegram
-      ? true
-      : isAndroid
-        ? hasNativeToken
-        : !!accessToken
+const telegramSession =
+  typeof window !== "undefined" &&
+  localStorage.getItem("fxhedz_tg_session") === "1"
 
+const isAuthenticated =
+  isTelegram
+    ? telegramSession
+    : isAndroid
+      ? hasNativeToken
+      : !!accessToken
+      
 const sessionExists =
   isTelegram
-    ? true
+    ? telegramSession
     : isAndroid
       ? hasNativeToken
       : !!refreshToken
+
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
   async function loadPreview(pair: string) {
@@ -730,6 +735,13 @@ const sessionExists =
     setInstrumentOrder(arrayMove(instrumentOrder, oldIndex, newIndex))
   }
   async function logoutCurrentSession() {
+
+  const tgId =
+    (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+
+  if (tgId) {
+    localStorage.removeItem("fxhedz_tg_session")
+  }
 
     const isAndroid =
       typeof window !== "undefined" &&
