@@ -5,3 +5,22 @@
 html, body {
   background: #000;
 }
+
+.controlpanel-scroll {
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.controlpanel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.controlpanel-scroll::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  height: 20px;
+  display: block;
+  background: linear-gradient(to bottom, transparent, #0a0a0a);
+}

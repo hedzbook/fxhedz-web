@@ -73,19 +73,22 @@ export default function ControlPanel({
   const planName = (status || "none").toUpperCase()
 
   return (
-    <div
-      className="
-      w-full
-      flex
-      flex-col
-      bg-neutral-900
-      pt-6
-      pb-6
-      px-5
-      space-y-8
-      text-sm
-    "
-    >
+<div
+className="
+w-full
+h-full
+flex
+flex-col
+bg-neutral-900
+pt-6
+pb-6
+px-5
+space-y-7
+text-sm
+overflow-y-auto
+controlpanel-scroll
+"
+>
 
       <Section>
 
@@ -214,7 +217,7 @@ export default function ControlPanel({
 
       </Section>
 
-      <div className="pt-4 border-t border-neutral-800">
+      <div className="pt-2">
         <button
           onClick={onLogout}
           className="w-full text-red-500 font-semibold hover:text-red-400 transition-colors"
