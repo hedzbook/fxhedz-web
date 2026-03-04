@@ -6,8 +6,6 @@ export async function GET(req: NextRequest) {
   const telegramId = req.headers.get("x-telegram-id")
   const platform = req.headers.get("x-platform")
 
-  let email: string | null = null
-
   // ============================
   // TELEGRAM MODE
   // ============================
@@ -35,43 +33,45 @@ export async function GET(req: NextRequest) {
     }
   }
 
-// ============================
-// JWT MODE (WEB / ANDROID)
-// ============================
+  // ============================
+  // JWT MODE (WEB / ANDROID)
+  // ============================
 
-const jwtUser = verifyAccessToken(req)
+  const jwtUser = verifyAccessToken(req)
 
-if (!jwtUser || typeof jwtUser !== "object") {
-  return NextResponse.json(
-    { error: "Unauthorized" },
-    { status: 401 }
-  )
-}
+  if (!jwtUser || typeof jwtUser !== "object") {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    )
+  }
 
-if (!email || typeof email !== "string") {
-  return NextResponse.json(
-    { error: "Unauthorized" },
-    { status: 401 }
-  )
-}
+  const email = (jwtUser as any).email
 
-try {
+  if (!email || typeof email !== "string") {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    )
+  }
 
-  const res = await fetch(
-    `${process.env.GAS_AUTH_URL}?secret=${process.env.GAS_SECRET}&email=${encodeURIComponent(email)}`,
-    { cache: "no-store" }
-  )
+  try {
 
-  const data = await res.json()
+    const res = await fetch(
+      `${process.env.GAS_AUTH_URL}?secret=${process.env.GAS_SECRET}&email=${encodeURIComponent(email)}`,
+      { cache: "no-store" }
+    )
 
-  return NextResponse.json(data)
+    const data = await res.json()
 
-} catch {
-  return NextResponse.json({
-    active: false,
-    blocked: true,
-    status: null,
-    expiry: null
-  })
-}
+    return NextResponse.json(data)
+
+  } catch {
+    return NextResponse.json({
+      active: false,
+      blocked: true,
+      status: null,
+      expiry: null
+    })
+  }
 }
