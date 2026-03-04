@@ -20,6 +20,9 @@ const PLAN = {
     playSku: "fxhedz_liveplus"
 }
 
+const PLAYSTORE_URL =
+    "https://play.google.com/store/apps/details?id=com.fxhedz.live"
+
 export default function ControlPanel({
     accessMeta,
     deviceId,
@@ -156,6 +159,51 @@ export default function ControlPanel({
                 </div>
 
             </Block>
+
+            {/* ================= MOBILE APP ================= */}
+            {!isAndroid && (
+                <Block title="Mobile App">
+
+                    <a
+                        href={PLAYSTORE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="
+        w-full
+        flex
+        items-center
+        justify-center
+        gap-2
+        py-3
+        bg-neutral-800
+        hover:bg-neutral-700
+        border
+        border-neutral-700
+        rounded-md
+        transition-colors
+        font-semibold
+      "
+                    >
+
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path d="M3 2l13 10L3 22V2zm15 11l3-2-3-2v4z" />
+                        </svg>
+
+                        Download Android App
+
+                    </a>
+
+                    <div className="text-neutral-400 text-xs leading-relaxed">
+                        Install the FXHEDZ mobile app for push alerts and faster execution.
+                    </div>
+
+                </Block>
+            )}
 
             {/* ================= SYSTEM BLOCK ================= */}
             <Block title="System">
