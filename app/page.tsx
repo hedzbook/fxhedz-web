@@ -159,7 +159,7 @@ useEffect(() => {
 
         // Mark as authenticated
         setRefreshToken("telegram-session")
-        setAccessToken("telegram-session")
+        setAccessToken(null)
 
         // Optional: store resolved email if backend returns it
         if (data?.email) {

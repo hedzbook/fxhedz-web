@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server"
 import { verifyAccessToken } from "@/lib/jwt"
 
@@ -7,8 +6,72 @@ const GAS_BASE =
 
 export async function GET(req: NextRequest) {
 
+  const pair = req.nextUrl.searchParams.get("pair")
+
   // ============================
-  // REQUIRE JWT
+  // TELEGRAM MODE
+  // ============================
+
+  const telegramId = req.headers.get("x-telegram-id")
+  const platform = req.headers.get("x-platform")
+
+  if (telegramId && platform === "telegram") {
+
+    try {
+
+      const url = pair
+        ? `${GAS_BASE}?secret=${process.env.GAS_SECRET}&telegram_chat_id=${telegramId}&platform=telegram&pair=${pair}`
+        : `${GAS_BASE}?secret=${process.env.GAS_SECRET}&telegram_chat_id=${telegramId}&platform=telegram`
+
+      const res = await fetch(url, { cache: "no-store" })
+
+      if (!res.ok) {
+        throw new Error("GAS failed (telegram)")
+      }
+
+      const json = await res.json()
+
+      // ============================
+      // SINGLE PAIR RESPONSE
+      // ============================
+
+      if (pair && json?.signals?.[pair]) {
+        return NextResponse.json({
+          ...json.signals[pair],
+          feed: json.feed || [],
+          history: json.history || [],
+          performance: json.performance || {},
+          blocked: json.blocked,
+          active: json.active,
+          plan: json.plan,
+          expiry: json.expiry,
+          appInstruments: json.appInstruments || [],
+          webInstruments: json.webInstruments || [],
+          telegramInstruments: json.telegramInstruments || []
+        })
+      }
+
+      // ============================
+      // FULL RESPONSE
+      // ============================
+
+      return NextResponse.json({
+        ...json,
+        appInstruments: json.appInstruments || [],
+        webInstruments: json.webInstruments || [],
+        telegramInstruments: json.telegramInstruments || []
+      })
+
+    } catch {
+      return NextResponse.json(
+        { error: "Signal fetch failed (telegram)" },
+        { status: 500 }
+      )
+    }
+  }
+
+  // ============================
+  // JWT MODE (WEB / ANDROID)
   // ============================
 
   const jwtUser = verifyAccessToken(req)
@@ -30,8 +93,6 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-
-    const pair = req.nextUrl.searchParams.get("pair")
 
     const url = pair
       ? `${GAS_BASE}?secret=${process.env.GAS_SECRET}&email=${encodeURIComponent(email)}&pair=${pair}`
