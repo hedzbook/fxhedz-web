@@ -132,28 +132,14 @@ export default function Page() {
     // ===============================
     // 🔥 TELEGRAM SESSION RESTORE
     // ===============================
-const tgSession =
+const tgUserId =
   typeof window !== "undefined" &&
-  localStorage.getItem("fxhedz_tg_session") === "1"
+  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-setTelegramSession(!!tgSession)
-    const tgUserId =
-      typeof window !== "undefined" &&
-      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
-
-    // Only restore existing Telegram session
-    if (tgSession && tgUserId) {
-      setRefreshToken("telegram-session")
-      setAccessToken("telegram-auth")
-      setAuthLoading(false)
-      return
-    }
-
-    // If Telegram present but no session → treat as unauthenticated
-    if (tgUserId && !tgSession) {
-      setAuthLoading(false)
-      return
-    }
+if (tgUserId) {
+  setAuthLoading(false)
+  return
+}
 
     // ===============================
     // ANDROID
@@ -702,8 +688,6 @@ const sessionExists =
       (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
     if (tgId) {
-      localStorage.removeItem("fxhedz_tg_session")
-      setTelegramSession(false)
     }
 
     const isAndroid =
