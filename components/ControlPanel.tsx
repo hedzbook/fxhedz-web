@@ -85,8 +85,8 @@ px-5
 text-sm
 overflow-y-auto
 controlpanel-scroll
+max-h-screen
 "
-style={{ overscrollBehavior: "contain" }}
 >
 
       <Section>
