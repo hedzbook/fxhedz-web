@@ -77,16 +77,19 @@ export default function Page() {
     typeof window !== "undefined" &&
     !!(window as any).ReactNativeWebView
 
-  const isTelegram =
-    typeof window !== "undefined" &&
-    !!(window as any)?.Telegram?.WebApp
+const cookiePlatform =
+  typeof document !== "undefined"
+    ? document.cookie
+        .split("; ")
+        .find(r => r.startsWith("fx_platform="))
+        ?.split("=")[1]
+    : null
 
-  const platform =
-    isAndroid
-      ? "android"
-      : isTelegram
-        ? "telegram"
-        : "web"
+const platform =
+  cookiePlatform === "android" ||
+  cookiePlatform === "telegram"
+    ? cookiePlatform
+    : "web"
 
   // =======================================
   // DEVICE ID INITIALIZATION (MUST RUN FIRST)
@@ -177,11 +180,16 @@ export default function Page() {
     const storedEmail = localStorage.getItem("email")
     const storedDeviceId = localStorage.getItem("fxhedz_device_id")
 
-    if (!storedRefresh || !storedEmail) {
-      setEmail(storedEmail || null)
-      setAuthLoading(false)
-      return
-    }
+if (
+  !storedRefresh ||
+  storedRefresh === "undefined" ||
+  !storedEmail
+) {
+  localStorage.removeItem("refreshToken")
+  setEmail(storedEmail || null)
+  setAuthLoading(false)
+  return
+}
 
     async function validate() {
 
@@ -214,11 +222,26 @@ export default function Page() {
           return
         }
 
-        if (!res.ok) {
-          localStorage.clear()
-          setAuthLoading(false)
-          return
-        }
+if (res.status === 401) {
+  localStorage.clear()
+  setAuthLoading(false)
+  return
+}
+
+if (res.status === 403) {
+  const data = await res.json()
+
+  setEmail(storedEmail)
+  setRefreshToken(storedRefresh)
+
+  setDeviceLimit({
+    active: true,
+    count: data.device_count
+  })
+
+  setAuthLoading(false)
+  return
+}
 
         const data = await res.json()
 
@@ -288,12 +311,10 @@ export default function Page() {
       ? hasNativeToken
       : !!accessToken
 
-  const sessionExists =
-    isAndroid
-      ? hasNativeToken
-      : isTelegram
-        ? !!email
-        : !!refreshToken
+const sessionExists =
+  isAndroid
+    ? hasNativeToken
+    : !!refreshToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
