@@ -468,32 +468,32 @@ export default function Page() {
 
     if (subActive === null) return
 
-async function loadSignals() {
-  try {
+    async function loadSignals() {
+      try {
 
-    const headers: Record<string, string> = {}
+        const headers: Record<string, string> = {}
 
-    const tgId =
-      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+        const tgId =
+          (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-    if (tgId) {
-      headers["x-telegram-id"] = String(tgId)
-      headers["x-platform"] = "telegram"
-    } else if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`
+        if (tgId) {
+          headers["x-telegram-id"] = String(tgId)
+          headers["x-platform"] = "telegram"
+        } else if (accessToken) {
+          headers["Authorization"] = `Bearer ${accessToken}`
+        }
+
+        const res = await fetch(SIGNAL_API, { headers })
+
+        if (!res.ok) return
+
+        const json = await res.json()
+        const incoming = json?.signals ?? {}
+
+        setSignals(incoming)
+
+      } catch { }
     }
-
-    const res = await fetch(SIGNAL_API, { headers })
-
-    if (!res.ok) return
-
-    const json = await res.json()
-    const incoming = json?.signals ?? {}
-
-    setSignals(incoming)
-
-  } catch {}
-}
 
     loadSignals()
     const interval = setInterval(loadSignals, 2500)
@@ -583,25 +583,25 @@ async function loadSignals() {
       // ===============================
 
       try {
-const headers: Record<string, string> = {}
+        const headers: Record<string, string> = {}
 
-const tgId =
-  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+        const tgId =
+          (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-if (tgId) {
-  headers["x-telegram-id"] = String(tgId)
-  headers["x-platform"] = "telegram"
-} else if (accessToken) {
-  headers["Authorization"] = `Bearer ${accessToken}`
-}
+        if (tgId) {
+          headers["x-telegram-id"] = String(tgId)
+          headers["x-platform"] = "telegram"
+        } else if (accessToken) {
+          headers["Authorization"] = `Bearer ${accessToken}`
+        }
 
-const res = await fetch(
-  `/api/subscription`,
-  {
-    cache: "no-store",
-    headers
-  }
-)
+        const res = await fetch(
+          `/api/subscription`,
+          {
+            cache: "no-store",
+            headers
+          }
+        )
 
         const data = await res.json()
         // alert("SUB DATA: " + JSON.stringify(data))
@@ -630,22 +630,22 @@ const res = await fetch(
 
     async function checkSubscription() {
       try {
-const headers: Record<string, string> = {}
+        const headers: Record<string, string> = {}
 
-const tgId =
-  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+        const tgId =
+          (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-if (tgId) {
-  headers["x-telegram-id"] = String(tgId)
-  headers["x-platform"] = "telegram"
-} else if (accessToken) {
-  headers["Authorization"] = `Bearer ${accessToken}`
-}
+        if (tgId) {
+          headers["x-telegram-id"] = String(tgId)
+          headers["x-platform"] = "telegram"
+        } else if (accessToken) {
+          headers["Authorization"] = `Bearer ${accessToken}`
+        }
 
-const res = await fetch("/api/subscription", {
-  cache: "no-store",
-  headers
-})
+        const res = await fetch("/api/subscription", {
+          cache: "no-store",
+          headers
+        })
 
         const data = await res.json()
 
