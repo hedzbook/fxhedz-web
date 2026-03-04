@@ -142,6 +142,19 @@ const platform =
   }>({ active: false })
 
   useEffect(() => {
+  const limit = localStorage.getItem("fx_device_limit")
+
+  if (limit === "true") {
+    const count = localStorage.getItem("fx_device_limit_count")
+
+    setDeviceLimit({
+      active: true,
+      count: count ? Number(count) : undefined
+    })
+  }
+}, [])
+
+  useEffect(() => {
 
     function handler(e: any) {
 
@@ -721,6 +734,9 @@ const sessionExists =
       }
     }
 
+
+    localStorage.removeItem("fx_device_limit")
+localStorage.removeItem("fx_device_limit_count")
     localStorage.clear()
     window.location.reload()
   }
