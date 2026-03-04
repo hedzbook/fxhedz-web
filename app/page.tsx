@@ -294,7 +294,7 @@ export default function Page() {
 
   const sessionExists =
     isTelegram
-      ? false
+      ? true
       : isAndroid
         ? hasNativeToken
         : !!accessToken
