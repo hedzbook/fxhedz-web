@@ -146,9 +146,6 @@ if (tgUserId && !tgLoggedOut) {
 
     try {
 
-setAccessToken(null)
-setRefreshToken(null)
-setEmail(null)
 setAuthLoading(false)
       
     } catch (e) {
@@ -525,21 +522,6 @@ const sessionExists =
       let id: string | null = null
 
       // ===============================
-      // TELEGRAM DEVICE ID OVERRIDE
-      // ===============================
-      if (platform === "telegram") {
-        try {
-          const tg = (window as any)?.Telegram?.WebApp
-          const tgUserId = tg?.initDataUnsafe?.user?.id
-
-          if (tgUserId) {
-            id = String(tgUserId)
-            localStorage.setItem("fxhedz_device_id", id)
-          }
-        } catch { }
-      }
-
-      // ===============================
       // FALLBACK (WEB / ANDROID URL)
       // ===============================
       if (!id) {
@@ -602,7 +584,7 @@ const sessionExists =
   // =============================
   useEffect(() => {
 
-    if (!isAndroid && !isAuthenticated) return
+    if (!isAndroid && !isTelegram && !isAuthenticated) return
 
     async function checkSubscription() {
       try {
@@ -711,6 +693,7 @@ const sessionExists =
 if (tgId) {
   localStorage.setItem("tg_logged_out", "1")
   window.location.reload()
+  return
 }
 
     const isAndroid =
