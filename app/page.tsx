@@ -64,6 +64,7 @@ type SubscriptionMeta = {
 
 export default function Page() {
 
+  const [signalsLoading, setSignalsLoading] = useState(true)
   const [appReady, setAppReady] = useState(false)
   const dummySignals = useMemo(() => generateDummySignals(), [])
   const [signals, setSignals] = useState<any>(dummySignals)
@@ -459,6 +460,7 @@ useEffect(() => {
     if (authLoading) return
 
     if (!isAuthenticated) {
+      setSignalsLoading(true)
       setSignals(generateDummySignals())
       return
     }
@@ -470,22 +472,28 @@ useEffect(() => {
 
     if (subActive === null) return
 
-    async function loadSignals() {
-      try {
-        const res = await fetch(SIGNAL_API, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        })
+async function loadSignals() {
 
-        if (!res.ok) return
+  try {
 
-        const json = await res.json()
-        const incoming = json?.signals ?? {}
+    const res = await fetch(SIGNAL_API, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
 
-        setSignals(incoming)
-      } catch { }
-    }
+    if (!res.ok) return
+
+    const json = await res.json()
+    const incoming = json?.signals ?? {}
+
+    setSignals(incoming)
+
+    // signals ready
+    setSignalsLoading(false)
+
+  } catch { }
+}
 
     loadSignals()
     const interval = setInterval(loadSignals, 2500)
@@ -1013,12 +1021,14 @@ useEffect(() => {
                         (isLive && isLivePair)
                       )
 
-                    const displaySignal =
-                      !isAuthenticated
-                        ? dummySignal
-                        : canAccess
-                          ? (realSignal ?? dummySignal)
-                          : dummySignal
+const displaySignal =
+  signalsLoading
+    ? null
+    : !isAuthenticated
+      ? dummySignal
+      : canAccess
+        ? (realSignal ?? dummySignal)
+        : dummySignal
 
                     const displayDirection =
                       !isAuthenticated
