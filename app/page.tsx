@@ -276,7 +276,7 @@ const isAuthenticated =
 
 const sessionExists =
   isTelegram
-    ? subActive !== null
+    ? subActive === true
     : isAndroid
       ? hasNativeToken
       : !!refreshToken
@@ -687,8 +687,13 @@ const sessionExists =
     const tgId =
       (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-    if (tgId) {
-    }
+if (tgId) {
+  setSubActive(false)
+  setAccessMeta(null)
+  setSignals(generateDummySignals())
+  setUiSignals(generateDummySignals())
+  return
+}
 
     const isAndroid =
       typeof window !== "undefined" &&
