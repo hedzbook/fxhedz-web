@@ -127,63 +127,75 @@ export default function Page() {
     typeof window !== "undefined" &&
     (window as any).__HAS_NATIVE_TOKEN__ === true
 
-useEffect(() => {
+  useEffect(() => {
 
-  // ===============================
-  // TELEGRAM AUTH (REAL AUTH, NOT BYPASS)
-  // ===============================
-  const tgUserId =
-    typeof window !== "undefined" &&
-    (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+    // ===============================
+    // 🔥 TELEGRAM SESSION RESTORE
+    // ===============================
+    const tgSession =
+      typeof window !== "undefined" &&
+      localStorage.getItem("fxhedz_tg_session") === "1"
 
-  if (tgUserId) {
+    const tgUserId =
+      typeof window !== "undefined" &&
+      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-    async function telegramAuth() {
-      try {
-
-        const res = await fetch("/api/native-auth", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            telegram_chat_id: String(tgUserId),
-            platform: "telegram"
-          })
-        })
-
-        if (!res.ok) {
-          setAuthLoading(false)
-          return
-        }
-
-        const data = await res.json()
-
-        // Mark as authenticated
-        setRefreshToken("telegram-session")
-        setAccessToken(null)
-
-        // Optional: store resolved email if backend returns it
-        if (data?.email) {
-          setEmail(data.email)
-        }
-
-      } catch (e) {
-        console.log("Telegram auth failed", e)
-      }
-
+    if (tgSession && tgUserId) {
+      setRefreshToken("telegram-session")
+      setAccessToken("telegram-auth")
       setAuthLoading(false)
+      return
     }
 
-    telegramAuth()
-    return
-  }
+    if (tgUserId) {
 
-  // ===============================
-  // ANDROID
-  // ===============================
-  if (isAndroid) {
-    setAuthLoading(false)
-    return
-  }
+      async function telegramAuth() {
+        try {
+
+          const res = await fetch("/api/native-auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              telegram_chat_id: String(tgUserId),
+              platform: "telegram"
+            })
+          })
+
+          if (!res.ok) {
+            setAuthLoading(false)
+            return
+          }
+
+          const data = await res.json()
+
+          // Mark as authenticated
+          localStorage.setItem("fxhedz_tg_session", "1")
+          setRefreshToken("telegram-session")
+          setAccessToken("telegram-auth")
+
+          // Optional: store resolved email if backend returns it
+          if (data?.email) {
+            setEmail(data.email)
+          }
+
+        } catch (e) {
+          console.log("Telegram auth failed", e)
+        }
+
+        setAuthLoading(false)
+      }
+
+      telegramAuth()
+      return
+    }
+
+    // ===============================
+    // ANDROID
+    // ===============================
+    if (isAndroid) {
+      setAuthLoading(false)
+      return
+    }
 
     // ===============================
     // NORMAL WEB FLOW
@@ -299,16 +311,16 @@ useEffect(() => {
 
   }, [refreshToken, email])
 
-const isTelegram =
-  typeof window !== "undefined" &&
-  !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+  const isTelegram =
+    typeof window !== "undefined" &&
+    !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-const isAuthenticated =
-  isTelegram
-    ? true
-    : isAndroid
-      ? hasNativeToken
-      : !!accessToken
+  const isAuthenticated =
+    isTelegram
+      ? true
+      : isAndroid
+        ? hasNativeToken
+        : !!accessToken
 
   const sessionExists =
     isAndroid
@@ -456,22 +468,32 @@ const isAuthenticated =
 
     if (subActive === null) return
 
-    async function loadSignals() {
-      try {
-        const res = await fetch(SIGNAL_API, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        })
+async function loadSignals() {
+  try {
 
-        if (!res.ok) return
+    const headers: Record<string, string> = {}
 
-        const json = await res.json()
-        const incoming = json?.signals ?? {}
+    const tgId =
+      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-        setSignals(incoming)
-      } catch { }
+    if (tgId) {
+      headers["x-telegram-id"] = String(tgId)
+      headers["x-platform"] = "telegram"
+    } else if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`
     }
+
+    const res = await fetch(SIGNAL_API, { headers })
+
+    if (!res.ok) return
+
+    const json = await res.json()
+    const incoming = json?.signals ?? {}
+
+    setSignals(incoming)
+
+  } catch {}
+}
 
     loadSignals()
     const interval = setInterval(loadSignals, 2500)
@@ -487,10 +509,10 @@ const isAuthenticated =
     if (authLoading) return
 
     // Only block unauthenticated for WEB
-if (!isAndroid && !isTelegram && !isAuthenticated) {
-  setSubActive(false)
-  return
-}
+    if (!isAndroid && !isTelegram && !isAuthenticated) {
+      setSubActive(false)
+      return
+    }
 
     // If Android and no native token â†’ block
     if (isAndroid && !hasNativeToken) {
@@ -561,15 +583,25 @@ if (!isAndroid && !isTelegram && !isAuthenticated) {
       // ===============================
 
       try {
-        const res = await fetch(
-          `/api/subscription`,
-          {
-            cache: "no-store",
-            headers: accessToken
-              ? { Authorization: `Bearer ${accessToken}` }
-              : {}
-          }
-        )
+const headers: Record<string, string> = {}
+
+const tgId =
+  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+
+if (tgId) {
+  headers["x-telegram-id"] = String(tgId)
+  headers["x-platform"] = "telegram"
+} else if (accessToken) {
+  headers["Authorization"] = `Bearer ${accessToken}`
+}
+
+const res = await fetch(
+  `/api/subscription`,
+  {
+    cache: "no-store",
+    headers
+  }
+)
 
         const data = await res.json()
         // alert("SUB DATA: " + JSON.stringify(data))
@@ -598,12 +630,22 @@ if (!isAndroid && !isTelegram && !isAuthenticated) {
 
     async function checkSubscription() {
       try {
-        const res = await fetch("/api/subscription", {
-          cache: "no-store",
-          headers: accessToken
-            ? { Authorization: `Bearer ${accessToken}` }
-            : {}
-        })
+const headers: Record<string, string> = {}
+
+const tgId =
+  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+
+if (tgId) {
+  headers["x-telegram-id"] = String(tgId)
+  headers["x-platform"] = "telegram"
+} else if (accessToken) {
+  headers["Authorization"] = `Bearer ${accessToken}`
+}
+
+const res = await fetch("/api/subscription", {
+  cache: "no-store",
+  headers
+})
 
         const data = await res.json()
 
