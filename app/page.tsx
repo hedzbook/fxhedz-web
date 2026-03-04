@@ -136,25 +136,20 @@ const tgUserId =
   typeof window !== "undefined" &&
   (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-if (tgUserId) {
+const tgLoggedOut =
+  typeof window !== "undefined" &&
+  localStorage.getItem("tg_logged_out") === "1"
+
+if (tgUserId && !tgLoggedOut) {
 
   async function bootstrapTelegram() {
 
     try {
 
-      // 1️⃣ register / confirm user
-      await fetch("/api/native-auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          telegram_chat_id: String(tgUserId),
-          platform: "telegram"
-        })
-      })
-
-      // 2️⃣ mark session as active
-      setAccessToken("telegram")
-      setRefreshToken("telegram")
+setAccessToken(null)
+setRefreshToken(null)
+setEmail(null)
+setAuthLoading(false)
       
     } catch (e) {
       console.log("Telegram bootstrap failed", e)
@@ -295,7 +290,7 @@ if (tgUserId) {
 
 const isAuthenticated =
   isTelegram
-    ? true
+    ? subActive === true
     : isAndroid
       ? hasNativeToken
       : !!accessToken
@@ -714,11 +709,8 @@ const sessionExists =
       (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
 if (tgId) {
-  setSubActive(false)
-  setAccessMeta(null)
-  setSignals(generateDummySignals())
-  setUiSignals(generateDummySignals())
-  return
+  localStorage.setItem("tg_logged_out", "1")
+  window.location.reload()
 }
 
     const isAndroid =
