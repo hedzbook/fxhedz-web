@@ -51,16 +51,6 @@ body: JSON.stringify({
 
   const gasData = await gasRes.json()
 
-  if (gasData.device_limit) {
-  return NextResponse.json(
-    {
-      device_limit: true,
-      device_count: gasData.device_count
-    },
-    { status: 403 }
-  )
-}
-
   if (!gasRes.ok) {
     return NextResponse.json({ error: "gas_error" }, { status: 500 })
   }

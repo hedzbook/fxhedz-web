@@ -54,7 +54,25 @@ async function completeLogin(idToken: string) {
     })
   })
 
+  if (!res.ok) {
   const data = await res.json()
+
+  if (res.status === 403 && data.device_limit) {
+    localStorage.setItem("email", data.email)
+    localStorage.setItem("fxhedz_device_id", deviceId)
+
+    window.dispatchEvent(
+      new CustomEvent("fxhedz-device-limit", {
+        detail: { count: data.device_count }
+      })
+    )
+    return
+  }
+
+  return
+}
+
+const data = await res.json()
 
   if (res.status === 403 && data.device_limit) {
     localStorage.setItem("email", data.email)
