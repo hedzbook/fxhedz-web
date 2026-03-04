@@ -76,18 +76,17 @@ export default function ControlPanel({
 <div
 className="
 w-full
-h-full
 flex
 flex-col
 bg-neutral-900
 pt-6
-pb-6
+pb-4
 px-5
-space-y-7
 text-sm
 overflow-y-auto
 controlpanel-scroll
 "
+style={{ overscrollBehavior: "contain" }}
 >
 
       <Section>
@@ -217,11 +216,18 @@ controlpanel-scroll
 
       </Section>
 
-      <div className="pt-2">
-        <button
-          onClick={onLogout}
-          className="w-full text-red-500 font-semibold hover:text-red-400 transition-colors"
-        >
+      <div className="pt-4">
+<button
+  onClick={onLogout}
+  className="
+  w-full
+  py-2
+  text-red-500
+  font-semibold
+  hover:text-red-400
+  transition-colors
+"
+>
           Sign Out
         </button>
       </div>
@@ -232,7 +238,7 @@ controlpanel-scroll
 
 function Section({ children }: any) {
   return (
-    <div className="space-y-3 pb-6 border-b border-neutral-800 last:border-none">
+    <div className="space-y-3 pt-5 pb-5 border-b border-neutral-800 first:pt-0 last:border-none">
       {children}
     </div>
   )
