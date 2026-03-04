@@ -132,27 +132,27 @@ export default function Page() {
     // ===============================
     // 🔥 TELEGRAM SESSION RESTORE
     // ===============================
-const tgSession =
-  typeof window !== "undefined" &&
-  localStorage.getItem("fxhedz_tg_session") === "1"
+    const tgSession =
+      typeof window !== "undefined" &&
+      localStorage.getItem("fxhedz_tg_session") === "1"
+    setTelegramSession(true)
+    const tgUserId =
+      typeof window !== "undefined" &&
+      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-const tgUserId =
-  typeof window !== "undefined" &&
-  (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+    // Only restore existing Telegram session
+    if (tgSession && tgUserId) {
+      setRefreshToken("telegram-session")
+      setAccessToken("telegram-auth")
+      setAuthLoading(false)
+      return
+    }
 
-// Only restore existing Telegram session
-if (tgSession && tgUserId) {
-  setRefreshToken("telegram-session")
-  setAccessToken("telegram-auth")
-  setAuthLoading(false)
-  return
-}
-
-// If Telegram present but no session → treat as unauthenticated
-if (tgUserId && !tgSession) {
-  setAuthLoading(false)
-  return
-}
+    // If Telegram present but no session → treat as unauthenticated
+    if (tgUserId && !tgSession) {
+      setAuthLoading(false)
+      return
+    }
 
     // ===============================
     // ANDROID
@@ -280,23 +280,28 @@ if (tgUserId && !tgSession) {
     typeof window !== "undefined" &&
     !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-const telegramSession =
-  typeof window !== "undefined" &&
-  localStorage.getItem("fxhedz_tg_session") === "1"
+  const [telegramSession, setTelegramSession] = useState<boolean>(false)
 
-const isAuthenticated =
-  isTelegram
-    ? telegramSession
-    : isAndroid
-      ? hasNativeToken
-      : !!accessToken
-      
-const sessionExists =
-  isTelegram
-    ? telegramSession
-    : isAndroid
-      ? hasNativeToken
-      : !!refreshToken
+  useEffect(() => {
+    if (typeof window === "undefined") return
+
+    const flag = localStorage.getItem("fxhedz_tg_session") === "1"
+    setTelegramSession(flag)
+  }, [])
+
+  const isAuthenticated =
+    isTelegram
+      ? telegramSession
+      : isAndroid
+        ? hasNativeToken
+        : !!accessToken
+
+  const sessionExists =
+    isTelegram
+      ? telegramSession
+      : isAndroid
+        ? hasNativeToken
+        : !!refreshToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
@@ -701,12 +706,13 @@ const sessionExists =
   }
   async function logoutCurrentSession() {
 
-  const tgId =
-    (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+    const tgId =
+      (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-  if (tgId) {
-    localStorage.removeItem("fxhedz_tg_session")
-  }
+    if (tgId) {
+      localStorage.removeItem("fxhedz_tg_session")
+      setTelegramSession(false)
+    }
 
     const isAndroid =
       typeof window !== "undefined" &&
