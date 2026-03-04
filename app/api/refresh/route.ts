@@ -4,16 +4,54 @@ import { createAccessToken } from "@/lib/jwt"
 
 export async function POST(req: NextRequest) {
   try {
-    const { refreshToken, deviceId, email, platform } = await req.json()
+    const body = await req.json()
 
-    if (!refreshToken || !deviceId || !email) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 })
+    const refreshToken = body?.refreshToken
+    const deviceId = body?.deviceId
+    const emailRaw = body?.email
+    const platformRaw = body?.platform
+
+    // ================================
+    // STRICT INPUT VALIDATION
+    // ================================
+
+    if (
+      !refreshToken ||
+      refreshToken === "undefined" ||
+      typeof refreshToken !== "string" ||
+      refreshToken.trim().length < 10 ||
+      !deviceId ||
+      typeof deviceId !== "string" ||
+      !emailRaw ||
+      typeof emailRaw !== "string"
+    ) {
+      return NextResponse.json(
+        { error: "Invalid refresh request" },
+        { status: 401 }
+      )
     }
+
+    const email = emailRaw.toLowerCase().trim()
+
+    const platform =
+      platformRaw === "telegram" ||
+      platformRaw === "android" ||
+      platformRaw === "web"
+        ? platformRaw
+        : "web"
+
+    // ================================
+    // HASH REFRESH TOKEN
+    // ================================
 
     const refreshHash = crypto
       .createHash("sha256")
       .update(refreshToken)
       .digest("hex")
+
+    // ================================
+    // CALL GAS VALIDATION
+    // ================================
 
     const gasRes = await fetch(process.env.GAS_AUTH_URL!, {
       method: "POST",
@@ -23,13 +61,24 @@ export async function POST(req: NextRequest) {
         email,
         device_id: deviceId,
         refresh_token_hash: refreshHash,
-        platform: platform || "web"
+        platform
       })
     })
 
+    if (!gasRes.ok) {
+      return NextResponse.json(
+        { error: "Auth service unavailable" },
+        { status: 500 }
+      )
+    }
+
     const gasData = await gasRes.json()
 
-    if (gasData.device_limit) {
+    // ================================
+    // DEVICE LIMIT ENFORCEMENT
+    // ================================
+
+    if (gasData?.device_limit) {
       return NextResponse.json(
         {
           device_limit: true,
@@ -39,18 +88,29 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (!gasData.valid) {
+    // ================================
+    // INVALID TOKEN
+    // ================================
+
+    if (!gasData?.valid) {
       return NextResponse.json(
         { error: "Invalid refresh token" },
         { status: 401 }
       )
     }
 
+    // ================================
+    // ISSUE NEW ACCESS TOKEN
+    // ================================
+
     const accessToken = createAccessToken({ email, deviceId })
 
     return NextResponse.json({ accessToken })
 
-  } catch {
-    return NextResponse.json({ error: "Refresh failed" }, { status: 401 })
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Refresh failed" },
+      { status: 401 }
+    )
   }
 }
