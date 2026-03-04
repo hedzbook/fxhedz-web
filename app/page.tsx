@@ -132,10 +132,11 @@ export default function Page() {
     // ===============================
     // 🔥 TELEGRAM SESSION RESTORE
     // ===============================
-    const tgSession =
-      typeof window !== "undefined" &&
-      localStorage.getItem("fxhedz_tg_session") === "1"
-    setTelegramSession(true)
+const tgSession =
+  typeof window !== "undefined" &&
+  localStorage.getItem("fxhedz_tg_session") === "1"
+
+setTelegramSession(!!tgSession)
     const tgUserId =
       typeof window !== "undefined" &&
       (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
