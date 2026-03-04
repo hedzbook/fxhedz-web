@@ -179,11 +179,11 @@ max-h-screen
             rel="noopener noreferrer"
             className="flex justify-center"
           >
-            <img
-              src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-              alt="Get it on Google Play"
-              className="h-14"
-            />
+<img
+  src="/playstore.png"
+  alt="Get it on Google Play"
+  className="h-12"
+/>
           </a>
 
           <p className="text-neutral-400 text-xs text-center">
