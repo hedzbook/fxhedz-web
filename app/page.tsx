@@ -249,10 +249,17 @@ export default function Page() {
       ? hasNativeToken
       : !!accessToken
 
-  const sessionExists =
-    isAndroid
-      ? hasNativeToken
+const isTelegram =
+  typeof window !== "undefined" &&
+  !!(window as any)?.Telegram?.WebApp
+
+const sessionExists =
+  isAndroid
+    ? hasNativeToken
+    : isTelegram
+      ? !!email
       : !!refreshToken
+
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
   async function loadPreview(pair: string) {
