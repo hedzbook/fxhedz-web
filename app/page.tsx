@@ -780,6 +780,43 @@ export default function Page() {
   const isGuest =
     !isAuthenticated
 
+    // =======================================
+// HARD BLOCK: DEVICE LIMIT
+// =======================================
+if (deviceLimit.active) {
+  return (
+    <div className="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center">
+      <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md text-center space-y-4">
+
+        <div className="text-lg font-semibold">
+          Device Restricted
+        </div>
+
+        <div className="text-sm text-neutral-400">
+          Maximum 2 web devices allowed.
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={logoutAllWebDevices}
+            className="flex-1 bg-neutral-700 hover:bg-neutral-600 py-2 rounded"
+          >
+            Logout All Devices
+          </button>
+
+          <button
+            onClick={logoutCurrentSession}
+            className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded"
+          >
+            Logout
+          </button>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
   const plan = accessMeta?.status?.toLowerCase()
 
   const isLivePlus = plan === "live+"
@@ -1184,38 +1221,6 @@ export default function Page() {
         </div>
 
       </main>
-      {deviceLimit.active && (
-        <div className="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
-          <div className="bg-neutral-900 p-6 rounded-xl w-[90%] max-w-md text-center space-y-4">
-
-            <div className="text-lg font-semibold">
-              Device Restricted
-            </div>
-
-            <div className="text-sm text-neutral-400">
-              Maximum 2 web devices allowed.
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={logoutAllWebDevices}
-                className="flex-1 bg-neutral-700 hover:bg-neutral-600 py-2 rounded"
-              >
-                Logout All Devices
-              </button>
-
-              <button
-                onClick={logoutCurrentSession}
-                className="flex-1 bg-red-600 hover:bg-red-500 py-2 rounded"
-              >
-                Logout
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
       {!authLoading && !deviceLimit.active && (
         <AccessOverlay
           sessionExists={sessionExists}
