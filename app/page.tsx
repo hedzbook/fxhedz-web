@@ -302,7 +302,7 @@ const isAuthenticated =
 
 const sessionExists =
   isTelegram
-    ? subActive === true
+    ? true
     : isAndroid
       ? hasNativeToken
       : !!refreshToken
