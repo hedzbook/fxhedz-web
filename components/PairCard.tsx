@@ -56,10 +56,11 @@ function PairCard({
   history,
   orders,
   performance,
-  notes
+  notes,
+  isGuest
 }: Props) {
 
-  if (!signal) {
+if (!signal && !isGuest) {
   return <PairCardSkeleton />
 }
   const dir: TradeDirection = direction ?? "--"
