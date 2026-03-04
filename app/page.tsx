@@ -281,28 +281,19 @@ setTelegramSession(!!tgSession)
     typeof window !== "undefined" &&
     !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
-  const [telegramSession, setTelegramSession] = useState<boolean>(false)
+const isAuthenticated =
+  isTelegram
+    ? subActive === true
+    : isAndroid
+      ? hasNativeToken
+      : !!accessToken
 
-  useEffect(() => {
-    if (typeof window === "undefined") return
-
-    const flag = localStorage.getItem("fxhedz_tg_session") === "1"
-    setTelegramSession(flag)
-  }, [])
-
-  const isAuthenticated =
-    isTelegram
-      ? telegramSession
-      : isAndroid
-        ? hasNativeToken
-        : !!accessToken
-
-  const sessionExists =
-    isTelegram
-      ? telegramSession
-      : isAndroid
-        ? hasNativeToken
-        : !!refreshToken
+const sessionExists =
+  isTelegram
+    ? subActive !== null
+    : isAndroid
+      ? hasNativeToken
+      : !!refreshToken
 
   const [accessMeta, setAccessMeta] =
     useState<SubscriptionMeta | null>(null)
