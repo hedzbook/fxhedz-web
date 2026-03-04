@@ -219,21 +219,28 @@ export default function Page() {
           })
         })
 
-        if (res.status === 403) {
+if (res.status === 403) {
 
-          const data = await res.json()
+  const data = await res.json()
 
-          setEmail(storedEmail)
-          setRefreshToken(storedRefresh)
+  setEmail(storedEmail)
+  setRefreshToken(storedRefresh)
 
-          setDeviceLimit({
-            active: true,
-            count: data.device_count
-          })
+  // Persist device limit
+  localStorage.setItem("fx_device_limit", "true")
+  localStorage.setItem(
+    "fx_device_limit_count",
+    String(data.device_count || 2)
+  )
 
-          setAuthLoading(false)
-          return
-        }
+  setDeviceLimit({
+    active: true,
+    count: data.device_count
+  })
+
+  setAuthLoading(false)
+  return
+}
 
         if (res.status === 401) {
           localStorage.clear()
