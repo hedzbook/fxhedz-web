@@ -299,8 +299,14 @@ useEffect(() => {
 
   }, [refreshToken, email])
 
-  const isAuthenticated =
-    isAndroid
+const isTelegram =
+  typeof window !== "undefined" &&
+  !!(window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
+
+const isAuthenticated =
+  isTelegram
+    ? true
+    : isAndroid
       ? hasNativeToken
       : !!accessToken
 
@@ -481,10 +487,10 @@ useEffect(() => {
     if (authLoading) return
 
     // Only block unauthenticated for WEB
-    if (!isAndroid && !isAuthenticated) {
-      setSubActive(false)
-      return
-    }
+if (!isAndroid && !isTelegram && !isAuthenticated) {
+  setSubActive(false)
+  return
+}
 
     // If Android and no native token â†’ block
     if (isAndroid && !hasNativeToken) {
