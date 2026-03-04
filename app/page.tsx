@@ -137,7 +137,33 @@ const tgUserId =
   (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id
 
 if (tgUserId) {
-  setAuthLoading(false)
+
+  async function bootstrapTelegram() {
+
+    try {
+
+      // 1️⃣ register / confirm user
+      await fetch("/api/native-auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          telegram_chat_id: String(tgUserId),
+          platform: "telegram"
+        })
+      })
+
+      // 2️⃣ mark session as active
+      setAccessToken("telegram")
+      setRefreshToken("telegram")
+      
+    } catch (e) {
+      console.log("Telegram bootstrap failed", e)
+    }
+
+    setAuthLoading(false)
+  }
+
+  bootstrapTelegram()
   return
 }
 
@@ -269,7 +295,7 @@ if (tgUserId) {
 
 const isAuthenticated =
   isTelegram
-    ? subActive === true
+    ? true
     : isAndroid
       ? hasNativeToken
       : !!accessToken
