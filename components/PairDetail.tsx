@@ -311,41 +311,64 @@ export default function PairDetail({
 
                         </div>
 
-                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+<div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                            <div className="shrink-0 text-neutral-400 mb-2">
-                                Active Orders
-                            </div>
+  {/* HEADER */}
+  <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
 
-                            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+    <div className="px-2">Active</div>
 
-                                {data?.orders?.length ? data.orders.map((o: any, i: number) => (
-                                    <div
-                                        key={i}
-                                        className="flex justify-between bg-neutral-800 p-2"
-                                    >
-                                        <div>
-                                            <div className={o.direction === "BUY" ? "text-green-400" : "text-red-400"}>
-                                                {o.direction}
-                                            </div>
-                                            <div className="text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                                {/*ENTRY*/} {o.entry}
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div>{o.lots}</div>
-                                            <div className={Number(o.profit) >= 0 ? "text-green-400" : "text-red-400"}>
-                                                {Number(o.profit).toFixed(2)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="text-neutral-500">
-                                        No open orders
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+    <div className="px-2">Orders</div>
+
+    <div className="px-2 text-right">
+      Lots {data?.orders?.reduce((s:any,o:any)=>s+Number(o.lots||0),0).toFixed(2)}
+    </div>
+
+    <div className="px-2 text-right">
+      ~PnL {data?.orders?.reduce((s:any,o:any)=>s+Number(o.profit||0),0).toFixed(2)}
+    </div>
+
+  </div>
+
+  {/* ROWS */}
+  <div className="flex-1 overflow-y-auto space-y-1">
+
+    {data?.orders?.length ? data.orders.map((o:any,i:number)=>(
+
+      <div
+        key={i}
+        className="grid grid-cols-4 bg-neutral-800 py-1 font-mono tabular-nums"
+      >
+
+        <div className={`px-2 ${o.direction==="BUY"?"text-green-400":"text-red-400"}`}>
+          {o.direction}
+        </div>
+
+        <div className="px-2 text-neutral-300">
+          {o.entry}
+        </div>
+
+        <div className="px-2 text-right tracking-tight">
+          {o.lots}
+        </div>
+
+        <div className={`px-2 text-right tracking-tight ${Number(o.profit)>=0?"text-green-400":"text-red-400"}`}>
+          {Number(o.profit).toFixed(2)}
+        </div>
+
+      </div>
+
+    )) : (
+
+      <div className="text-neutral-500 px-2">
+        No open orders
+      </div>
+
+    )}
+
+  </div>
+
+</div>
 
                     </div>
                 )}
