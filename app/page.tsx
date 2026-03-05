@@ -314,7 +314,7 @@ export default function Page() {
         })
 
         if (!res.ok) {
-          // ðŸ”¥ Token invalid â†’ force logout
+          // Token invalid force logout
           localStorage.clear()
           window.location.reload()
           return
@@ -528,7 +528,7 @@ export default function Page() {
       setSubActive(false)
       return
     }
-    // If Android and no native token â†’ block
+    // If Android and no native token block
     if (isAndroid && !hasNativeToken) {
       setSubActive(false)
       return

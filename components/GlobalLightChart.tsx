@@ -39,7 +39,7 @@ export default function GlobalLightChart({
 
         const width = container.clientWidth
 
-        // ðŸ”¥ Responsive Font Clamp (9px â†’ 14px)
+        // ðŸ”¥ Responsive Font Clamp (9px - 14px)
         const clampedFontSize = Math.max(
             9,
             Math.min(14, Math.floor(width * 0.012))

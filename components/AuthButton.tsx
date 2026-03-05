@@ -31,7 +31,7 @@ const hasNativeToken =
 
           ensureDeviceIdentity()
 
-          // If inside Android WebView â†’ trigger native login
+          // If inside Android WebView trigger native login
           if (typeof window !== "undefined" && (window as any).ReactNativeWebView) {
             (window as any).ReactNativeWebView.postMessage("LOGIN_REQUEST")
           } else {
