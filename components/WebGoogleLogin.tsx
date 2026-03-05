@@ -5,9 +5,9 @@ import { useEffect } from "react"
 
 export default function WebGoogleLogin() {
 
-  const isTelegram =
-    typeof window !== "undefined" &&
-    (window as any)?.Telegram?.WebApp
+const isTelegram =
+  typeof window !== "undefined" &&
+  Boolean((window as any)?.Telegram?.WebApp?.initDataUnsafe)
 
   useEffect(() => {
 
@@ -131,27 +131,32 @@ window.location.reload()
     window.location.href = url
   }
 
-  if (isTelegram) {
-    return (
-      <button
-        onClick={startTelegramGoogleFlow}
-        className="
-          flex items-center justify-center gap-3 
-          w-full max-w-[clamp(140px,65vw,240px)]
-py-[clamp(6px,1.8vh,10px)]
-px-[clamp(10px,3vw,18px)]
-text-[clamp(9px,5.5px+1.0937vw,19.5px)]
-          bg-white hover:bg-neutral-50 
-          rounded-md border border-neutral-300
-          shadow-sm transition-all duration-200
-          active:scale-[0.98]
-        "
-      >
-        <GoogleIcon />
-        <span>Sign in with Google</span>
-      </button>
-    )
-  }
+if (isTelegram) {
+  return (
+    <button
+      onClick={startTelegramGoogleFlow}
+      className="
+        flex items-center justify-center
+        gap-[clamp(6px,1vw,10px)]
+
+        w-[clamp(150px,70vw,260px)]
+
+        py-[clamp(8px,1.6vh,12px)]
+        px-[clamp(14px,3vw,22px)]
+
+        text-[clamp(12px,1.4vw,16px)] font-medium
+
+        bg-white hover:bg-neutral-50
+        rounded-md border border-neutral-300
+        shadow-sm transition-all duration-200
+        active:scale-[0.98]
+      "
+    >
+      <GoogleIcon />
+      <span className="whitespace-nowrap">Sign in with Google</span>
+    </button>
+  )
+}
 
   return <div id="googleBtn" />
 }
@@ -159,7 +164,7 @@ text-[clamp(9px,5.5px+1.0937vw,19.5px)]
 function GoogleIcon() {
   return (
     <svg
-      className="w-[clamp(14px,3vw,20px)] h-[clamp(14px,3vw,20px)] shrink-0"
+      className="w-[clamp(16px,1.2vw,20px)] h-[clamp(16px,1.2vw,20px)] shrink-0"
       viewBox="0 0 18 18"
       xmlns="http://www.w3.org/2000/svg"
     >
