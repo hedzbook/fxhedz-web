@@ -14,28 +14,28 @@ type Props = {
 }
 
 const PLANS = [
-  {
-    label: "1 Month",
-    price: "$9.99",
-    months: 1,
-    razorpay: "https://rzp.io/rzp/ssReKHK",
-    sku: "fxhedz_monthly"
-  },
-  {
-    label: "3 Months",
-    price: "$26.99",
-    months: 3,
-    razorpay: "https://rzp.io/rzp/Npm6HPL",
-    sku: "fxhedz_quarterly",
-    highlight: true
-  },
-  {
-    label: "6 Months",
-    price: "$47.99",
-    months: 6,
-    razorpay: "https://rzp.io/rzp/YWH4Fyxx",
-    sku: "fxhedz_semiannual"
-  }
+    {
+        label: "1 Month",
+        price: "$9.99",
+        months: 1,
+        razorpay: "https://rzp.io/rzp/ssReKHK",
+        sku: "fxhedz_monthly"
+    },
+    {
+        label: "3 Months",
+        price: "$26.99",
+        months: 3,
+        razorpay: "https://rzp.io/rzp/Npm6HPL",
+        sku: "fxhedz_quarterly",
+        highlight: true
+    },
+    {
+        label: "6 Months",
+        price: "$47.99",
+        months: 6,
+        razorpay: "https://rzp.io/rzp/YWH4Fyxx",
+        sku: "fxhedz_semiannual"
+    }
 ]
 
 const PLAYSTORE_URL =
@@ -51,6 +51,10 @@ export default function ControlPanel({
     const isAndroid =
         typeof window !== "undefined" &&
         !!(window as any).ReactNativeWebView
+
+    const isTelegram =
+        typeof window !== "undefined" &&
+        (window as any)?.Telegram?.WebApp
 
     const nativeEmail =
         typeof window !== "undefined"
@@ -136,8 +140,8 @@ max-h-screen
             <Section>
 
                 <div className="text-emerald-400 uppercase text-xs tracking-wider">
-<Title>{isLivePlus ? "LIVE+ STATUS" : "GO LIVE+"}</Title>
-</div>
+                    <Title>{isLivePlus ? "LIVE+ STATUS" : "GO LIVE+"}</Title>
+                </div>
 
                 {!isLivePlus ? (
 
@@ -156,8 +160,8 @@ max-h-screen
         transition-colors
         font-semibold
 ${plan.highlight
-  ? "bg-emerald-600 hover:bg-emerald-500 animate-pulse"
-  : "bg-sky-600 hover:bg-sky-500"}
+                                        ? "bg-emerald-600 hover:bg-emerald-500 animate-pulse"
+                                        : "bg-sky-600 hover:bg-sky-500"}
       `}
                             >
 
@@ -235,7 +239,16 @@ ${plan.highlight
                 <Title>System</Title>
 
                 <Row label="Version" value={version} mono />
-                <Row label="Platform" value={isAndroid ? "ANDROID" : "WEB"} />
+                <Row
+                    label="Platform"
+                    value={
+                        isAndroid
+                            ? "ANDROID"
+                            : isTelegram
+                                ? "TELEGRAM"
+                                : "WEB"
+                    }
+                />
                 <Row label="Latency" value="~120ms" />
                 <Row label="Last Sync" value="Live" />
 
