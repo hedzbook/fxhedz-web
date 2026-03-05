@@ -5,13 +5,32 @@ import WebGoogleLogin from "./WebGoogleLogin"
 
 type Props = {
   sessionExists: boolean
+  authLoading?: boolean
   deviceLimited?: boolean
 }
 
-export default function AccessOverlay({ sessionExists, deviceLimited }: Props) {
+export default function AccessOverlay({
+  sessionExists,
+  authLoading,
+  deviceLimited
+}: Props) {
+
+  if (authLoading) {
+    return (
+      <OverlayContainer>
+        <Panel>
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-5 h-5 border-2 border-neutral-700 border-t-blue-500 rounded-full animate-spin" />
+            <p className="text-[10px] font-bold text-neutral-500 tracking-[0.2em]">
+              VERIFYING
+            </p>
+          </div>
+        </Panel>
+      </OverlayContainer>
+    )
+  }
 
   if (deviceLimited) return null
-
   if (sessionExists) return null
 
   return (

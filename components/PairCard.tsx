@@ -94,73 +94,57 @@ py-[clamp(2px,0.6vh,6px)]
         }}
       >
 
-{!signal ? (
+        {signal && (
+          <div className="flex flex-col w-full">
 
-  /* ================= SKELETON HEADER ================= */
-  <div className="flex flex-col w-full animate-pulse">
+            {/* ROW 1 Ã¢â‚¬â€ PAIR + DIRECTION */}
+            <div className="flex justify-between items-center">
+              <div className="font-semibold text-[clamp(11px,6.66px+1.354vw,24px)] leading-none">
+                {pair}
+              </div>
 
-    <div className="flex justify-between items-center">
-      <div className="h-4 w-16 bg-neutral-800 rounded" />
-      <div className="h-4 w-12 bg-neutral-800 rounded" />
-    </div>
+              <div className={`font-bold text-[clamp(11px,6.66px+1.354vw,24px)] ${liveDir === "BUY"
+                ? "text-green-400"
+                : liveDir === "SELL"
+                  ? "text-red-400"
+                  : liveDir === "HEDGED"
+                    ? "text-sky-400"
+                    : "text-neutral-500"
+                }`}>
+                {liveDir}
+              </div>
+            </div>
 
-    <div className="mt-2 flex justify-between items-center">
-      <div className="h-3 w-14 bg-neutral-800 rounded" />
-      <div className="h-3 w-10 bg-neutral-800 rounded" />
-    </div>
+            {/* ROW 2 Ã¢â‚¬â€ LOTS + B/S COUNT */}
+            <div className="mt-[clamp(1px,0.4vw,6px)] flex justify-between items-center text-[clamp(9px,5.5px+1.0937vw,19.5px)] leading-none">
+              <div
+                className={
+                  liveDir === "EXIT"
+                    ? "text-neutral-500"
+                    : "text-white"
+                }
+              >
+                {signal?.lots ?? "-"} LOTS
+              </div>
 
-    <div className="mt-3 h-[4px] w-full bg-neutral-800 rounded" />
+              <div className="font-semibold">
+                <span className="text-green-400">{signal?.buys ?? 0}B</span>
+                <span className="text-neutral-500 px-1">/</span>
+                <span className="text-red-400">{signal?.sells ?? 0}S</span>
+              </div>
+            </div>
 
-  </div>
+            {/* ROW 3 Ã¢â‚¬â€ TRADE BAR */}
+            <div className="mt-[clamp(1px,0.8vw,10px)]">
+              <InlineTradeStrip
+                signal={signal}
+                direction={liveDir}
+                frozenExitPrice={frozenExitPrice}
+              />
+            </div>
 
-) : (
-
-  <div className="flex flex-col w-full">
-
-    {/* ROW 1 — PAIR + DIRECTION */}
-    <div className="flex justify-between items-center">
-      <div className="font-semibold text-[clamp(11px,6.66px+1.354vw,24px)] leading-none">
-        {pair}
-      </div>
-
-      <div className={`font-bold text-[clamp(11px,6.66px+1.354vw,24px)] ${
-        liveDir === "BUY"
-          ? "text-green-400"
-          : liveDir === "SELL"
-          ? "text-red-400"
-          : liveDir === "HEDGED"
-          ? "text-sky-400"
-          : "text-neutral-500"
-      }`}>
-        {liveDir}
-      </div>
-    </div>
-
-    {/* ROW 2 — LOTS + B/S COUNT */}
-    <div className="mt-[clamp(1px,0.4vw,6px)] flex justify-between items-center text-[clamp(9px,5.5px+1.0937vw,19.5px)] leading-none">
-      <div className={liveDir === "EXIT" ? "text-neutral-500" : "text-white"}>
-        {signal?.lots ?? "-"} LOTS
-      </div>
-
-      <div className="font-semibold">
-        <span className="text-green-400">{signal?.buys ?? 0}B</span>
-        <span className="text-neutral-500 px-1">/</span>
-        <span className="text-red-400">{signal?.sells ?? 0}S</span>
-      </div>
-    </div>
-
-    {/* ROW 3 — TRADE BAR */}
-    <div className="mt-[clamp(1px,0.8vw,10px)]">
-      <InlineTradeStrip
-        signal={signal}
-        direction={liveDir}
-        frozenExitPrice={frozenExitPrice}
-      />
-    </div>
-
-  </div>
-
-)}
+          </div>
+        )}
       </div>
 
       {/* ================= EXPANDED CONTENT ================ */}

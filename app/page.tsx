@@ -142,24 +142,24 @@ export default function Page() {
     count?: number
   }>({ active: false })
 
-useEffect(() => {
+  useEffect(() => {
 
-  const limit = localStorage.getItem("fx_device_limit")
+    const limit = localStorage.getItem("fx_device_limit")
 
-  if (limit === "true") {
+    if (limit === "true") {
 
-    const count = localStorage.getItem("fx_device_limit_count")
+      const count = localStorage.getItem("fx_device_limit_count")
 
-    setDeviceLimit({
-      active: true,
-      count: count ? Number(count) : undefined
-    })
+      setDeviceLimit({
+        active: true,
+        count: count ? Number(count) : undefined
+      })
 
-  }
+    }
 
-  setAppReady(true)
+    setAppReady(true)
 
-}, [])
+  }, [])
 
   useEffect(() => {
 
@@ -1005,10 +1005,6 @@ useEffect(() => {
                       subActive !== null &&
                       accessMeta !== null
 
-                      const signalsReady =
-  uiSignals &&
-  Object.keys(uiSignals).length > 0
-
                     const canAccess =
                       subscriptionReady &&
                       subActive === true &&
@@ -1017,14 +1013,12 @@ useEffect(() => {
                         (isLive && isLivePair)
                       )
 
-const displaySignal =
-  !isAuthenticated
-    ? dummySignal
-    : !signalsReady
-      ? undefined
-      : canAccess
-        ? realSignal
-        : dummySignal
+                    const displaySignal =
+                      !isAuthenticated
+                        ? dummySignal
+                        : canAccess
+                          ? (realSignal ?? dummySignal)
+                          : dummySignal
 
                     const displayDirection =
                       !isAuthenticated
@@ -1226,12 +1220,13 @@ const displaySignal =
         </div>
 
       </main>
-{appReady && !authLoading && (
-  <AccessOverlay
-    sessionExists={sessionExists}
-    deviceLimited={deviceLimit.active}
-  />
-)}
+      {appReady && !authLoading && (
+        <AccessOverlay
+          sessionExists={sessionExists}
+          authLoading={authLoading}
+          deviceLimited={deviceLimit.active}
+        />
+      )}
     </div>
   )
 }
