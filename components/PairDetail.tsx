@@ -493,38 +493,72 @@ export default function PairDetail({
                     </div>
                 )}
 
-                {tab === "history" && (
-                    <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
+<div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                        <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1">
+{/* HEADER */}
 
-                            {data?.history?.length ? data.history.map((h: any, i: number) => (
-                                <div
-                                    key={i}
-                                    className="bg-neutral-800 border border-neutral-800 px-2 py-2 flex justify-between text-[clamp(9px,5.5px+1.0937vw,19.5px)]"
-                                >
-                                    <div>
-                                        <div className={h.direction === "BUY" ? "text-green-400" : "text-red-400"}>
-                                            {h.direction}
-                                        </div>
-                                        <div className="text-xs text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                            {fmtPrice(pair, h.entry)} - {fmtPrice(pair, h.exit)}
-                                        </div>
-                                    </div>
-                                    <div className={h.pnl >= 0 ? "text-green-400" : "text-red-400"}>
-                                        {fmtPnl(h.pnl)}
-                                    </div>
-                                </div>
-                            )) : (
-                                <div className="text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-500 text-center">
-                                    No history yet
-                                </div>
-                            )}
+<div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums tracking-tight">
 
-                        </div>
+<div className="px-2">Time</div>
+<div className="px-2">Dir</div>
 
-                    </div>
-                )}
+<div className="px-2 text-right">Entry</div>
+<div className="px-2 text-right">Exit</div>
+
+<div className="px-2 text-right">Lots</div>
+<div className="px-2 text-right">PnL</div>
+
+</div>
+
+
+{/* HISTORY ROWS */}
+
+<div className="flex-1 overflow-y-auto space-y-1">
+
+{data?.history?.length ? data.history.map((h:any,i:number)=>(
+
+<div
+key={i}
+className="grid grid-cols-6 bg-neutral-800 py-1 font-mono tabular-nums tracking-tight"
+>
+
+<div className="px-2 text-neutral-400">
+{String(h.time).slice(0,10)}
+</div>
+
+<div className={`px-2 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
+{h.direction}
+</div>
+
+<div className="px-2 text-right text-neutral-300">
+{h.entry}
+</div>
+
+<div className="px-2 text-right text-neutral-300">
+{h.exit}
+</div>
+
+<div className="px-2 text-right">
+{h.lots}
+</div>
+
+<div className={`px-2 text-right ${Number(h.pnl)>=0?"text-green-400":"text-red-400"}`}>
+{Number(h.pnl).toFixed(2)}
+</div>
+
+</div>
+
+)):(
+
+<div className="text-neutral-500 px-2">
+No history
+</div>
+
+)}
+
+</div>
+
+</div>
 
                 {tab === "performance" && (
                     <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
