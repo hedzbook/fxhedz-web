@@ -135,7 +135,9 @@ max-h-screen
 
             <Section>
 
-                <Title>Subscription</Title>
+                <div className="text-emerald-400 uppercase text-xs tracking-wider">
+GO LIVE+
+</div>
 
                 {!isLivePlus ? (
 
