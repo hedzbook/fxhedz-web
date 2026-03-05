@@ -455,7 +455,7 @@ export default function PairDetail({
                 {tab === "performance" && (
                     <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
 
-                        <div className="flex-1 min-h-0 overflow-y-auto space-y-[clamp(8px,1vh,16px)] pr-1">
+                        <div className="flex flex-col flex-1 min-h-0 gap-[clamp(8px,1vh,16px)] pr-1">
 
                             <div className="grid grid-cols-2 gap-[clamp(6px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
                                 <Metric
@@ -477,15 +477,16 @@ export default function PairDetail({
                                 <Stat label="Wins" value={data?.performance?.wins} />
                                 <Stat label="Losses" value={data?.performance?.losses} />
                                 <Stat label="Total PnL" value={data?.performance?.pnlTotal} />
-                                <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[140px]">
+
+                                <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[160px]">
 
                                     <div className="text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)] mb-2">
                                         Equity / Drawdown
                                     </div>
 
-                                    <div className="flex-1 w-full">
+                                    <div className="flex-1 min-h-0">
 
-                                        {curveData.length > 1 && (
+                                        {curveData.length > 0 && (
 
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <LineChart data={curveData}>
