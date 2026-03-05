@@ -138,7 +138,7 @@ export default function PairDetail({
 
         return trades.map((t: any, i: number) => {
 
-            equity += Number(t.pnl || 0)
+            equity = Number((equity + Number(t.pnl || 0)).toFixed(4))
 
             if (equity > peak) peak = equity
 
@@ -472,51 +472,65 @@ export default function PairDetail({
                                 />
                             </div>
 
-                            <div className="space-y-[clamp(8px,1vh,16px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                            <div className="flex flex-col flex-1 gap-[clamp(8px,1vh,16px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
                                 <Stat label="Total Trades" value={data?.performance?.trades} />
                                 <Stat label="Wins" value={data?.performance?.wins} />
                                 <Stat label="Losses" value={data?.performance?.losses} />
                                 <Stat label="Total PnL" value={data?.performance?.pnlTotal} />
-                                <div className="text-neutral-500 text-xs mt-3">
-                                    Equity / Drawdown
-                                </div>
-                                {curveData.length > 1 && (
+                                <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[140px]">
 
-                                    <div className="mt-4 h-[110px] w-full">
+                                    <div className="text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)] mb-2">
+                                        Equity / Drawdown
+                                    </div>
 
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart data={curveData}>
+                                    <div className="flex-1 w-full">
 
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="equity"
-                                                    stroke="#3b82f6"
-                                                    strokeWidth={2}
-                                                    dot={false}
-                                                />
+                                        {curveData.length > 1 && (
 
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey="drawdown"
-                                                    stroke="#ef4444"
-                                                    strokeWidth={1.5}
-                                                    dot={false}
-                                                />
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <LineChart data={curveData}>
 
-                                                <Tooltip
-                                                    contentStyle={{
-                                                        background: "#0a0a0a",
-                                                        border: "1px solid #222",
-                                                        fontSize: "11px"
-                                                    }}
-                                                />
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="equity"
+                                                        stroke="#3b82f6"
+                                                        strokeWidth={2}
+                                                        dot={false}
+                                                        activeDot={{ r: 4 }}
+                                                    />
 
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="drawdown"
+                                                        stroke="#ef4444"
+                                                        strokeWidth={1.5}
+                                                        dot={false}
+                                                        activeDot={{ r: 4 }}
+                                                    />
+
+                                                    <Tooltip
+                                                        formatter={(value, name) => {
+                                                            const v = Number(value ?? 0).toFixed(2)
+                                                            const label = name === "equity" ? "Equity" : "Drawdown"
+                                                            return [v, label]
+                                                        }}
+                                                        contentStyle={{
+                                                            background: "#0a0a0a",
+                                                            border: "1px solid #222"
+                                                        }}
+                                                        wrapperStyle={{
+                                                            fontSize: "clamp(9px,5.5px+1.0937vw,19.5px)"
+                                                        }}
+                                                    />
+
+                                                </LineChart>
+                                            </ResponsiveContainer>
+
+                                        )}
 
                                     </div>
 
-                                )}
+                                </div>
                             </div>
 
                         </div>
