@@ -136,7 +136,7 @@ max-h-screen
             <Section>
 
                 <div className="text-emerald-400 uppercase text-xs tracking-wider">
-GO LIVE+
+<Title>{isLivePlus ? "LIVE+ STATUS" : "GO LIVE+"}</Title>
 </div>
 
                 {!isLivePlus ? (
