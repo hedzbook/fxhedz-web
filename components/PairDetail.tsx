@@ -493,25 +493,42 @@ export default function PairDetail({
                     </div>
                 )}
 
+{tab === "history" && (
+<div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
+
 <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
 {/* HEADER */}
 
-<div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums tracking-tight">
+<div className="grid grid-cols-[1.2fr_0.6fr_1fr_1fr_0.8fr_1.2fr] text-neutral-400 mb-2 font-mono tabular-nums tracking-tight">
 
-<div className="px-2">Time</div>
-<div className="px-2">Dir</div>
+<div className="px-2">
+Time
+</div>
 
-<div className="px-2 text-right">Entry</div>
-<div className="px-2 text-right">Exit</div>
+<div className="px-2">
+Dir
+</div>
 
-<div className="px-2 text-right">Lots</div>
-<div className="px-2 text-right">PnL</div>
+<div className="px-2 text-right">
+Entry
+</div>
+
+<div className="px-2 text-right">
+Exit
+</div>
+
+<div className="px-2 text-right">
+Lots
+</div>
+
+<div className="px-2 text-right">
+PnL
+</div>
 
 </div>
 
-
-{/* HISTORY ROWS */}
+{/* ROWS */}
 
 <div className="flex-1 overflow-y-auto space-y-1">
 
@@ -519,31 +536,33 @@ export default function PairDetail({
 
 <div
 key={i}
-className="grid grid-cols-6 bg-neutral-800 py-1 font-mono tabular-nums tracking-tight"
+className="grid grid-cols-[1.2fr_0.6fr_1fr_1fr_0.8fr_1.2fr] bg-neutral-800 py-1 font-mono tabular-nums tracking-tight"
 >
 
 <div className="px-2 text-neutral-400">
-{String(h.time).slice(0,10)}
+{String(h.time).substring(0,10)}
 </div>
 
 <div className={`px-2 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
 {h.direction}
 </div>
 
-<div className="px-2 text-right text-neutral-300">
-{h.entry}
+<div className="px-2 text-right text-neutral-300 tracking-tight">
+{fmtPrice(pair,h.entry)}
 </div>
 
-<div className="px-2 text-right text-neutral-300">
-{h.exit}
+<div className="px-2 text-right text-neutral-300 tracking-tight">
+{fmtPrice(pair,h.exit)}
 </div>
 
-<div className="px-2 text-right">
-{h.lots}
+<div className="px-2 text-right tracking-tight">
+{fmtLots(h.lots)}
 </div>
 
-<div className={`px-2 text-right ${Number(h.pnl)>=0?"text-green-400":"text-red-400"}`}>
-{Number(h.pnl).toFixed(2)}
+<div className={`px-2 text-right font-semibold tracking-tight ${
+Number(h.pnl)>=0 ? "text-green-400":"text-red-400"
+}`}>
+{fmtPnl(h.pnl)}
 </div>
 
 </div>
@@ -551,7 +570,7 @@ className="grid grid-cols-6 bg-neutral-800 py-1 font-mono tabular-nums tracking-
 )):(
 
 <div className="text-neutral-500 px-2">
-No history
+No history yet
 </div>
 
 )}
@@ -559,6 +578,9 @@ No history
 </div>
 
 </div>
+
+</div>
+)}
 
                 {tab === "performance" && (
                     <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
