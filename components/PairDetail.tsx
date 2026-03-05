@@ -20,6 +20,33 @@ type Props = {
     setAppInstruments: React.Dispatch<React.SetStateAction<string[]>>
 }
 
+const SYMBOL_DIGITS: Record<string, number> = {
+  ETHUSD: 2,
+  USDCHF: 5,
+  USDJPY: 3,
+  XAUUSD: 3,
+  EURUSD: 5,
+  GBPUSD: 5,
+  AUDUSD: 5,
+  USOIL: 3,
+  BTCUSD: 2
+}
+
+function fmtPrice(pair: string, v: any) {
+  if (v === null || v === undefined || v === "--") return "--"
+  return Number(v).toFixed(SYMBOL_DIGITS[pair] ?? 2)
+}
+
+function fmtLots(v: any) {
+  if (v === null || v === undefined) return "--"
+  return Number(v).toFixed(2)
+}
+
+function fmtPnl(v: any) {
+  if (v === null || v === undefined) return "--"
+  return Number(v).toFixed(2)
+}
+
 export default function PairDetail({
     pair,
     signal,
@@ -293,17 +320,17 @@ export default function PairDetail({
 
                                     <MiniBlock
                                         label="At"
-                                        value={atValue}
+                                        value={fmtPrice(pair, atValue)}
                                     />
 
                                     <MiniBlock
                                         label="Take Profit"
-                                        value={tpValue}
+                                        value={fmtPrice(pair, tpValue)}
                                     />
 
                                     <MiniBlock
                                         label="Hedz Stop"
-                                        value={slValue}
+                                        value={fmtPrice(pair, slValue)}
                                     />
 
                                 </div>
@@ -314,21 +341,25 @@ export default function PairDetail({
 <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
   {/* HEADER */}
-  <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
+<div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
 
-    <div className="px-2">Active</div>
+  <div className="px-2">Active</div>
 
-    <div className="px-2">Orders</div>
+  <div className="px-2">Orders</div>
 
-    <div className="px-2 text-right">
-      Lots {data?.orders?.reduce((s:any,o:any)=>s+Number(o.lots||0),0).toFixed(2)}
-    </div>
-
-    <div className="px-2 text-right">
-      ~PnL {data?.orders?.reduce((s:any,o:any)=>s+Number(o.profit||0),0).toFixed(2)}
-    </div>
-
+  <div className="px-2 text-right">
+    Lots {fmtLots(
+      data?.orders?.reduce((s:any,o:any)=>s + Number(o.lots || 0), 0)
+    )}
   </div>
+
+  <div className="px-2 text-right">
+    ~PnL {fmtPnl(
+      data?.orders?.reduce((s:any,o:any)=>s + Number(o.profit || 0), 0)
+    )}
+  </div>
+
+</div>
 
   {/* ROWS */}
   <div className="flex-1 overflow-y-auto space-y-1">
@@ -345,15 +376,15 @@ export default function PairDetail({
         </div>
 
         <div className="px-2 text-neutral-300">
-          {o.entry}
+          {fmtPrice(pair, o.entry)}
         </div>
 
         <div className="px-2 text-right tracking-tight">
-          {o.lots}
+          {fmtLots(o.lots)}
         </div>
 
         <div className={`px-2 text-right tracking-tight ${Number(o.profit)>=0?"text-green-400":"text-red-400"}`}>
-          {Number(o.profit).toFixed(2)}
+          {fmtPnl(o.profit)}
         </div>
 
       </div>
@@ -456,11 +487,11 @@ export default function PairDetail({
                                             {h.direction}
                                         </div>
                                         <div className="text-xs text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                            {h.entry} - {h.exit}
+                                            {fmtPrice(pair, h.entry)} - {fmtPrice(pair, h.exit)}
                                         </div>
                                     </div>
                                     <div className={h.pnl >= 0 ? "text-green-400" : "text-red-400"}>
-                                        {h.pnl}
+                                        {fmtPnl(h.pnl)}
                                     </div>
                                 </div>
                             )) : (
