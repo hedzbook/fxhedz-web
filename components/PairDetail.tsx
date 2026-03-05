@@ -500,7 +500,7 @@ export default function PairDetail({
 
 {/* HEADER */}
 
-<div className="grid grid-cols-[11ch_5ch_11ch_11ch_7ch_10ch] text-neutral-400 mb-2 font-mono tabular-nums">
+<div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
 
 <div className="px-2">
 Time
@@ -536,7 +536,7 @@ PnL
 
 <div
 key={i}
-className="grid grid-cols-[11ch_5ch_11ch_11ch_7ch_10ch] border-t border-neutral-800 py-1 font-mono tabular-nums"
+className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-nums"
 >
 
 <div className="px-2 text-neutral-400">
