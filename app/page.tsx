@@ -1005,6 +1005,10 @@ useEffect(() => {
                       subActive !== null &&
                       accessMeta !== null
 
+                      const signalsReady =
+  uiSignals &&
+  Object.keys(uiSignals).length > 0
+
                     const canAccess =
                       subscriptionReady &&
                       subActive === true &&
@@ -1013,12 +1017,14 @@ useEffect(() => {
                         (isLive && isLivePair)
                       )
 
-                    const displaySignal =
-                      !isAuthenticated
-                        ? dummySignal
-                        : canAccess
-                          ? (realSignal ?? dummySignal)
-                          : dummySignal
+const displaySignal =
+  !isAuthenticated
+    ? dummySignal
+    : !signalsReady
+      ? undefined
+      : canAccess
+        ? realSignal
+        : dummySignal
 
                     const displayDirection =
                       !isAuthenticated
