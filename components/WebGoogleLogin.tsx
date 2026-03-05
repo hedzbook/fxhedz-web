@@ -5,9 +5,9 @@ import { useEffect } from "react"
 
 export default function WebGoogleLogin() {
 
-const isTelegram =
-  typeof window !== "undefined" &&
-  Boolean((window as any)?.Telegram?.WebApp?.initDataUnsafe)
+  const isTelegram =
+    typeof window !== "undefined" &&
+    Boolean((window as any)?.Telegram?.WebApp?.initDataUnsafe)
 
   useEffect(() => {
 
@@ -28,12 +28,12 @@ const isTelegram =
 
   }, [])
 
-async function completeLogin(idToken: string) {
+  async function completeLogin(idToken: string) {
 
-  // trigger verifying overlay immediately
-  window.dispatchEvent(new Event("fxhedz-login-start"))
+    // trigger verifying overlay immediately
+    window.dispatchEvent(new Event("fxhedz-login-start"))
 
-  let deviceId = localStorage.getItem("fxhedz_device_id")
+    let deviceId = localStorage.getItem("fxhedz_device_id")
 
     if (!deviceId) {
       deviceId = crypto.randomUUID()
@@ -58,23 +58,23 @@ async function completeLogin(idToken: string) {
     // ===============================
     // DEVICE LIMIT
     // ===============================
-if (res.status === 403 && data.device_limit) {
+    if (res.status === 403 && data.device_limit) {
 
-  localStorage.setItem("email", data.email)
-  localStorage.setItem("fxhedz_device_id", deviceId)
+      localStorage.setItem("email", data.email)
+      localStorage.setItem("fxhedz_device_id", deviceId)
 
-  // persist device limit
-  localStorage.setItem("fx_device_limit", "true")
-  localStorage.setItem("fx_device_limit_count", String(data.device_count))
+      // persist device limit
+      localStorage.setItem("fx_device_limit", "true")
+      localStorage.setItem("fx_device_limit_count", String(data.device_count))
 
-  window.dispatchEvent(
-    new CustomEvent("fxhedz-device-limit", {
-      detail: { count: data.device_count }
-    })
-  )
+      window.dispatchEvent(
+        new CustomEvent("fxhedz-device-limit", {
+          detail: { count: data.device_count }
+        })
+      )
 
-  return
-}
+      return
+    }
 
     // ===============================
     // ANY OTHER ERROR
@@ -91,13 +91,13 @@ if (res.status === 403 && data.device_limit) {
     localStorage.removeItem("fx_device_limit")
     localStorage.removeItem("fx_device_limit_count")
 
-localStorage.setItem("refreshToken", data.refreshToken)
-localStorage.setItem("email", data.email)
+    localStorage.setItem("refreshToken", data.refreshToken)
+    localStorage.setItem("email", data.email)
 
-// trigger loading UI immediately
-localStorage.setItem("fxhedz_loading", "true")
+    // trigger loading UI immediately
+    localStorage.setItem("fxhedz_loading", "true")
 
-window.location.reload()
+    window.location.reload()
   }
 
   async function handleCredentialResponse(response: any) {
@@ -131,11 +131,11 @@ window.location.reload()
     window.location.href = url
   }
 
-if (isTelegram) {
-  return (
-    <button
-      onClick={startTelegramGoogleFlow}
-      className="
+  if (isTelegram) {
+    return (
+      <button
+        onClick={startTelegramGoogleFlow}
+        className="
         flex items-center justify-center
         gap-[clamp(6px,1vw,10px)]
 
@@ -151,12 +151,12 @@ if (isTelegram) {
         shadow-sm transition-all duration-200
         active:scale-[0.98]
       "
-    >
-      <GoogleIcon />
-      <span className="whitespace-nowrap">Sign in with Google</span>
-    </button>
-  )
-}
+      >
+        <GoogleIcon />
+        <span className="whitespace-nowrap">Sign in with Google</span>
+      </button>
+    )
+  }
 
   return <div id="googleBtn" />
 }
