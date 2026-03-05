@@ -354,7 +354,7 @@ export default function PairDetail({
   </div>
 
   <div className="px-2 text-right">
-    ~PnL {fmtPnl(
+    $ {fmtPnl(
       data?.orders?.reduce((s:any,o:any)=>s + Number(o.profit || 0), 0)
     )}
   </div>

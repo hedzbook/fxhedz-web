@@ -64,7 +64,7 @@ return (
 
     <div className="flex-1 h-full flex items-center justify-center text-[clamp(9px,5.5px+1.0937vw,19.5px)] leading-none">
 <div className="flex items-center gap-[clamp(4px,0.6vw,8px)]">
-  <span className="text-neutral-400">~PnL</span>
+  <span className="text-neutral-400">$</span>
   <span className={totalFloating >= 0 ? "text-green-400" : "text-red-400"}>
     {totalFloating.toFixed(2)}
   </span>
