@@ -502,11 +502,11 @@ export default function PairDetail({
 
 <div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
 
-<div className="px-2">
+<div className="pl-3 pr-2">
 Time
 </div>
 
-<div className="px-2">
+<div className="pl-3 pr-2">
 Dir
 </div>
 
@@ -559,10 +559,13 @@ className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-n
 {fmtLots(h.lots)}
 </div>
 
-<div className={`px-2 text-right font-semibold tracking-tight ${
-Number(h.pnl)>=0 ? "text-green-400":"text-red-400"
-}`}>
-{fmtPnl(h.pnl)}
+<div
+  className={`px-2 text-right font-semibold tabular-nums ${
+    Number(h.pnl) >= 0 ? "text-green-400" : "text-red-400"
+  }`}
+>
+  {Number(h.pnl) >= 0 ? " " : "-"}
+  {Math.abs(Number(h.pnl)).toFixed(2)}
 </div>
 
 </div>
