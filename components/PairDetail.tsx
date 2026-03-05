@@ -192,6 +192,12 @@ export default function PairDetail({
     const totalPnl =
         data?.orders?.reduce((s: any, o: any) => s + Number(o.profit || 0), 0) ?? 0
 
+const historyLots =
+data?.history?.reduce((s:any,h:any)=>s + Number(h.lots || 0),0) ?? 0
+
+const historyPnl =
+data?.history?.reduce((s:any,h:any)=>s + Number(h.pnl || 0),0) ?? 0
+
     return (
         <div className="flex flex-col h-full bg-black min-h-0">
 
@@ -350,77 +356,80 @@ export default function PairDetail({
 
                         </div>
 
-                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+<div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                            {/* HEADER */}
-                            <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
+{/* HEADER */}
+<div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
+<div className="px-2">Buys/Sells</div>
+<div className="px-2">OpenOrders</div>
+<div className="px-2 text-right">Lots</div>
+<div className="px-2 text-right">PnL</div>
+</div>
 
-                                <div className="px-2">
-                                    <span className="text-green-400">{buyCount}B</span>
-                                    <span className="text-neutral-500"> / </span>
-                                    <span className="text-red-400">{sellCount}S</span>
-                                </div>
+{/* SCROLL AREA */}
+<div className="flex-1 overflow-y-auto">
 
-                                <div className="px-2">
-                                    Open
-                                </div>
+{data?.orders?.length ? data.orders.map((o:any,i:number)=>(
 
-                                <div className="px-2 text-right">
-                                    Lots {fmtLots(totalLots)}
-                                </div>
+<div
+key={i}
+className="grid grid-cols-4 border-t border-neutral-800 py-1 font-mono tabular-nums"
+>
 
-                                <div
-                                    className={`px-2 text-right ${totalPnl > 0
-                                            ? "text-green-400"
-                                            : totalPnl < 0
-                                                ? "text-red-400"
-                                                : "text-neutral-400"
-                                        }`}
-                                >
-                                    $ {fmtPnl(totalPnl)}
-                                </div>
+<div className={`px-2 ${o.direction==="BUY"?"text-green-400":"text-red-400"}`}>
+{o.direction}
+</div>
 
-                            </div>
+<div className="px-2 text-neutral-300">
+{fmtPrice(pair,o.entry)}
+</div>
 
-                            {/* ROWS */}
-                            <div className="flex-1 overflow-y-auto">
+<div className="px-2 text-right">
+{fmtLots(o.lots)}
+</div>
 
-                                {data?.orders?.length ? data.orders.map((o: any, i: number) => (
+<div className={`px-2 text-right ${Number(o.profit)>=0?"text-green-400":"text-red-400"}`}>
+{fmtPnl(o.profit)}
+</div>
 
-                                    <div
-                                        key={i}
-                                        className="grid grid-cols-4 border-t border-neutral-800 py-1 font-mono tabular-nums"
-                                    >
+</div>
 
-                                        <div className={`px-2 ${o.direction === "BUY" ? "text-green-400" : "text-red-400"}`}>
-                                            {o.direction}
-                                        </div>
+)) : (
 
-                                        <div className="px-2 text-neutral-300">
-                                            {fmtPrice(pair, o.entry)}
-                                        </div>
+<div className="text-neutral-500 px-2">
+No open orders
+</div>
 
-                                        <div className="px-2 text-right tracking-tight">
-                                            {fmtLots(o.lots)}
-                                        </div>
+)}
 
-                                        <div className={`px-2 text-right tracking-tight ${Number(o.profit) >= 0 ? "text-green-400" : "text-red-400"}`}>
-                                            {fmtPnl(o.profit)}
-                                        </div>
+</div>
 
-                                    </div>
+{/* FIXED FOOTER */}
+<div className="grid grid-cols-4 border-t border-neutral-800 pt-2 mt-2 font-mono tabular-nums">
 
-                                )) : (
+<div className="px-2">
+<span className="text-green-400">{buyCount}B</span>
+<span className="text-neutral-500"> / </span>
+<span className="text-red-400">{sellCount}S</span>
+</div>
 
-                                    <div className="text-neutral-500 px-2">
-                                        No open orders
-                                    </div>
+<div className="px-2 text-neutral-400">
+-
+</div>
 
-                                )}
+<div className="px-2 text-right text-neutral-300">
+{fmtLots(totalLots)}
+</div>
 
-                            </div>
+<div className={`px-2 text-right font-semibold ${
+totalPnl>=0 ? "text-green-400":"text-red-400"
+}`}>
+{fmtPnl(totalPnl)}
+</div>
 
-                        </div>
+</div>
+
+</div>
 
                     </div>
                 )}
@@ -502,11 +511,11 @@ export default function PairDetail({
 
 <div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
 
-<div className="pl-3 pr-2">
+<div className="px-1">
 Time
 </div>
 
-<div className="pl-3 pr-2">
+<div className="px-4">
 Dir
 </div>
 
@@ -539,33 +548,30 @@ key={i}
 className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-nums"
 >
 
-<div className="px-2 text-neutral-400">
+<div className="px-1 text-neutral-400">
 {String(h.time).substring(0,10)}
 </div>
 
-<div className={`px-2 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
+<div className={`px-4 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
 {h.direction}
 </div>
 
-<div className="px-2 text-right text-neutral-300 tracking-tight">
+<div className="px-2 text-right text-neutral-300">
 {fmtPrice(pair,h.entry)}
 </div>
 
-<div className="px-2 text-right text-neutral-300 tracking-tight">
+<div className="px-2 text-right text-neutral-300">
 {fmtPrice(pair,h.exit)}
 </div>
 
-<div className="px-2 text-right tracking-tight">
+<div className="px-2 text-right">
 {fmtLots(h.lots)}
 </div>
 
-<div
-  className={`px-2 text-right font-semibold tabular-nums ${
-    Number(h.pnl) >= 0 ? "text-green-400" : "text-red-400"
-  }`}
->
-  {Number(h.pnl) >= 0 ? " " : "-"}
-  {Math.abs(Number(h.pnl)).toFixed(2)}
+<div className={`px-2 text-right ${
+Number(h.pnl)>=0?"text-green-400":"text-red-400"
+}`}>
+{fmtPnl(h.pnl)}
 </div>
 
 </div>
@@ -577,6 +583,29 @@ No history yet
 </div>
 
 )}
+
+</div>
+
+{/* FOOTER TOTAL */}
+<div className="grid grid-cols-6 border-t border-neutral-800 pt-2 mt-2 font-mono tabular-nums">
+
+<div className="px-1 text-neutral-400">
+Total
+</div>
+
+<div></div>
+<div></div>
+<div></div>
+
+<div className="px-2 text-right text-neutral-300">
+{fmtLots(historyLots)}
+</div>
+
+<div className={`px-2 text-right font-semibold ${
+historyPnl >= 0 ? "text-green-400" : "text-red-400"
+}`}>
+{fmtPnl(historyPnl)}
+</div>
 
 </div>
 
