@@ -13,12 +13,30 @@ type Props = {
     onLogout: () => void
 }
 
-const PLAN = {
-    label: "LIVE+ Monthly",
-    price: "$9.99 / month",
-    razorpayLink: "https://rzp.io/l/fxhedz_monthly",
-    playSku: "fxhedz_liveplus"
-}
+const PLANS = [
+  {
+    label: "1 Month",
+    price: "$9.99",
+    months: 1,
+    razorpay: "https://rzp.io/rzp/ssReKHK",
+    sku: "fxhedz_monthly"
+  },
+  {
+    label: "3 Months",
+    price: "$26.99",
+    months: 3,
+    razorpay: "https://rzp.io/rzp/Npm6HPL",
+    sku: "fxhedz_quarterly",
+    highlight: true
+  },
+  {
+    label: "6 Months",
+    price: "$47.99",
+    months: 6,
+    razorpay: "https://rzp.io/rzp/YWH4Fyxx",
+    sku: "fxhedz_semiannual"
+  }
+]
 
 const PLAYSTORE_URL =
     "https://play.google.com/store/apps/details?id=com.fxhedz.live"
@@ -52,19 +70,21 @@ export default function ControlPanel({
         return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
     }, [accessMeta])
 
-    function handleUpgrade() {
+    function handleUpgrade(plan: any) {
 
         if (isAndroid) {
+
             ; (window as any).ReactNativeWebView.postMessage(
                 JSON.stringify({
                     type: "PLAY_BILLING_REQUEST",
-                    sku: PLAN.playSku
+                    sku: plan.sku
                 })
             )
+
             return
         }
 
-        window.open(PLAN.razorpayLink, "_blank")
+        window.open(plan.razorpay, "_blank")
     }
 
     const status = accessMeta?.status?.toLowerCase()
@@ -119,23 +139,37 @@ max-h-screen
 
                 {!isLivePlus ? (
 
-                    <button
-                        onClick={handleUpgrade}
-                        className="
-            w-full
-            py-3
-            bg-sky-600
-            hover:bg-sky-500
-            rounded-md
-            font-semibold
-            transition-colors
-          "
-                    >
-                        Upgrade to LIVE+
-                        <div className="text-xs text-sky-200 mt-1">
-                            {PLAN.price}
-                        </div>
-                    </button>
+                    <div className="flex gap-2">
+
+                        {PLANS.map((plan) => (
+
+                            <button
+                                key={plan.months}
+                                onClick={() => handleUpgrade(plan)}
+                                className={`
+        flex-1
+        py-3
+        rounded-md
+        text-center
+        transition-colors
+        font-semibold
+${plan.highlight
+  ? "bg-emerald-600 hover:bg-emerald-500 animate-pulse"
+  : "bg-sky-600 hover:bg-sky-500"}
+      `}
+                            >
+
+                                <div>{plan.label}</div>
+
+                                <div className="text-xs opacity-80">
+                                    {plan.price}
+                                </div>
+
+                            </button>
+
+                        ))}
+
+                    </div>
 
                 ) : (
 
@@ -238,7 +272,7 @@ max-h-screen
 
 function Section({ children }: any) {
     return (
-        <div className="space-y-3 pt-5 pb-5 border-b border-neutral-800 first:pt-0 last:border-none">
+        <div className="space-y-3 pt-6 pb-5 border-b border-neutral-800 first:pt-0 last:border-none">
             {children}
         </div>
     )
@@ -256,14 +290,14 @@ function Row({ label, value, highlight, mono }: any) {
     return (
         <div className="flex justify-between items-center">
             <span className="text-neutral-500">{label}</span>
-<span
-  className={`
+            <span
+                className={`
   ${mono ? "font-mono text-xs text-neutral-400" : ""}
   ${!mono ? "text-neutral-200" : ""}
   ${highlight === "green" ? "text-green-400" : ""}
   ${highlight === "red" ? "text-red-400" : ""}
 `}
->
+            >
                 {value}
             </span>
         </div>
