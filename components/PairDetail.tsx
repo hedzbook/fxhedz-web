@@ -180,6 +180,12 @@ export default function PairDetail({
 
     }, [data?.history])
 
+    const buyCount =
+  data?.orders?.filter((o:any)=>o.direction==="BUY").length ?? 0
+
+const sellCount =
+  data?.orders?.filter((o:any)=>o.direction==="SELL").length ?? 0
+
     return (
         <div className="flex flex-col h-full bg-black min-h-0">
 
@@ -343,9 +349,13 @@ export default function PairDetail({
   {/* HEADER */}
 <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
 
-  <div className="px-2">Active</div>
+  <div className="px-2">
+    {buyCount}B / {sellCount}S
+  </div>
 
-  <div className="px-2">Orders</div>
+  <div className="px-2">
+    Open Orders
+  </div>
 
   <div className="px-2 text-right">
     Lots {fmtLots(
