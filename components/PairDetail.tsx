@@ -453,9 +453,8 @@ export default function PairDetail({
                 )}
 
                 {tab === "performance" && (
-                    <div className="flex flex-col flex-1 min-h-0 px-[clamp(8px,1.2vw,16px)] pt-[clamp(8px,1.2vw,16px)] pb-[clamp(12px,1.6vw,20px)]">
-
-                        <div className="flex flex-col flex-1 min-h-0 gap-[clamp(8px,1vh,16px)] pr-1">
+                    <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
+                        <div className="flex flex-col flex-1 min-h-0 overflow-hidden gap-[clamp(8px,1vh,16px)]">
 
                             <div className="grid grid-cols-2 gap-[clamp(6px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
                                 <Metric
@@ -478,7 +477,7 @@ export default function PairDetail({
                                 <Stat label="Losses" value={data?.performance?.losses} />
                                 <Stat label="Total PnL" value={data?.performance?.pnlTotal} />
 
-                                <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[160px]">
+                                <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[125px] overflow-hidden">
 
                                     <div className="text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)] mb-2">
                                         Equity / Drawdown
@@ -520,7 +519,8 @@ export default function PairDetail({
                                                             border: "1px solid #222"
                                                         }}
                                                         wrapperStyle={{
-                                                            fontSize: "clamp(9px,5.5px+1.0937vw,19.5px)"
+                                                            fontSize: "clamp(9px,5.5px+1.0937vw,19.5px)",
+                                                            fontVariantNumeric: "tabular-nums"
                                                         }}
                                                     />
 
