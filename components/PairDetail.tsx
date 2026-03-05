@@ -2,7 +2,13 @@
 "use client"
 
 import GlobalLightChart from "./GlobalLightChart"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
+import {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    Tooltip
+} from "recharts"
 
 type Props = {
     pair: string
@@ -120,6 +126,34 @@ export default function PairDetail({
         direction === "HEDGED" || direction === "EXIT"
             ? "--"
             : signal?.sl ?? "--"
+
+    const curveData = useMemo(() => {
+
+        if (!data?.history) return []
+
+        const trades = [...data.history].reverse()
+
+        let equity = 0
+        let peak = 0
+
+        return trades.map((t: any, i: number) => {
+
+            equity += Number(t.pnl || 0)
+
+            if (equity > peak) peak = equity
+
+            const drawdown = equity - peak
+
+            return {
+                index: i,
+                equity,
+                drawdown
+            }
+
+        })
+
+    }, [data?.history])
+
     return (
         <div className="flex flex-col h-full bg-black min-h-0">
 
@@ -443,6 +477,46 @@ export default function PairDetail({
                                 <Stat label="Wins" value={data?.performance?.wins} />
                                 <Stat label="Losses" value={data?.performance?.losses} />
                                 <Stat label="Total PnL" value={data?.performance?.pnlTotal} />
+                                <div className="text-neutral-500 text-xs mt-3">
+                                    Equity / Drawdown
+                                </div>
+                                {curveData.length > 1 && (
+
+                                    <div className="mt-4 h-[110px] w-full">
+
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={curveData}>
+
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="equity"
+                                                    stroke="#3b82f6"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                />
+
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="drawdown"
+                                                    stroke="#ef4444"
+                                                    strokeWidth={1.5}
+                                                    dot={false}
+                                                />
+
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        background: "#0a0a0a",
+                                                        border: "1px solid #222",
+                                                        fontSize: "11px"
+                                                    }}
+                                                />
+
+                                            </LineChart>
+                                        </ResponsiveContainer>
+
+                                    </div>
+
+                                )}
                             </div>
 
                         </div>
