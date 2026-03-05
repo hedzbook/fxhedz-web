@@ -453,7 +453,7 @@ export default function PairDetail({
                 )}
 
                 {tab === "performance" && (
-                    <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
+                    <div className="flex flex-col flex-1 min-h-0 px-[clamp(8px,1.2vw,16px)] pt-[clamp(8px,1.2vw,16px)] pb-[clamp(12px,1.6vw,20px)]">
 
                         <div className="flex flex-col flex-1 min-h-0 gap-[clamp(8px,1vh,16px)] pr-1">
 
@@ -484,7 +484,7 @@ export default function PairDetail({
                                         Equity / Drawdown
                                     </div>
 
-                                    <div className="flex-1 min-h-0">
+                                    <div className="flex-1 min-h-0 pt-1">
 
                                         {curveData.length > 0 && (
 
