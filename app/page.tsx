@@ -92,6 +92,24 @@ export default function Page() {
       ? cookiePlatform
       : "web"
 
+      const [loginStarting, setLoginStarting] = useState(false)
+      useEffect(() => {
+
+function handler() {
+  setLoginStarting(true)
+
+  // safety reset in case login flow breaks
+  setTimeout(() => {
+    setLoginStarting(false)
+  }, 10000)
+}
+
+  window.addEventListener("fxhedz-login-start", handler)
+
+  return () =>
+    window.removeEventListener("fxhedz-login-start", handler)
+
+}, [])
   // =======================================
   // DEVICE ID INITIALIZATION (MUST RUN FIRST)
   // =======================================
@@ -776,8 +794,25 @@ export default function Page() {
     })
   }, [uiSignals, pairData])
 
-  const isGuest =
-    !isAuthenticated
+if (!appReady || authLoading || loginStarting) {
+  return (
+    <div className="h-[100dvh] bg-black text-white flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="text-sm tracking-[0.3em] text-blue-500 font-black">
+          FXHEDZ <span className="text-white">LIVE</span>
+        </div>
+
+        <div className="w-5 h-5 border-2 border-neutral-700 border-t-blue-500 rounded-full animate-spin" />
+
+        <p className="text-[10px] font-bold text-neutral-500 tracking-[0.2em]">
+          VERIFYING
+        </p>
+      </div>
+    </div>
+  )
+}
+
+const isGuest = !isAuthenticated
 
   // =======================================
   // HARD BLOCK: DEVICE LIMIT
@@ -1223,7 +1258,6 @@ export default function Page() {
       {appReady && !authLoading && (
         <AccessOverlay
           sessionExists={sessionExists}
-          authLoading={authLoading}
           deviceLimited={deviceLimit.active}
         />
       )}

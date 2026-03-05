@@ -28,9 +28,12 @@ export default function WebGoogleLogin() {
 
   }, [])
 
-  async function completeLogin(idToken: string) {
+async function completeLogin(idToken: string) {
 
-    let deviceId = localStorage.getItem("fxhedz_device_id")
+  // trigger verifying overlay immediately
+  window.dispatchEvent(new Event("fxhedz-login-start"))
+
+  let deviceId = localStorage.getItem("fxhedz_device_id")
 
     if (!deviceId) {
       deviceId = crypto.randomUUID()
