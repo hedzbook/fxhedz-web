@@ -383,13 +383,13 @@ export default function PairDetail({
                             </div>
 
                             {/* ROWS */}
-                            <div className="flex-1 overflow-y-auto space-y-1">
+                            <div className="flex-1 overflow-y-auto">
 
                                 {data?.orders?.length ? data.orders.map((o: any, i: number) => (
 
                                     <div
                                         key={i}
-                                        className="grid grid-cols-4 bg-neutral-800 py-1 font-mono tabular-nums"
+                                        className="grid grid-cols-4 border-t border-neutral-800 py-1 font-mono tabular-nums"
                                     >
 
                                         <div className={`px-2 ${o.direction === "BUY" ? "text-green-400" : "text-red-400"}`}>
@@ -530,13 +530,13 @@ PnL
 
 {/* ROWS */}
 
-<div className="flex-1 overflow-y-auto space-y-1">
+<div className="flex-1 overflow-y-auto">
 
 {data?.history?.length ? data.history.map((h:any,i:number)=>(
 
 <div
 key={i}
-className="grid grid-cols-[1.2fr_0.6fr_1fr_1fr_0.8fr_1.2fr] bg-neutral-800 py-1 font-mono tabular-nums tracking-tight"
+className="grid grid-cols-[1.2fr_0.6fr_1fr_1fr_0.8fr_1.2fr] border-t border-neutral-800 py-1 font-mono tabular-nums tracking-tight"
 >
 
 <div className="px-2 text-neutral-400">
