@@ -307,7 +307,7 @@ function Row({ label, value, highlight, mono }: any) {
             <span className="text-neutral-500">{label}</span>
             <span
                 className={`
-  ${mono ? "font-mono text-xs text-neutral-400" : ""}
+  ${mono ? "font-mono text-[0.85em] text-neutral-400" : ""}
   ${!mono ? "text-neutral-200" : ""}
   ${highlight === "green" ? "text-green-400" : ""}
   ${highlight === "red" ? "text-red-400" : ""}
