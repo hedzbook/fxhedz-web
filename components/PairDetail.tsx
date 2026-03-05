@@ -354,7 +354,7 @@ const sellCount =
   </div>
 
   <div className="px-2">
-    Open Orders
+    OpenOrders
   </div>
 
   <div className="px-2 text-right">
