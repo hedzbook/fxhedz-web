@@ -48,13 +48,13 @@ export default function ControlPanel({
     onLogout
 }: Props) {
 
-    const isAndroid =
-        typeof window !== "undefined" &&
-        !!(window as any).ReactNativeWebView
+const isAndroid =
+  typeof window !== "undefined" &&
+  !!(window as any).ReactNativeWebView
 
-    const isTelegram =
-        typeof window !== "undefined" &&
-        (window as any)?.Telegram?.WebApp
+const isTelegram =
+  typeof window !== "undefined" &&
+  Boolean((window as any)?.Telegram?.WebApp?.initData)
 
     const nativeEmail =
         typeof window !== "undefined"
