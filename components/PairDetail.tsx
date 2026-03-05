@@ -21,30 +21,30 @@ type Props = {
 }
 
 const SYMBOL_DIGITS: Record<string, number> = {
-  ETHUSD: 2,
-  USDCHF: 5,
-  USDJPY: 3,
-  XAUUSD: 3,
-  EURUSD: 5,
-  GBPUSD: 5,
-  AUDUSD: 5,
-  USOIL: 3,
-  BTCUSD: 2
+    ETHUSD: 2,
+    USDCHF: 5,
+    USDJPY: 3,
+    XAUUSD: 3,
+    EURUSD: 5,
+    GBPUSD: 5,
+    AUDUSD: 5,
+    USOIL: 3,
+    BTCUSD: 2
 }
 
 function fmtPrice(pair: string, v: any) {
-  if (v === null || v === undefined || v === "--") return "--"
-  return Number(v).toFixed(SYMBOL_DIGITS[pair] ?? 2)
+    if (v === null || v === undefined || v === "--") return "--"
+    return Number(v).toFixed(SYMBOL_DIGITS[pair] ?? 2)
 }
 
 function fmtLots(v: any) {
-  if (v === null || v === undefined) return "--"
-  return Number(v).toFixed(2)
+    if (v === null || v === undefined) return "--"
+    return Number(v).toFixed(2)
 }
 
 function fmtPnl(v: any) {
-  if (v === null || v === undefined) return "--"
-  return Number(v).toFixed(2)
+    if (v === null || v === undefined) return "--"
+    return Number(v).toFixed(2)
 }
 
 export default function PairDetail({
@@ -181,10 +181,16 @@ export default function PairDetail({
     }, [data?.history])
 
     const buyCount =
-  data?.orders?.filter((o:any)=>o.direction==="BUY").length ?? 0
+        data?.orders?.filter((o: any) => o.direction === "BUY").length ?? 0
 
-const sellCount =
-  data?.orders?.filter((o:any)=>o.direction==="SELL").length ?? 0
+    const sellCount =
+        data?.orders?.filter((o: any) => o.direction === "SELL").length ?? 0
+
+    const totalLots =
+        data?.orders?.reduce((s: any, o: any) => s + Number(o.lots || 0), 0) ?? 0
+
+    const totalPnl =
+        data?.orders?.reduce((s: any, o: any) => s + Number(o.profit || 0), 0) ?? 0
 
     return (
         <div className="flex flex-col h-full bg-black min-h-0">
@@ -344,72 +350,77 @@ const sellCount =
 
                         </div>
 
-<div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-  {/* HEADER */}
-<div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
+                            {/* HEADER */}
+                            <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
 
-  <div className="px-2">
-    {buyCount}B / {sellCount}S
-  </div>
+                                <div className="px-2">
+                                    <span className="text-green-400">{buyCount}B</span>
+                                    <span className="text-neutral-500"> / </span>
+                                    <span className="text-red-400">{sellCount}S</span>
+                                </div>
 
-  <div className="px-2">
-    #Open
-  </div>
+                                <div className="px-2">
+                                    Open
+                                </div>
 
-  <div className="px-2 text-right">
-    Lots {fmtLots(
-      data?.orders?.reduce((s:any,o:any)=>s + Number(o.lots || 0), 0)
-    )}
-  </div>
+                                <div className="px-2 text-right">
+                                    Lots {fmtLots(totalLots)}
+                                </div>
 
-  <div className="px-2 text-right">
-    $ {fmtPnl(
-      data?.orders?.reduce((s:any,o:any)=>s + Number(o.profit || 0), 0)
-    )}
-  </div>
+                                <div
+                                    className={`px-2 text-right ${totalPnl > 0
+                                            ? "text-green-400"
+                                            : totalPnl < 0
+                                                ? "text-red-400"
+                                                : "text-neutral-400"
+                                        }`}
+                                >
+                                    $ {fmtPnl(totalPnl)}
+                                </div>
 
-</div>
+                            </div>
 
-  {/* ROWS */}
-  <div className="flex-1 overflow-y-auto space-y-1">
+                            {/* ROWS */}
+                            <div className="flex-1 overflow-y-auto space-y-1">
 
-    {data?.orders?.length ? data.orders.map((o:any,i:number)=>(
+                                {data?.orders?.length ? data.orders.map((o: any, i: number) => (
 
-      <div
-        key={i}
-        className="grid grid-cols-4 bg-neutral-800 py-1 font-mono tabular-nums"
-      >
+                                    <div
+                                        key={i}
+                                        className="grid grid-cols-4 bg-neutral-800 py-1 font-mono tabular-nums"
+                                    >
 
-        <div className={`px-2 ${o.direction==="BUY"?"text-green-400":"text-red-400"}`}>
-          {o.direction}
-        </div>
+                                        <div className={`px-2 ${o.direction === "BUY" ? "text-green-400" : "text-red-400"}`}>
+                                            {o.direction}
+                                        </div>
 
-        <div className="px-2 text-neutral-300">
-          {fmtPrice(pair, o.entry)}
-        </div>
+                                        <div className="px-2 text-neutral-300">
+                                            {fmtPrice(pair, o.entry)}
+                                        </div>
 
-        <div className="px-2 text-right tracking-tight">
-          {fmtLots(o.lots)}
-        </div>
+                                        <div className="px-2 text-right tracking-tight">
+                                            {fmtLots(o.lots)}
+                                        </div>
 
-        <div className={`px-2 text-right tracking-tight ${Number(o.profit)>=0?"text-green-400":"text-red-400"}`}>
-          {fmtPnl(o.profit)}
-        </div>
+                                        <div className={`px-2 text-right tracking-tight ${Number(o.profit) >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                            {fmtPnl(o.profit)}
+                                        </div>
 
-      </div>
+                                    </div>
 
-    )) : (
+                                )) : (
 
-      <div className="text-neutral-500 px-2">
-        No open orders
-      </div>
+                                    <div className="text-neutral-500 px-2">
+                                        No open orders
+                                    </div>
 
-    )}
+                                )}
 
-  </div>
+                            </div>
 
-</div>
+                        </div>
 
                     </div>
                 )}
