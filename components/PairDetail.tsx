@@ -361,7 +361,7 @@ data?.history?.reduce((s:any,h:any)=>s + Number(h.pnl || 0),0) ?? 0
 {/* HEADER */}
 <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
 <div className="px-2">Buys/Sells</div>
-<div className="px-2">OpenOrders</div>
+<div className="px-2">Orders</div>
 <div className="px-2 text-right">Lots</div>
 <div className="px-2 text-right">PnL</div>
 </div>
@@ -414,7 +414,7 @@ No open orders
 </div>
 
 <div className="px-2 text-neutral-400">
--
+{/* - */}
 </div>
 
 <div className="px-2 text-right text-neutral-300">
