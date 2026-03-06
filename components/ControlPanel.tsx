@@ -25,7 +25,6 @@ const MT5_EA_URL = "/api/ea-download"
 export default function ControlPanel({ accessMeta, deviceId, version, onLogout }: Props) {
     const [showEASetup, setShowEASetup] = useState(false)
 
-    // Environment Detection
     const env = useMemo(() => {
         if (typeof window === "undefined") return { isAndroid: false, isTelegram: false, email: null }
         return {
@@ -54,17 +53,15 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
     const isLivePlus = status === "live+"
 
     return (
-        <div className="relative w-full flex flex-col bg-[#0f0f0f] text-neutral-200 text-sm overflow-y-auto max-h-screen controlpanel-scroll selection:bg-sky-500/30">
+        <div className="relative w-full h-full flex flex-col bg-[#0f0f0f] text-neutral-200 text-sm overflow-y-auto controlpanel-scroll selection:bg-sky-500/30">
             
-            {/* Header & Account */}
             <Section title="Account Profile">
                 <Row label="User" value={env.email} />
-                <Row label="Current Plan" value={(status || "Basic").toUpperCase()} highlight={isLivePlus ? "green" : "blue"} />
+                <Row label="Current Plan" value={(status || "Live").toUpperCase()} highlight={isLivePlus ? "green" : "blue"} />
                 <Row label="Status" value={isAccountActive ? "● ACTIVE" : "○ EXPIRED"} highlight={isAccountActive ? "green" : "red"} />
-                {deviceId && <Row label="Hardware ID" value={deviceId} mono />}
+                {deviceId && <Row label="Hardware ID" value={deviceId} mono truncate />}
             </Section>
 
-            {/* Subscription Section */}
             <Section title={isLivePlus ? "Subscription Details" : "Premium Upgrade"}>
                 {!isLivePlus ? (
                     <div className="space-y-4">
@@ -84,9 +81,6 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                                 </button>
                             ))}
                         </div>
-                        <p className="text-[11px] text-neutral-500 text-center leading-tight">
-                            Unlock real-time institutional signals and automated MT5 execution.
-                        </p>
                     </div>
                 ) : (
                     <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 space-y-3">
@@ -95,7 +89,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                             <span className="px-2 py-0.5 bg-emerald-500 text-black text-[9px] font-black rounded-full">PRO</span>
                         </div>
                         {accessMeta?.expiry && (
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-emerald-500/10">
                                 <div className="flex flex-col">
                                     <span className="text-[10px] text-neutral-500 uppercase">Renews on</span>
                                     <span className="font-mono text-xs">{new Date(accessMeta.expiry).toLocaleDateString()}</span>
@@ -112,13 +106,12 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 )}
             </Section>
 
-            {/* MT5 Integration */}
             <Section title="Ecosystem Tools">
                 <button
                     onClick={() => setShowEASetup(true)}
                     className="group relative flex items-center gap-4 w-full p-4 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 rounded-xl transition-all overflow-hidden"
                 >
-                    <div className="h-12 w-12 bg-neutral-900 rounded-lg flex items-center justify-center border border-neutral-700">
+                    <div className="h-12 w-12 bg-neutral-900 rounded-lg flex items-center justify-center border border-neutral-700 flex-shrink-0">
                          <img src="/mt5ea.png" alt="EA" className="h-8 w-8 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <div className="flex-1 text-left">
@@ -129,7 +122,6 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </button>
             </Section>
 
-            {/* Mobile App Section */}
             {!env.isAndroid && (
                 <Section title="Mobile Alerts">
                     <a href={PLAYSTORE_URL} target="_blank" rel="noopener noreferrer" 
@@ -139,9 +131,8 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </Section>
             )}
 
-            {/* Network & Meta */}
             <Section title="System Status">
-                <div className="grid grid-cols-2 gap-y-2">
+                <div className="space-y-1">
                     <Row label="Version" value={version} mono />
                     <Row label="Platform" value={env.isAndroid ? "Native App" : env.isTelegram ? "Telegram" : "Cloud Web"} />
                     <Row label="Latency" value="~124ms" highlight="green" />
@@ -149,7 +140,6 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </div>
             </Section>
 
-            {/* Support Links */}
             <Section title="Resources">
                 <div className="grid grid-cols-2 gap-2">
                     <LinkBtn label="Technical Support" href="https://t.me/fxhedzbot" />
@@ -168,15 +158,15 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </div>
             </div>
 
-            {/* EA Setup Modal */}
+            {/* EA Setup Modal - Fixed to Viewport for better Mobile fit */}
             {showEASetup && (
-                <div className="absolute inset-0 z-50 bg-[#0a0a0a] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <div className="flex justify-between items-center px-6 py-5 border-b border-neutral-800">
+                <div className="fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex justify-between items-center px-6 py-5 border-b border-neutral-800 bg-[#0a0a0a]">
                         <h2 className="text-xs font-black uppercase tracking-tighter text-neutral-400">MT5 Integration Guide</h2>
-                        <button onClick={() => setShowEASetup(false)} className="h-8 w-8 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300">✕</button>
+                        <button onClick={() => setShowEASetup(false)} className="h-8 w-8 flex items-center justify-center rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition-colors">✕</button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-24">
+                    <div className="flex-1 overflow-y-auto p-6 space-y-10 pb-32">
                         <Step number={1} title="Download Resources" img="/ea/step1.png">
                             <li>Obtain the <code className="text-sky-400">iHEDZ_Connector.ex5</code> file.</li>
                             <li>Ensure your file extension remains unaltered.</li>
@@ -193,13 +183,13 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                         </Step>
                     </div>
 
-                    <div className="p-6 border-t border-neutral-800 bg-[#0a0a0a]/80 backdrop-blur-md sticky bottom-0">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-neutral-800 bg-[#0a0a0a]/95 backdrop-blur-md">
                         {isLivePlus ? (
-                            <a href={MT5_EA_URL} download className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 p-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20">
+                            <a href={MT5_EA_URL} download className="block w-full text-center bg-emerald-600 hover:bg-emerald-500 p-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20 active:scale-[0.98]">
                                 DOWNLOAD EXPERT ADVISOR
                             </a>
                         ) : (
-                            <button onClick={() => setShowEASetup(false)} className="w-full bg-sky-600 p-4 rounded-xl font-bold">
+                            <button onClick={() => setShowEASetup(false)} className="w-full bg-sky-600 p-4 rounded-xl font-bold active:scale-[0.98]">
                                 UPGRADE TO LIVE+ TO DOWNLOAD
                             </button>
                         )}
@@ -210,8 +200,6 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
     )
 }
 
-/* Sub-Components */
-
 function Section({ title, children }: { title: string, children: React.ReactNode }) {
     return (
         <div className="px-6 py-6 border-b border-neutral-800/50 last:border-none">
@@ -221,12 +209,12 @@ function Section({ title, children }: { title: string, children: React.ReactNode
     )
 }
 
-function Row({ label, value, highlight, mono }: any) {
+function Row({ label, value, highlight, mono, truncate }: any) {
     const colorClass = highlight === "green" ? "text-emerald-400" : highlight === "red" ? "text-red-400" : highlight === "blue" ? "text-sky-400" : "text-neutral-300";
     return (
-        <div className="flex justify-between items-center py-1">
-            <span className="text-neutral-500 font-medium">{label}</span>
-            <span className={`${mono ? "font-mono text-[11px]" : "font-semibold"} ${colorClass}`}>
+        <div className="flex justify-between items-center py-1.5 gap-4">
+            <span className="text-neutral-500 font-medium flex-shrink-0">{label}</span>
+            <span className={`${mono ? "font-mono text-[10px]" : "font-semibold"} ${colorClass} ${truncate ? "truncate max-w-[180px]" : "text-right"}`}>
                 {value}
             </span>
         </div>
@@ -236,7 +224,7 @@ function Row({ label, value, highlight, mono }: any) {
 function LinkBtn({ label, href }: { label: string, href: string }) {
     return (
         <a href={href} target="_blank" rel="noopener noreferrer" 
-           className="text-[11px] font-bold text-sky-500/80 hover:text-sky-400 py-2 px-3 bg-sky-500/5 rounded-md border border-sky-500/10 transition-colors text-center">
+           className="text-[11px] font-bold text-sky-500/80 hover:text-sky-400 py-2.5 px-3 bg-sky-500/5 rounded-md border border-sky-500/10 transition-colors text-center">
             {label}
         </a>
     )
@@ -244,13 +232,15 @@ function LinkBtn({ label, href }: { label: string, href: string }) {
 
 function Step({ number, title, img, children }: any) {
     return (
-        <div className="space-y-3">
+        <div className="space-y-4">
             <div className="flex items-center gap-3">
-                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-sky-600 text-black text-[10px] font-black">{number}</span>
+                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-sky-600 text-black text-[10px] font-black flex-shrink-0">{number}</span>
                 <h4 className="font-bold text-neutral-100">{title}</h4>
             </div>
-            <img src={img} className="w-full rounded-xl border border-neutral-800 shadow-2xl" alt={`Step ${number}`} />
-            <ul className="list-none space-y-2 text-[12px] text-neutral-400 pl-2 border-l border-neutral-800 ml-3">
+            <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900">
+                <img src={img} className="w-full h-full object-cover" alt={`Step ${number}`} />
+            </div>
+            <ul className="list-none space-y-2 text-[12px] text-neutral-400 pl-4 border-l border-neutral-800 ml-3">
                 {children}
             </ul>
         </div>
