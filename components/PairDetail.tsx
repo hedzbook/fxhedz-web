@@ -341,7 +341,7 @@ data?.history?.reduce((s:any,h:any)=>s + Number(h.pnl || 0),0) ?? 0
                                     />
 
                                     <MiniBlock
-                                        label="At"
+                                        label="Price"
                                         value={fmtPrice(pair, atValue)}
                                     />
 
@@ -365,7 +365,7 @@ data?.history?.reduce((s:any,h:any)=>s + Number(h.pnl || 0),0) ?? 0
 {/* HEADER */}
 <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
 <div className="px-2">Buys/Sells</div>
-<div className="px-2">Orders</div>
+<div className="px-2">Price</div>
 <div className="px-2 text-right">Lots</div>
 <div className="px-2 text-right">PnL</div>
 </div>
@@ -651,7 +651,7 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
                                             <ResponsiveContainer width="100%" height="100%">
 <LineChart
 data={curveData}
-margin={{ top: 5, right: 3, left: 0, bottom: 0 }}
+margin={{ top: 5, right: 0, left: 0, bottom: 0 }}
 >
 
 <CartesianGrid stroke="#222" strokeDasharray="3 3" />
