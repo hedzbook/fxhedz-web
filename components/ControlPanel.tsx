@@ -189,7 +189,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </Section>
 
                 {/* EXPERT ADVISOR - CENTERED CONTENT */}
-                <Section title="Expert Advisor">
+                <Section title="Expert Advisor (Coming Soon...)">
                     <div className="flex gap-2 items-stretch h-[48px]">
                         {/* Left Button: Download EA */}
                         <button
@@ -230,7 +230,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
 
                 {/* APP DOWNLOAD - FULL COLOR & NO HIGHLIGHTING */}
                 {!env.isAndroid && (
-                    <Section title="Download App">
+                    <Section title="Download App (Coming Soon...)">
                         <div className="flex gap-2 items-stretch h-[48px]">
                             {/* Apple Store Button */}
                             <button
