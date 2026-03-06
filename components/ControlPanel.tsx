@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 
 type Props = {
     accessMeta: {
@@ -24,6 +25,8 @@ const MT5_EA_URL = "/api/ea-download"
 
 export default function ControlPanel({ accessMeta, deviceId, version, onLogout }: Props) {
 
+    const router = useRouter()
+
     const [showEASetup, setShowEASetup] = useState(false)
 
     const env = useMemo(() => {
@@ -43,22 +46,16 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
         return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
     }, [accessMeta])
 
-    // =====================================
-    // Detect active subscription length
-    // =====================================
-const activeMonths = useMemo(() => {
+    const activeMonths = useMemo(() => {
 
-    if (!daysLeft) return 0
+        if (!daysLeft) return 0
 
-    // trial period
-    if (daysLeft < 14) return 0
+        if (daysLeft < 14) return 0
+        if (daysLeft >= 14 && daysLeft <= 31) return 1
+        if (daysLeft <= 93) return 3
+        return 6
 
-    // paid plans
-    if (daysLeft >= 14 && daysLeft <= 31) return 1
-    if (daysLeft <= 93) return 3
-    return 6
-
-}, [daysLeft])
+    }, [daysLeft])
 
     const handleUpgrade = (plan: typeof PLANS[0]) => {
 
@@ -82,6 +79,7 @@ const activeMonths = useMemo(() => {
     const isLivePlus = status === "live+"
 
     return (
+        <>
         <div className="relative w-full h-full flex flex-col bg-[#0f0f0f] text-neutral-200 text-sm overflow-y-auto controlpanel-scroll">
 
             <Section title="Account Profile">
@@ -244,6 +242,80 @@ const activeMonths = useMemo(() => {
             </div>
 
         </div>
+
+        {/* EA OVERLAY */}
+
+        {showEASetup && (
+
+        <div className="fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col">
+
+            <div className="flex justify-between items-center px-5 py-4 border-b border-neutral-800">
+                <div className="text-xs font-bold tracking-widest text-neutral-400">
+                    MT5 INTEGRATION GUIDE
+                </div>
+
+                <button
+                    onClick={() => setShowEASetup(false)}
+                    className="h-9 w-9 rounded-full bg-neutral-800 flex items-center justify-center"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6 pb-32">
+
+                <Step number={1} title="Download Resources" img="/ea/step1.png">
+                    <li>Download iHEDZ_Connector.ex5</li>
+                    <li>Do not rename the file</li>
+                </Step>
+
+                <Step number={2} title="Open MT5 Data Folder" img="/ea/step2.png">
+                    <li>Open MT5 → File → Open Data Folder</li>
+                    <li>Navigate to MQL5 / Experts</li>
+                </Step>
+
+                <Step number={3} title="Install EA" img="/ea/step3.png">
+                    <li>Copy file into Experts folder</li>
+                    <li>Restart MetaTrader 5</li>
+                </Step>
+
+            </div>
+
+            {/* Bottom Action Bar */}
+
+            <div className="fixed left-0 right-0 bottom-[70px] p-4 bg-[#0a0a0a] border-t border-neutral-800 flex gap-3">
+
+                <button
+                    onClick={() => router.push("/ea")}
+                    className="flex-1 bg-neutral-800 border border-neutral-700 py-3 rounded-lg font-semibold"
+                >
+                    My EA
+                </button>
+
+                {isLivePlus ? (
+                    <a
+                        href={MT5_EA_URL}
+                        download
+                        className="flex-1 bg-emerald-600 text-center py-3 rounded-lg font-bold"
+                    >
+                        Download EA
+                    </a>
+                ) : (
+                    <button
+                        onClick={() => setShowEASetup(false)}
+                        className="flex-1 bg-sky-600 py-3 rounded-lg font-bold"
+                    >
+                        Upgrade
+                    </button>
+                )}
+
+            </div>
+
+        </div>
+
+        )}
+
+        </>
     )
 }
 
@@ -281,6 +353,32 @@ function Row({ label, value, highlight, mono, truncate }: any) {
             >
                 {value}
             </span>
+
+        </div>
+    )
+}
+
+function Step({ number, title, img, children }: any) {
+    return (
+        <div className="space-y-3">
+
+            <div className="flex items-center gap-3">
+                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-sky-600 text-black text-[10px] font-black">
+                    {number}
+                </span>
+                <h4 className="font-bold text-neutral-100">
+                    {title}
+                </h4>
+            </div>
+
+            <img
+                src={img}
+                className="w-full max-h-[220px] object-contain rounded-xl border border-neutral-800"
+            />
+
+            <ul className="list-disc pl-6 text-neutral-400 text-sm">
+                {children}
+            </ul>
 
         </div>
     )
