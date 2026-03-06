@@ -144,51 +144,64 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </div>
             </Section>
 
-            {/* EXPERT ADVISOR */}
-            <Section title="Expert Advisor">
-                <div className="flex gap-2 items-stretch h-[44px]">
-                    <button onClick={() => setShowEASetup(true)} className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="3" y2="15" />
-                        </svg>
-                        <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">EA</div>
-                    </button>
-                    <div className="flex-1 rounded-lg border border-sky-500/30 bg-sky-950/20 flex items-center justify-center overflow-hidden">
-                        <img src="/mt5ea.png" className="h-full w-auto object-contain scale-110 drop-shadow-[0_0_5px_rgba(56,189,248,0.5)]" alt="EA" />
-                    </div>
-                    <button onClick={() => window.location.href="/ea"} className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400">
-                            <rect width="20" height="14" x="2" y="3" rx="2" /><line x1="12" x2="12" y1="17" y2="21" /><line x1="8" x2="16" y1="21" y2="21" />
-                        </svg>
-                        <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">MY EA</div>
-                    </button>
-                </div>
-            </Section>
+{/* EXPERT ADVISOR - FIXED TO FILL */}
+<Section title="Expert Advisor">
+    <div className="flex gap-2 items-stretch h-[48px]">
+        <button onClick={() => setShowEASetup(true)} className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="3" y2="15" />
+            </svg>
+            <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">EA</div>
+        </button>
 
-            {/* APP DOWNLOAD - TRIPLE BUTTON LAYOUT */}
-            {!env.isAndroid && (
-            <Section title="Download App">
-                <div className="flex gap-2 items-stretch h-[44px]">
-                    {/* LEFT: APPLE */}
-                    <button className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex items-center justify-center active:scale-95 transition-transform opacity-40">
-                         <img src="/apple.png" className="h-5 w-5 object-contain grayscale" alt="iOS" />
-                    </button>
+        {/* This div now forces the image to fill the entire box */}
+        <div className="flex-1 rounded-lg border border-sky-500/30 bg-sky-950/20 relative overflow-hidden">
+            <img 
+                src="/mt5ea.png" 
+                className="absolute inset-0 w-full h-full object-cover" 
+                alt="EA" 
+            />
+        </div>
 
-                    {/* CENTER: ANDROID (ACTIVE) */}
-                    <button 
-                        onClick={() => window.open(PLAYSTORE_URL)}
-                        className="flex-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 flex items-center justify-center active:scale-95 transition-transform shadow-[0_0_15px_rgba(16,185,129,0.1)]"
-                    >
-                         <img src="/playstore.png" className="h-5 w-auto object-contain" alt="Android" />
-                    </button>
+        <button onClick={() => window.location.href="/ea"} className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400">
+                <rect width="20" height="14" x="2" y="3" rx="2" /><line x1="12" x2="12" y1="17" y2="21" /><line x1="8" x2="16" y1="21" y2="21" />
+            </svg>
+            <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">MY EA</div>
+        </button>
+    </div>
+</Section>
 
-                    {/* RIGHT: WEB/WINDOWS */}
-                    <button className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex items-center justify-center active:scale-95 transition-transform opacity-40">
-                         <img src="/web.png" className="h-5 w-5 object-contain grayscale" alt="Web" />
-                    </button>
-                </div>
-            </Section>
-            )}
+{/* APP DOWNLOAD - FULL COLOR & NO HIGHLIGHTING */}
+{!env.isAndroid && (
+<Section title="Download App">
+    <div className="flex gap-2 items-stretch h-[48px]">
+        {/* Apple Store Button */}
+        <button 
+            onClick={() => window.open("YOUR_APPLE_STORE_URL")}
+            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 relative overflow-hidden active:scale-95 transition-transform"
+        >
+             <img src="/apple.png" className="absolute inset-0 w-full h-full object-cover" alt="iOS" />
+        </button>
+
+        {/* Google Play Store Button */}
+        <button 
+            onClick={() => window.open(PLAYSTORE_URL)}
+            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 relative overflow-hidden active:scale-95 transition-transform"
+        >
+             <img src="/playstore.png" className="absolute inset-0 w-full h-full object-cover" alt="Android" />
+        </button>
+
+        {/* Web/Cloud Button */}
+        <button 
+            onClick={() => window.open("YOUR_WEB_URL")}
+            className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 relative overflow-hidden active:scale-95 transition-transform"
+        >
+             <img src="/web.png" className="absolute inset-0 w-full h-full object-cover" alt="Web" />
+        </button>
+    </div>
+</Section>
+)}
 
             {/* SYSTEM */}
             <Section title="System Status">
