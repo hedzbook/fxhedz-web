@@ -651,7 +651,7 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
                                             <ResponsiveContainer width="100%" height="100%">
 <LineChart
 data={curveData}
-margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
+margin={{ top: 5, right: 3, left: 0, bottom: 0 }}
 >
 
 <CartesianGrid stroke="#222" strokeDasharray="3 3" />
