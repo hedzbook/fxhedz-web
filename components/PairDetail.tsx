@@ -656,13 +656,16 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
 <XAxis
 dataKey="time"
 stroke="#666"
-tick={{ fontSize: 10 }}
+tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
+tickMargin={8}
 tickFormatter={(v)=>String(v).substring(5,10)}
 />
 
 <YAxis
+orientation="right"
 stroke="#666"
-tick={{ fontSize: 10 }}
+tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
+tickMargin={8}
 domain={["dataMin","dataMax"]}
 />
 
