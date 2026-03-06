@@ -6,7 +6,10 @@ import {
     ResponsiveContainer,
     LineChart,
     Line,
-    Tooltip
+    Tooltip,
+    XAxis,
+    YAxis,
+    CartesianGrid
 } from "recharts"
 
 type Props = {
@@ -170,11 +173,12 @@ export default function PairDetail({
 
             const drawdown = equity - peak
 
-            return {
-                index: i,
-                equity,
-                drawdown
-            }
+return {
+    index: i,
+    time: t.time,
+    equity,
+    drawdown
+}
 
         })
 
@@ -519,11 +523,11 @@ Time
 Dir
 </div>
 
-<div className="px-2 text-left">
+<div className="px-2 text-right">
 Entry
 </div>
 
-<div className="px-2 text-left">
+<div className="px-2 text-right">
 Exit
 </div>
 
@@ -645,43 +649,56 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
                                         {curveData.length > 0 && (
 
                                             <ResponsiveContainer width="100%" height="100%">
-                                                <LineChart data={curveData}>
+<LineChart data={curveData}>
 
-                                                    <Line
-                                                        type="monotone"
-                                                        dataKey="equity"
-                                                        stroke="#3b82f6"
-                                                        strokeWidth={2}
-                                                        dot={false}
-                                                        activeDot={{ r: 4 }}
-                                                    />
+<CartesianGrid stroke="#222" strokeDasharray="3 3" />
 
-                                                    <Line
-                                                        type="monotone"
-                                                        dataKey="drawdown"
-                                                        stroke="#ef4444"
-                                                        strokeWidth={1.5}
-                                                        dot={false}
-                                                        activeDot={{ r: 4 }}
-                                                    />
+<XAxis
+dataKey="time"
+stroke="#666"
+tick={{ fontSize: 10 }}
+tickFormatter={(v)=>String(v).substring(5,10)}
+/>
 
-                                                    <Tooltip
-                                                        formatter={(value, name) => {
-                                                            const v = Number(value ?? 0).toFixed(2)
-                                                            const label = name === "equity" ? "Equity" : "Drawdown"
-                                                            return [v, label]
-                                                        }}
-                                                        contentStyle={{
-                                                            background: "#0a0a0a",
-                                                            border: "1px solid #222"
-                                                        }}
-                                                        wrapperStyle={{
-                                                            fontSize: "clamp(9px,5.5px+1.0937vw,19.5px)",
-                                                            fontVariantNumeric: "tabular-nums"
-                                                        }}
-                                                    />
+<YAxis
+stroke="#666"
+tick={{ fontSize: 10 }}
+domain={["dataMin","dataMax"]}
+/>
 
-                                                </LineChart>
+<Line
+type="monotone"
+dataKey="equity"
+stroke="#3b82f6"
+strokeWidth={2}
+dot={false}
+/>
+
+<Line
+type="monotone"
+dataKey="drawdown"
+stroke="#ef4444"
+strokeWidth={1.5}
+dot={false}
+/>
+
+<Tooltip
+formatter={(value,name)=>{
+const v=Number(value??0).toFixed(2)
+const label=name==="equity"?"Equity":"Drawdown"
+return [v,label]
+}}
+contentStyle={{
+background:"#0a0a0a",
+border:"1px solid #222"
+}}
+wrapperStyle={{
+fontSize:"clamp(9px,5.5px+1.0937vw,19.5px)",
+fontVariantNumeric:"tabular-nums"
+}}
+/>
+
+</LineChart>
                                             </ResponsiveContainer>
 
                                         )}
