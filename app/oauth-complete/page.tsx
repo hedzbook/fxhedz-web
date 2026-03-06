@@ -40,12 +40,17 @@ export default function OAuthComplete() {
         })
       })
 
-      const data = await res.json()
+const data = await res.json()
 
-      localStorage.setItem("refreshToken", data.refreshToken)
-      localStorage.setItem("email", data.email)
+localStorage.setItem("refreshToken", data.refreshToken)
+localStorage.setItem("email", data.email)
 
-      window.location.href = "/"
+if (data.hash) {
+  localStorage.setItem("hash", data.hash)
+  ;(window as any).__USER_HASH__ = data.hash
+}
+
+window.location.href = "/"
     }
 
     finish()

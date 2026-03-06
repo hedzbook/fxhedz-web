@@ -95,11 +95,12 @@ export async function POST(req: NextRequest) {
       { expiresIn: ACCESS_EXPIRES_IN }
     )
 
-    return NextResponse.json({
-      accessToken,
-      refreshToken,
-      email
-    })
+return NextResponse.json({
+  accessToken,
+  refreshToken,
+  email,
+  hash: gasData.hash
+})
 
   } catch (err) {
     return NextResponse.json(
