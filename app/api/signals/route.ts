@@ -7,6 +7,9 @@ const GAS_BASE =
 
 export async function GET(req: NextRequest) {
 
+  const fastMode =
+  req.nextUrl.searchParams.get("fast") === "1"
+
   // ============================
   // REQUIRE JWT
   // ============================
@@ -49,21 +52,36 @@ export async function GET(req: NextRequest) {
     // SINGLE PAIR RESPONSE
     // ============================
 
-    if (pair && json?.signals?.[pair]) {
-      return NextResponse.json({
-        ...json.signals[pair],
-        feed: json.feed || [],
-        history: json.history || [],
-        performance: json.performance || {},
-        blocked: json.blocked,
-        active: json.active,
-        plan: json.plan,
-        expiry: json.expiry,
-        appInstruments: json.appInstruments || [],
-        webInstruments: json.webInstruments || [],
-        telegramInstruments: json.telegramInstruments || []
-      })
-    }
+if (pair && json?.signals?.[pair]) {
+
+  // ============================
+  // FAST MODE (3 second polling)
+  // ============================
+
+  if (fastMode) {
+    return NextResponse.json({
+      ...json.signals[pair]
+    })
+  }
+
+  // ============================
+  // FULL MODE (15 second refresh)
+  // ============================
+
+  return NextResponse.json({
+    ...json.signals[pair],
+    feed: json.feed || [],
+    history: json.history || [],
+    performance: json.performance || {},
+    blocked: json.blocked,
+    active: json.active,
+    plan: json.plan,
+    expiry: json.expiry,
+    appInstruments: json.appInstruments || [],
+    webInstruments: json.webInstruments || [],
+    telegramInstruments: json.telegramInstruments || []
+  })
+}
 
     // ============================
     // FULL RESPONSE

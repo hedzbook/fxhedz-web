@@ -511,7 +511,7 @@ export default function Page() {
     }
 
     loadSignals()
-    const interval = setInterval(loadSignals, 2500)
+    const interval = setInterval(loadSignals, 15000)
     return () => clearInterval(interval)
 
   }, [subActive, authLoading, accessToken])
@@ -654,7 +654,7 @@ export default function Page() {
     }
 
     // poll every 10 seconds
-    const interval = setInterval(checkSubscription, 10000)
+    const interval = setInterval(checkSubscription, 15000)
 
     return () => clearInterval(interval)
 
@@ -680,7 +680,7 @@ export default function Page() {
     async function refreshOpenPair() {
       try {
 
-        const res = await fetch(`/api/signals?pair=${pairKey}`, {
+        const res = await fetch(`/api/signals?pair=${pairKey}&fast=1`, {
           headers: accessToken
             ? { Authorization: `Bearer ${accessToken}` }
             : {}
@@ -696,13 +696,50 @@ export default function Page() {
     }
 
     refreshOpenPair()
-    const interval = setInterval(refreshOpenPair, 6000)
+    const interval = setInterval(refreshOpenPair, 3000)
 
     return () => {
       cancelled = true
       clearInterval(interval)
     }
   }, [openPair, subActive, authLoading])
+
+  useEffect(() => {
+
+    if (!openPair) return
+
+    if (isGuest) return
+
+    const pairKey = openPair
+
+    async function refreshFull() {
+      if (!openPair) return
+      try {
+
+        const res = await fetch(`/api/signals?pair=${pairKey}`, {
+          headers: accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : {}
+        })
+
+        const json = await res.json()
+
+        setPairData((prev: any) => ({
+          ...prev,
+          [pairKey]: json
+        }))
+
+      } catch { }
+
+    }
+
+    refreshFull()
+
+    const interval = setInterval(refreshFull, 15000)
+
+    return () => clearInterval(interval)
+
+  }, [openPair, accessToken])
 
   function togglePair(pair: string) {
     // Toggle between open/close pair expansion
