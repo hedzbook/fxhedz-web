@@ -328,23 +328,23 @@ w-full
 
             {showEASetup && (
 
-<div className="
+                <div className="
 fixed
 left-0
 right-0
-top-[56px]
-bottom-[64px]
+top-0
+bottom-[clamp(28px,3.5vh,50px)]
 z-50
 bg-neutral-900
 flex
 flex-col
 ">
 
-<div className="flex flex-col h-full">
+                    <div className="flex flex-col h-full">
 
                         {/* Header */}
 
-<div className="
+                        <div className="
 flex
 justify-between
 items-center
@@ -367,7 +367,7 @@ z-10
                                 className="
 text-neutral-400
 hover:text-white
-text-lg
+text-[clamp(10px,6.33px+1.15vw,21px)]
 "
                             >
                                 ✕
@@ -377,13 +377,13 @@ text-lg
 
                         {/* Scrollable Content */}
 
-<div className="
+                        <div className="
 flex-1
 overflow-y-auto
-px-5
-py-5
-space-y-8
-text-sm
+px-4
+py-4
+space-y-2
+text-[clamp(9px,5.5px+1.0937vw,19.5px)]
 text-neutral-300
 ">
 
@@ -391,56 +391,98 @@ text-neutral-300
                                 Follow these steps to install the FXHEDZ Expert Advisor in MetaTrader 5.
                             </p>
 
-                            <div>
-                                <b>Step 1 — Download EA</b>
-                                <p className="text-neutral-400 text-xs">
-                                    Download the FXHEDZ EA file to your computer.
-                                </p>
+                            <div className="space-y-1">
+
+                                <img
+                                    src="/ea/step1.png"
+                                    className="w-full rounded-md border border-neutral-800"
+                                />
+
+                                <div className="font-semibold text-neutral-200">
+                                    1. Download Expert Advisor
+                                </div>
+
+                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                                    <li>Download the FXHEDZ EA file</li>
+                                    <li>Save it to your desktop</li>
+                                    <li>Ensure the file extension is .ex5</li>
+                                    <li>Do not rename the file</li>
+                                    <li>Keep the file ready for MT5 installation</li>
+                                </ul>
+
                             </div>
 
-                            <div>
-                                <b>Step 2 — Open MT5 Data Folder</b>
-                                <p className="text-neutral-400 text-xs">
-                                    MT5 → File → Open Data Folder
-                                </p>
+                            <div className="space-y-1">
+
+                                <img
+                                    src="/ea/step1.png"
+                                    className="w-full rounded-md border border-neutral-800"
+                                />
+
+                                <div className="font-semibold text-neutral-200">
+                                    1. Download Expert Advisor
+                                </div>
+
+                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                                    <li>Download the FXHEDZ EA file</li>
+                                    <li>Save it to your desktop</li>
+                                    <li>Ensure the file extension is .ex5</li>
+                                    <li>Do not rename the file</li>
+                                    <li>Keep the file ready for MT5 installation</li>
+                                </ul>
+
                             </div>
 
-                            <div>
-                                <b>Step 3 — Navigate to Experts Folder</b>
-                                <p className="text-neutral-400 text-xs">
-                                    MQL5 → Experts
-                                </p>
+                            <div className="space-y-1">
+
+                                <img
+                                    src="/ea/step1.png"
+                                    className="w-full rounded-md border border-neutral-800"
+                                />
+
+                                <div className="font-semibold text-neutral-200">
+                                    1. Download Expert Advisor
+                                </div>
+
+                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                                    <li>Download the FXHEDZ EA file</li>
+                                    <li>Save it to your desktop</li>
+                                    <li>Ensure the file extension is .ex5</li>
+                                    <li>Do not rename the file</li>
+                                    <li>Keep the file ready for MT5 installation</li>
+                                </ul>
+
                             </div>
 
-                            <div>
-                                <b>Step 4 — Copy EA File</b>
-                                <p className="text-neutral-400 text-xs">
-                                    Place the downloaded FXHEDZ EA file inside the Experts folder.
-                                </p>
-                            </div>
+                            <div className="space-y-1">
 
-                            <div>
-                                <b>Step 5 — Restart MT5</b>
-                                <p className="text-neutral-400 text-xs">
-                                    Restart MetaTrader 5 so the EA appears in Navigator.
-                                </p>
-                            </div>
+                                <img
+                                    src="/ea/step1.png"
+                                    className="w-full rounded-md border border-neutral-800"
+                                />
 
-                            <div>
-                                <b>Step 6 — Attach EA to Chart</b>
-                                <p className="text-neutral-400 text-xs">
-                                    Drag FXHEDZ EA from Navigator onto any chart.
-                                </p>
+                                <div className="font-semibold text-neutral-200">
+                                    1. Download Expert Advisor
+                                </div>
+
+                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                                    <li>Download the FXHEDZ EA file</li>
+                                    <li>Save it to your desktop</li>
+                                    <li>Ensure the file extension is .ex5</li>
+                                    <li>Do not rename the file</li>
+                                    <li>Keep the file ready for MT5 installation</li>
+                                </ul>
+
                             </div>
 
                         </div>
 
                         {/* Footer */}
 
-<div className="
+                        <div className="
 border-t
 border-neutral-800
-p-4
+p-2
 sticky
 bottom-0
 bg-neutral-900
@@ -458,7 +500,8 @@ text-center
 bg-emerald-600
 hover:bg-emerald-500
 rounded-md
-py-3
+py-1
+text-[clamp(9px,5.5px+1.0937vw,19.5px)]
 font-semibold
 transition-colors
 "
@@ -470,9 +513,9 @@ transition-colors
 
                                 <div className="
 text-center
-text-sm
+text-[clamp(9px,5.5px+1.0937vw,19.5px)]
 text-neutral-400
-space-y-2
+space-y-1
 ">
 
                                     <div>
@@ -486,7 +529,7 @@ w-full
 bg-sky-600
 hover:bg-sky-500
 rounded-md
-py-3
+py-1
 font-semibold
 transition-colors
 "
