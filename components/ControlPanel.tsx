@@ -214,7 +214,7 @@ ${plan.highlight
             {/* MT5 EXPERT ADVISOR */}
             <Section>
 
-                <Title>MT5 Expert Advisor</Title>
+                <Title>iHEDZ MT5 Expert Advisor</Title>
 
                 <button
                     onClick={() => setShowEASetup(true)}
