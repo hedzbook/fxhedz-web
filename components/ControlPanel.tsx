@@ -328,35 +328,23 @@ w-full
 
             {showEASetup && (
 
-                <div className="
+<div className="
 fixed
-inset-0
+left-0
+right-0
+top-[56px]
+bottom-[64px]
 z-50
-bg-black/70
-flex
-items-center
-justify-center
-px-4
-">
-
-                    <div
-                        className="
 bg-neutral-900
-border
-border-neutral-700
-rounded-lg
-w-full
-max-w-lg
-max-h-[80vh]
 flex
 flex-col
-"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+">
+
+<div className="flex flex-col h-full">
 
                         {/* Header */}
 
-                        <div className="
+<div className="
 flex
 justify-between
 items-center
@@ -364,6 +352,10 @@ px-5
 py-4
 border-b
 border-neutral-800
+sticky
+top-0
+bg-neutral-900
+z-10
 ">
 
                             <div className="text-sm text-neutral-300 font-semibold">
@@ -385,13 +377,14 @@ text-lg
 
                         {/* Scrollable Content */}
 
-                        <div className="
-px-5
-py-4
+<div className="
+flex-1
 overflow-y-auto
+px-5
+py-5
+space-y-8
 text-sm
 text-neutral-300
-space-y-4
 ">
 
                             <p>
@@ -444,10 +437,13 @@ space-y-4
 
                         {/* Footer */}
 
-                        <div className="
+<div className="
 border-t
 border-neutral-800
 p-4
+sticky
+bottom-0
+bg-neutral-900
 ">
 
                             {isLivePlus ? (
