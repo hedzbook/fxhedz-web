@@ -520,7 +520,7 @@ Time
 </div>
 
 <div className="px-5">
-Dir
+Type
 </div>
 
 <div className="px-2 text-right">
