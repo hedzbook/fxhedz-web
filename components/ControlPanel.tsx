@@ -359,7 +359,7 @@ z-10
 ">
 
                             <div className="text-sm text-neutral-300 font-semibold">
-                                MT5 Expert Advisor Setup
+                                iHEDZ MT5 Expert Advisor Setup
                             </div>
 
                             <button
@@ -531,10 +531,10 @@ hover:bg-sky-500
 rounded-md
 py-1
 font-semibold
-transition-colors
+text-white
 "
                                     >
-                                        Upgrade to LIVE+
+                                        Go LIVE+
                                     </button>
 
                                 </div>

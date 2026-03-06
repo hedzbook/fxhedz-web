@@ -11,7 +11,7 @@ export async function GET() {
   return new NextResponse(file, {
     headers: {
       "Content-Type": "application/octet-stream",
-      "Content-Disposition": "attachment; filename=fxhedz-ea.ex5"
+      "Content-Disposition": "attachment; filename=iHEDZ.ex5"
     }
   })
 
