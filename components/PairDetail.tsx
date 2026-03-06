@@ -543,7 +543,7 @@ PnL
 
 {/* ROWS */}
 
-<div className="flex-1 overflow-y-auto -mb-1 pb-1">
+<div className="flex-1 overflow-y-auto -mb-0 pb-0">
 
 {data?.history?.length ? data.history.map((h:any,i:number)=>(
 
