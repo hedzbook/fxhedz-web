@@ -41,6 +41,9 @@ const PLANS = [
 const PLAYSTORE_URL =
     "https://play.google.com/store/apps/details?id=com.fxhedz.live"
 
+    const MT5_EA_URL =
+    "https://fxhedz.vercel.app/downloads/fxhedz-ea.ex5"
+
 export default function ControlPanel({
     accessMeta,
     deviceId,
@@ -48,13 +51,13 @@ export default function ControlPanel({
     onLogout
 }: Props) {
 
-const isAndroid =
-  typeof window !== "undefined" &&
-  !!(window as any).ReactNativeWebView
+    const isAndroid =
+        typeof window !== "undefined" &&
+        !!(window as any).ReactNativeWebView
 
-const isTelegram =
-  typeof window !== "undefined" &&
-  Boolean((window as any)?.Telegram?.WebApp?.initData)
+    const isTelegram =
+        typeof window !== "undefined" &&
+        Boolean((window as any)?.Telegram?.WebApp?.initData)
 
     const nativeEmail =
         typeof window !== "undefined"
@@ -206,6 +209,67 @@ ${plan.highlight
                 </p>
 
             </Section>
+
+{/* MT5 EXPERT ADVISOR */}
+
+<Section>
+
+    <Title>MT5 Expert Advisor</Title>
+
+    {isLivePlus ? (
+
+        <a
+            href={MT5_EA_URL}
+            download
+            className="
+flex
+justify-center
+items-center
+bg-neutral-800
+hover:bg-neutral-700
+rounded-md
+py-3
+transition-colors
+"
+        >
+            <img
+                src="/mt5ea.png"
+                alt="Download MT5 EA"
+                className="h-12"
+            />
+        </a>
+
+    ) : (
+
+        <div
+            className="
+flex
+flex-col
+items-center
+bg-neutral-800
+rounded-md
+py-3
+opacity-60
+"
+        >
+            <img
+                src="/mt5ea.png"
+                alt="MT5 EA Locked"
+                className="h-12"
+            />
+
+            <p className="text-xs text-neutral-400 mt-2">
+                Unlock EA through LIVE+ subscription
+            </p>
+        </div>
+
+    )}
+
+    <p className="text-neutral-400 text-xs text-center">
+        Connect FXHEDZ signals directly to MT5 execution.
+    </p>
+
+</Section>
 
             {!isAndroid && (
 
