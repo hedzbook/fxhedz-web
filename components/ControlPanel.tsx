@@ -7,7 +7,6 @@ type Props = {
         active?: boolean
         status?: string | null
         expiry?: string | null
-        plan_months?: number | null
     } | null
     deviceId?: string | null
     version: string
@@ -44,18 +43,34 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
         return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
     }, [accessMeta])
 
-    // 🔥 Real plan detection from backend
-    const activeMonths = accessMeta?.plan_months || 0
+    // =====================================
+    // Detect active subscription length
+    // =====================================
+const activeMonths = useMemo(() => {
+
+    if (!daysLeft) return 0
+
+    // trial period
+    if (daysLeft < 14) return 0
+
+    // paid plans
+    if (daysLeft >= 14 && daysLeft <= 31) return 1
+    if (daysLeft <= 93) return 3
+    return 6
+
+}, [daysLeft])
 
     const handleUpgrade = (plan: typeof PLANS[0]) => {
 
         if (env.isAndroid) {
+
             ;(window as any).ReactNativeWebView.postMessage(
                 JSON.stringify({
                     type: "PLAY_BILLING_REQUEST",
                     sku: plan.sku
                 })
             )
+
             return
         }
 
