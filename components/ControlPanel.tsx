@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 type Props = {
     accessMeta: {
@@ -41,8 +41,7 @@ const PLANS = [
 const PLAYSTORE_URL =
     "https://play.google.com/store/apps/details?id=com.fxhedz.live"
 
-    const MT5_EA_URL =
-    "https://sample-files.com/downloads/documents/txt/simple.txt"
+const MT5_EA_URL = "/api/ea-download"
 
 export default function ControlPanel({
     accessMeta,
@@ -76,6 +75,8 @@ export default function ControlPanel({
         const diff = expiry.getTime() - now.getTime()
         return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
     }, [accessMeta])
+
+    const [showEASetup, setShowEASetup] = useState(false)
 
     function handleUpgrade(plan: any) {
 
@@ -210,66 +211,46 @@ ${plan.highlight
 
             </Section>
 
-{/* MT5 EXPERT ADVISOR */}
+            {/* MT5 EXPERT ADVISOR */}
+            <Section>
 
-<Section>
+                <Title>MT5 Expert Advisor</Title>
 
-    <Title>MT5 Expert Advisor</Title>
-
-    {isLivePlus ? (
-
-        <a
-            href={MT5_EA_URL}
-            download
-            className="
+                <button
+                    onClick={() => setShowEASetup(true)}
+                    className="
 flex
-justify-center
+flex-col
 items-center
+justify-center
 bg-neutral-800
 hover:bg-neutral-700
 rounded-md
 py-3
 transition-colors
+w-full
 "
-        >
-            <img
-                src="/mt5ea.png"
-                alt="Download MT5 EA"
-                className="h-12"
-            />
-        </a>
+                >
 
-    ) : (
+                    <img
+                        src="/mt5ea.png"
+                        alt="MT5 EA"
+                        className="h-12"
+                    />
 
-        <div
-            className="
-flex
-flex-col
-items-center
-bg-neutral-800
-rounded-md
-py-3
-opacity-60
-"
-        >
-            <img
-                src="/mt5ea.png"
-                alt="MT5 EA Locked"
-                className="h-12"
-            />
+                    {!isLivePlus && (
+                        <p className="text-xs text-neutral-400 mt-2">
+                            Requires LIVE+ subscription
+                        </p>
+                    )}
 
-            <p className="text-xs text-neutral-400 mt-2">
-                Unlock EA through LIVE+ subscription
-            </p>
-        </div>
+                </button>
 
-    )}
+                <p className="text-neutral-400 text-xs text-center">
+                    Connect FXHEDZ signals directly to MT5 execution.
+                </p>
 
-    <p className="text-neutral-400 text-xs text-center">
-        Connect FXHEDZ signals directly to MT5 execution.
-    </p>
-
-</Section>
+            </Section>
 
             {!isAndroid && (
 
@@ -344,6 +325,189 @@ opacity-60
                     Sign Out
                 </button>
             </div>
+
+            {showEASetup && (
+
+                <div className="
+fixed
+inset-0
+z-50
+bg-black/70
+flex
+items-center
+justify-center
+px-4
+">
+
+                    <div
+                        className="
+bg-neutral-900
+border
+border-neutral-700
+rounded-lg
+w-full
+max-w-lg
+max-h-[80vh]
+flex
+flex-col
+"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+
+                        {/* Header */}
+
+                        <div className="
+flex
+justify-between
+items-center
+px-5
+py-4
+border-b
+border-neutral-800
+">
+
+                            <div className="text-sm text-neutral-300 font-semibold">
+                                MT5 Expert Advisor Setup
+                            </div>
+
+                            <button
+                                onClick={() => setShowEASetup(false)}
+                                className="
+text-neutral-400
+hover:text-white
+text-lg
+"
+                            >
+                                ✕
+                            </button>
+
+                        </div>
+
+                        {/* Scrollable Content */}
+
+                        <div className="
+px-5
+py-4
+overflow-y-auto
+text-sm
+text-neutral-300
+space-y-4
+">
+
+                            <p>
+                                Follow these steps to install the FXHEDZ Expert Advisor in MetaTrader 5.
+                            </p>
+
+                            <div>
+                                <b>Step 1 — Download EA</b>
+                                <p className="text-neutral-400 text-xs">
+                                    Download the FXHEDZ EA file to your computer.
+                                </p>
+                            </div>
+
+                            <div>
+                                <b>Step 2 — Open MT5 Data Folder</b>
+                                <p className="text-neutral-400 text-xs">
+                                    MT5 → File → Open Data Folder
+                                </p>
+                            </div>
+
+                            <div>
+                                <b>Step 3 — Navigate to Experts Folder</b>
+                                <p className="text-neutral-400 text-xs">
+                                    MQL5 → Experts
+                                </p>
+                            </div>
+
+                            <div>
+                                <b>Step 4 — Copy EA File</b>
+                                <p className="text-neutral-400 text-xs">
+                                    Place the downloaded FXHEDZ EA file inside the Experts folder.
+                                </p>
+                            </div>
+
+                            <div>
+                                <b>Step 5 — Restart MT5</b>
+                                <p className="text-neutral-400 text-xs">
+                                    Restart MetaTrader 5 so the EA appears in Navigator.
+                                </p>
+                            </div>
+
+                            <div>
+                                <b>Step 6 — Attach EA to Chart</b>
+                                <p className="text-neutral-400 text-xs">
+                                    Drag FXHEDZ EA from Navigator onto any chart.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        {/* Footer */}
+
+                        <div className="
+border-t
+border-neutral-800
+p-4
+">
+
+                            {isLivePlus ? (
+
+                                <a
+                                    href={MT5_EA_URL}
+                                    download
+                                    className="
+block
+w-full
+text-center
+bg-emerald-600
+hover:bg-emerald-500
+rounded-md
+py-3
+font-semibold
+transition-colors
+"
+                                >
+                                    Download FXHEDZ EA
+                                </a>
+
+                            ) : (
+
+                                <div className="
+text-center
+text-sm
+text-neutral-400
+space-y-2
+">
+
+                                    <div>
+                                        EA download requires LIVE+ subscription
+                                    </div>
+
+                                    <button
+                                        onClick={() => setShowEASetup(false)}
+                                        className="
+w-full
+bg-sky-600
+hover:bg-sky-500
+rounded-md
+py-3
+font-semibold
+transition-colors
+"
+                                    >
+                                        Upgrade to LIVE+
+                                    </button>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    </div>
+                </div>
+
+            )}
 
         </div>
     )
