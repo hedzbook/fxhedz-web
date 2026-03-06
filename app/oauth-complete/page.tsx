@@ -47,7 +47,6 @@ localStorage.setItem("email", data.email)
 
 if (data.hash) {
   localStorage.setItem("hash", data.hash)
-  ;(window as any).__USER_HASH__ = data.hash
 }
 
 window.location.href = "/"

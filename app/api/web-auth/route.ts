@@ -68,6 +68,7 @@ body: JSON.stringify({
   return NextResponse.json({
     accessToken,
     refreshToken,
-    email
+    email,
+    hash: gasData.hash
   })
 }
