@@ -649,7 +649,10 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
                                         {curveData.length > 0 && (
 
                                             <ResponsiveContainer width="100%" height="100%">
-<LineChart data={curveData}>
+<LineChart
+data={curveData}
+margin={{ top: 5, right: 5, left: 0, bottom: 0 }}
+>
 
 <CartesianGrid stroke="#222" strokeDasharray="3 3" />
 
@@ -657,7 +660,8 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
 dataKey="time"
 stroke="#666"
 tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
-tickMargin={8}
+tickMargin={6}
+height={22}
 tickFormatter={(v)=>String(v).substring(5,10)}
 />
 
@@ -665,7 +669,8 @@ tickFormatter={(v)=>String(v).substring(5,10)}
 orientation="right"
 stroke="#666"
 tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
-tickMargin={8}
+tickMargin={6}
+width={45}
 domain={["dataMin","dataMax"]}
 />
 
