@@ -44,21 +44,24 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
     }, [accessMeta])
 
     const activeMonths = useMemo(() => {
-
         if (!daysLeft) return 0
         if (daysLeft < 14) return 0
         if (daysLeft <= 31) return 1
         if (daysLeft <= 93) return 3
         return 6
-
     }, [daysLeft])
 
     const handleUpgrade = (plan: typeof PLANS[0]) => {
 
         if (env.isAndroid) {
+
             ;(window as any).ReactNativeWebView.postMessage(
-                JSON.stringify({ type: "PLAY_BILLING_REQUEST", sku: plan.sku })
+                JSON.stringify({
+                    type: "PLAY_BILLING_REQUEST",
+                    sku: plan.sku
+                })
             )
+
             return
         }
 
@@ -73,6 +76,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
         <>
         <div className="relative w-full h-full flex flex-col bg-[#0f0f0f] text-neutral-200 text-sm overflow-y-auto controlpanel-scroll pb-24">
 
+            {/* ACCOUNT */}
             <Section title="Account Profile">
                 <Row label="User" value={env.email} />
                 <Row label="Current Plan" value={(status || "Live").toUpperCase()} highlight={isLivePlus ? "green" : "blue"} />
@@ -80,45 +84,15 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 {deviceId && <Row label="Hardware ID" value={deviceId} mono truncate />}
             </Section>
 
-            {isLivePlus && (
-                <div className="px-6 pt-3">
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-
-                        <div className="flex justify-between items-center">
-                            <span className="text-[10px] text-emerald-400 font-bold tracking-widest">
-                                LIVE+ ACCESS
-                            </span>
-
-                            <span className="px-2 py-[2px] bg-emerald-500 text-black text-[9px] font-black rounded-full">
-                                PRO
-                            </span>
-                        </div>
-
-                        {accessMeta?.expiry && (
-                            <div className="flex justify-between mt-2 text-[11px]">
-
-                                <span className="text-neutral-400">
-                                    {new Date(accessMeta.expiry).toLocaleDateString()}
-                                </span>
-
-                                <span className={`${daysLeft && daysLeft <= 3 ? "text-red-400" : "text-emerald-400"}`}>
-                                    {daysLeft}d
-                                </span>
-
-                            </div>
-                        )}
-
-                    </div>
-                </div>
-            )}
-
+            {/* SUBSCRIPTION */}
             <Section title={isLivePlus ? "Extend Subscription" : "Premium Upgrade"}>
 
                 <div className="flex gap-2">
 
                     {PLANS.map(plan => {
 
-                        const isCurrentPlan = isLivePlus && activeMonths === plan.months
+                        const isCurrentPlan =
+                            isLivePlus && activeMonths === plan.months
 
                         return (
                             <button
@@ -148,29 +122,37 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
 
             </Section>
 
-            <Section title="Tools">
 
-                <div className="grid grid-cols-2 gap-3">
+            {/* EXPERT ADVISOR */}
+            <Section title="Expert Advisor">
 
-                    <ToolCard
-                        img="/mt5ea.png"
-                        text="MT5 Expert Advisor"
-                        onClick={() => setShowEASetup(true)}
-                    />
-
-                    {!env.isAndroid && (
-                        <ToolCard
-                            img="/playstore.png"
-                            text="Android App"
-                            onClick={() => window.open(PLAYSTORE_URL)}
-                        />
-                    )}
-
-                </div>
+                <ToolCard
+                    img="/mt5ea.png"
+                    text="MT5 Expert Advisor"
+                    onClick={() => setShowEASetup(true)}
+                />
 
             </Section>
 
-            <Section title="System">
+
+            {/* ANDROID APP */}
+            {!env.isAndroid && (
+
+            <Section title="Android App">
+
+                <ToolCard
+                    img="/playstore.png"
+                    text="Download Android App"
+                    onClick={() => window.open(PLAYSTORE_URL)}
+                />
+
+            </Section>
+
+            )}
+
+
+            {/* SYSTEM */}
+            <Section title="System Status">
 
                 <Row label="Version" value={version} mono />
                 <Row label="Platform" value={env.isAndroid ? "Android" : env.isTelegram ? "Telegram" : "Web"} />
@@ -178,6 +160,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 <Row label="Sync" value="Live" highlight="green" />
 
             </Section>
+
 
             <div className="p-6">
 
@@ -192,6 +175,8 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
 
         </div>
 
+
+        {/* EA OVERLAY */}
 
         {showEASetup && (
 
@@ -214,34 +199,23 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
 
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 text-[13px]">
 
-                <Step
-                    number={1}
-                    title="Download Resources"
-                    img="/ea/step1.png"
-                >
+                <Step number={1} title="Download Resources" img="/ea/step1.png">
                     <li>Download iHEDZ_Connector.ex5</li>
                     <li>Do not rename the file</li>
                 </Step>
 
-                <Step
-                    number={2}
-                    title="Open Data Folder"
-                    img="/ea/step2.png"
-                >
+                <Step number={2} title="Open Data Folder" img="/ea/step2.png">
                     <li>MT5 → File → Open Data Folder</li>
                     <li>MQL5 / Experts</li>
                 </Step>
 
-                <Step
-                    number={3}
-                    title="Install EA"
-                    img="/ea/step3.png"
-                >
+                <Step number={3} title="Install EA" img="/ea/step3.png">
                     <li>Copy file into Experts</li>
                     <li>Restart MetaTrader</li>
                 </Step>
 
             </div>
+
 
             <div className="border-t border-neutral-800 p-4 grid grid-cols-2 gap-3">
 
@@ -271,6 +245,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
 }
 
 
+
 function Section({ title, children }: any) {
     return (
         <div className="px-6 py-5 border-b border-neutral-800">
@@ -288,15 +263,15 @@ function ToolCard({ img, text, onClick }: any) {
     return (
         <button
             onClick={onClick}
-            className="flex flex-col items-center justify-center py-4 bg-neutral-900 border border-neutral-800 rounded-lg"
+            className="w-full bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden"
         >
 
             <img
                 src={img}
-                className="h-8 mb-2 object-contain"
+                className="w-full object-contain"
             />
 
-            <div className="text-[11px] text-neutral-400">
+            <div className="text-[11px] text-neutral-400 text-center py-2">
                 {text}
             </div>
 
@@ -305,7 +280,7 @@ function ToolCard({ img, text, onClick }: any) {
 }
 
 
-function Row({ label, value, highlight, mono, truncate }: any) {
+function Row({ label, value, highlight, mono }: any) {
 
     const color =
         highlight === "green"
