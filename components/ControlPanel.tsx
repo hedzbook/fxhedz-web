@@ -101,8 +101,8 @@ export default function ControlPanel({
     const planName = (status || "none").toUpperCase()
 
     return (
-        <div
-            className="
+<div className="
+relative
 w-full
 flex
 flex-col
@@ -114,8 +114,7 @@ text-sm
 overflow-y-auto
 controlpanel-scroll
 max-h-screen
-"
-        >
+">
 
             <Section>
 
@@ -328,12 +327,9 @@ w-full
 
             {showEASetup && (
 
-                <div className="
-fixed
-left-0
-right-0
-top-0
-bottom-[clamp(28px,3.5vh,50px)]
+<div className="
+absolute
+inset-0
 z-50
 bg-neutral-900
 flex
