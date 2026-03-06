@@ -77,13 +77,48 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 <Section title="Account Profile">
                     <Row label="User" value={env.email} />
 
-                    {env.hash && (
-                        <Row
-                            label="License Hash"
-                            value={env.hash}
-                            mono
-                        />
-                    )}
+{env.hash && (
+    <div className="flex justify-between items-center text-[12px] py-1">
+        <span className="text-neutral-500">License Hash</span>
+
+        <div className="flex items-center gap-2">
+            <span
+                className="font-mono text-[11px] text-neutral-300 cursor-pointer"
+                onClick={() => navigator.clipboard.writeText(env.hash)}
+            >
+                {env.hash}
+            </span>
+
+            <button
+                onClick={async () => {
+
+                    if (!confirm("Regenerate License Hash? This will disable all running Expert Advisors.")) {
+                        return
+                    }
+
+                    const res = await fetch("/api/regenerate-hash", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: env.email })
+                    })
+
+                    const data = await res.json()
+
+                    if (data.hash) {
+
+                        localStorage.setItem("hash", data.hash)
+
+                        location.reload()
+                    }
+
+                }}
+                className="text-[9px] px-2 py-1 rounded bg-neutral-800 border border-neutral-700 hover:bg-neutral-700"
+            >
+                REGEN
+            </button>
+        </div>
+    </div>
+)}
 
                     <Row label="Current Plan" value={(status || "Live").toUpperCase()} highlight={isLivePlus ? "green" : "blue"} />
                     <Row label="Status" value={isAccountActive ? "● ACTIVE" : "○ EXPIRED"} highlight={isAccountActive ? "green" : "red"} />
