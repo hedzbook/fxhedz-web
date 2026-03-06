@@ -515,15 +515,15 @@ totalPnl>=0 ? "text-green-400":"text-red-400"
 Time
 </div>
 
-<div className="px-4">
+<div className="px-5">
 Dir
 </div>
 
-<div className="px-2 text-right">
+<div className="px-2 text-left">
 Entry
 </div>
 
-<div className="px-2 text-right">
+<div className="px-2 text-left">
 Exit
 </div>
 
@@ -552,7 +552,7 @@ className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-n
 {String(h.time).substring(0,10)}
 </div>
 
-<div className={`px-4 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
+<div className={`px-5 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
 {h.direction}
 </div>
 
@@ -618,26 +618,21 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
                     <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
                         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto gap-[clamp(8px,1vh,16px)]">
 
-                            <div className="grid grid-cols-2 gap-[clamp(6px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                <Metric
-                                    label="Win Rate"
-                                    value={
-                                        data?.performance?.winRate !== undefined
-                                            ? data.performance.winRate + "%"
-                                            : "--"
-                                    }
-                                />
-                                <Metric
-                                    label="Profit Factor"
-                                    value={data?.performance?.profitFactor ?? "--"}
-                                />
-                            </div>
+<div className="grid grid-cols-2 gap-[clamp(6px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                            <div className="flex flex-col flex-1 gap-[clamp(8px,1vh,16px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                <Stat label="Total Trades" value={data?.performance?.trades} />
-                                <Stat label="Wins" value={data?.performance?.wins} />
-                                <Stat label="Losses" value={data?.performance?.losses} />
-                                <Stat label="Total PnL" value={data?.performance?.pnlTotal} />
+<Stat label="Win Rate" value={data?.performance?.winRate + "%"} />
+
+<Stat label="Profit Factor" value={data?.performance?.profitFactor} />
+
+<Stat label="Wins" value={data?.performance?.wins} />
+
+<Stat label="Losses" value={data?.performance?.losses} />
+
+<Stat label="Total Trades" value={data?.performance?.trades} />
+
+<Stat label="Total PnL" value={data?.performance?.pnlTotal} />
+
+</div>
 
                                 <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[125px] overflow-hidden">
 
@@ -698,7 +693,6 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
 
                         </div>
 
-                    </div>
                 )}
             </div>
 
