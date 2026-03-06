@@ -42,7 +42,7 @@ const PLAYSTORE_URL =
     "https://play.google.com/store/apps/details?id=com.fxhedz.live"
 
     const MT5_EA_URL =
-    "https://fxhedz.vercel.app/downloads/fxhedz-ea.ex5"
+    "https://sample-files.com/downloads/documents/txt/simple.txt"
 
 export default function ControlPanel({
     accessMeta,
