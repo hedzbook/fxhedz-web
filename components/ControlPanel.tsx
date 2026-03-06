@@ -2,6 +2,11 @@
 
 import { useMemo, useState } from "react"
 
+/**
+ * FXHEDZ Professional Control Panel
+ * Version 2.0 - Optimized for MT5 Integration & Play Store Release
+ */
+
 type Props = {
     accessMeta: {
         active?: boolean
@@ -38,9 +43,7 @@ const PLANS = [
     }
 ]
 
-const PLAYSTORE_URL =
-    "https://play.google.com/store/apps/details?id=com.fxhedz.live"
-
+const PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=com.fxhedz.live"
 const MT5_EA_URL = "/api/ea-download"
 
 export default function ControlPanel({
@@ -50,23 +53,11 @@ export default function ControlPanel({
     onLogout
 }: Props) {
 
-    const isAndroid =
-        typeof window !== "undefined" &&
-        !!(window as any).ReactNativeWebView
+    const isAndroid = typeof window !== "undefined" && !!(window as any).ReactNativeWebView
+    const isTelegram = typeof window !== "undefined" && Boolean((window as any)?.Telegram?.WebApp?.initData)
 
-    const isTelegram =
-        typeof window !== "undefined" &&
-        Boolean((window as any)?.Telegram?.WebApp?.initData)
-
-    const nativeEmail =
-        typeof window !== "undefined"
-            ? (window as any).__NATIVE_EMAIL__ || null
-            : null
-
-    const webEmail =
-        typeof window !== "undefined"
-            ? localStorage.getItem("email")
-            : null
+    const nativeEmail = typeof window !== "undefined" ? (window as any).__NATIVE_EMAIL__ || null : null
+    const webEmail = typeof window !== "undefined" ? localStorage.getItem("email") : null
 
     const daysLeft = useMemo(() => {
         if (!accessMeta?.expiry) return null
@@ -79,19 +70,12 @@ export default function ControlPanel({
     const [showEASetup, setShowEASetup] = useState(false)
 
     function handleUpgrade(plan: any) {
-
         if (isAndroid) {
-
-            ; (window as any).ReactNativeWebView.postMessage(
-                JSON.stringify({
-                    type: "PLAY_BILLING_REQUEST",
-                    sku: plan.sku
-                })
+            ;(window as any).ReactNativeWebView.postMessage(
+                JSON.stringify({ type: "PLAY_BILLING_REQUEST", sku: plan.sku })
             )
-
             return
         }
-
         window.open(plan.razorpay, "_blank")
     }
 
@@ -101,496 +85,209 @@ export default function ControlPanel({
     const planName = (status || "none").toUpperCase()
 
     return (
-<div className="
-relative
-w-full
-flex
-flex-col
-bg-neutral-900
-pt-6
-pb-4
-px-5
-text-sm
-overflow-y-auto
-controlpanel-scroll
-max-h-screen
-">
-
-            <Section>
-
-                <Title>Account</Title>
-
-                <Row label="Email" value={isAndroid ? nativeEmail || "—" : webEmail || "—"} />
-
-                <Row
-                    label="Plan"
-                    value={planName}
-                    highlight={isLivePlus ? "green" : undefined}
-                />
-
-                <Row
-                    label="Status"
-                    value={isAccountActive ? "ACTIVE" : "EXPIRED"}
-                    highlight={isAccountActive ? "green" : "red"}
-                />
-
-                {deviceId && (
-                    <Row label="Device" value={deviceId} mono />
-                )}
-
-            </Section>
-
-            <Section>
-
-                <div className="text-emerald-400 uppercase text-xs tracking-wider">
-                    <Title>{isLivePlus ? "LIVE+ STATUS" : "GO LIVE+"}</Title>
-                </div>
-
-                {!isLivePlus ? (
-
-                    <div className="flex gap-2">
-
-                        {PLANS.map((plan) => (
-
-                            <button
-                                key={plan.months}
-                                onClick={() => handleUpgrade(plan)}
-                                className={`
-        flex-1
-        py-3
-        rounded-md
-        text-center
-        transition-colors
-        font-semibold
-${plan.highlight
-                                        ? "bg-emerald-600 hover:bg-emerald-500 animate-pulse"
-                                        : "bg-sky-600 hover:bg-sky-500"}
-      `}
-                            >
-
-                                <div>{plan.label}</div>
-
-                                <div className="text-xs opacity-80">
-                                    {plan.price}
-                                </div>
-
-                            </button>
-
-                        ))}
-
-                    </div>
-
-                ) : (
-
-                    <>
-                        <div className="bg-emerald-600/20 border border-emerald-600 rounded-md py-3 text-center font-semibold text-emerald-400">
-                            LIVE+ ACTIVE
-                        </div>
-
-                        {accessMeta?.expiry && (
-                            <>
-                                <Row
-                                    label="Expiry"
-                                    value={new Date(accessMeta.expiry).toLocaleDateString()}
-                                />
-
-                                <Row
-                                    label="Days Left"
-                                    value={daysLeft?.toString() ?? "0"}
-                                    highlight={daysLeft && daysLeft <= 3 ? "red" : "green"}
-                                />
-                            </>
-                        )}
-                    </>
-                )}
-
-                <p className="text-neutral-400 text-xs leading-relaxed">
-                    LIVE+ provides real-time signals across all instruments.
-                </p>
-
-            </Section>
-
-            {/* MT5 EXPERT ADVISOR */}
-            <Section>
-
-                <Title>iHEDZ MT5 Expert Advisor</Title>
-
-                <button
-                    onClick={() => setShowEASetup(true)}
-                    className="
-flex
-flex-col
-items-center
-justify-center
-bg-neutral-800
-hover:bg-neutral-700
-rounded-md
-py-3
-transition-colors
-w-full
-"
-                >
-
-                    <img
-                        src="/mt5ea.png"
-                        alt="iHEDZ MT5 EA"
-                        className="h-12"
+        <div className="relative w-full h-full flex flex-col bg-black text-neutral-200 overflow-hidden font-sans">
+            {/* Scrollable Container */}
+            <div className="flex-1 overflow-y-auto px-5 pt-6 pb-20 space-y-6 scroll-smooth">
+                
+                {/* ACCOUNT SECTION */}
+                <Section title="User Identification">
+                    <Row label="Account ID" value={isAndroid ? nativeEmail || "Guest" : webEmail || "Guest"} />
+                    <Row 
+                        label="Subscription" 
+                        value={planName} 
+                        color={isLivePlus ? "text-emerald-400" : "text-neutral-400"}
                     />
-
-                    {!isLivePlus && (
-                        <p className="text-xs text-neutral-400 mt-2">
-                            Requires LIVE+ subscription
-                        </p>
-                    )}
-
-                </button>
-
-                <p className="text-neutral-400 text-xs text-center">
-                    Connect FXHEDZ signals directly to MT5 execution.
-                </p>
-
-            </Section>
-
-            {!isAndroid && (
-
-                <Section>
-
-                    <Title>Mobile App</Title>
-
-                    <a
-                        href={PLAYSTORE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex justify-center"
-                    >
-                        <img
-                            src="/playstore.png"
-                            alt="Get it on Google Play"
-                            className="h-12"
-                        />
-                    </a>
-
-                    <p className="text-neutral-400 text-xs text-center">
-                        Install the FXHEDZ app for push alerts.
-                    </p>
-
+                    <Row 
+                        label="System Status" 
+                        value={isAccountActive ? "AUTHORIZED" : "UNAUTHORIZED"} 
+                        color={isAccountActive ? "text-emerald-400" : "text-red-500"}
+                    />
+                    {deviceId && <Row label="Hardware ID" value={deviceId} mono />}
                 </Section>
 
-            )}
+                {/* SUBSCRIPTION CALL TO ACTION */}
+                <Section title={isLivePlus ? "Subscription Analytics" : "Upgrade to LIVE+"}>
+                    {!isLivePlus ? (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-3 gap-2">
+                                {PLANS.map((plan) => (
+                                    <button
+                                        key={plan.months}
+                                        onClick={() => handleUpgrade(plan)}
+                                        className={`flex flex-col items-center py-3 rounded-lg border transition-all ${
+                                            plan.highlight 
+                                            ? "bg-emerald-600/10 border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]" 
+                                            : "bg-neutral-900 border-neutral-800 hover:border-neutral-600"
+                                        }`}
+                                    >
+                                        <span className="text-xs font-bold">{plan.label}</span>
+                                        <span className="text-[10px] opacity-60">{plan.price}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <p className="text-[11px] text-neutral-500 leading-tight">
+                                LIVE+ unlocks 50+ instruments, HEDZ-compounder logic, and high-priority push notifications.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span className="text-xs text-emerald-400 font-semibold tracking-wide">PREMIUM ACCESS ACTIVE</span>
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            </div>
+                            {accessMeta?.expiry && (
+                                <>
+                                    <Row label="Renewal Date" value={new Date(accessMeta.expiry).toLocaleDateString()} />
+                                    <Row 
+                                        label="Time Remaining" 
+                                        value={`${daysLeft ?? 0} Days`} 
+                                        color={daysLeft && daysLeft <= 3 ? "text-red-400" : "text-emerald-400"}
+                                    />
+                                </>
+                            )}
+                        </div>
+                    )}
+                </Section>
 
-            <Section>
+                {/* MT5 EXPERT ADVISOR CARD */}
+                <div className="group relative bg-gradient-to-b from-neutral-900 to-black border border-neutral-800 rounded-xl p-4 overflow-hidden">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 className="text-sm font-bold text-white mb-1">iHEDZ Expert Advisor</h3>
+                            <p className="text-[11px] text-neutral-500">Automate signals on MetaTrader 5</p>
+                        </div>
+                        <img src="/mt5ea.png" alt="EA" className="h-8 opacity-80 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    
+                    <button
+                        onClick={() => setShowEASetup(true)}
+                        className="w-full bg-white text-black text-xs font-bold py-2.5 rounded-lg hover:bg-neutral-200 transition-colors"
+                    >
+                        {isLivePlus ? "MANAGE INSTALLATION" : "VIEW PREREQUISITES"}
+                    </button>
+                </div>
 
-                <Title>System</Title>
+                {/* SYSTEM METRICS */}
+                <Section title="Engine Status">
+                    <Row label="Version" value={version} mono />
+                    <Row label="Environment" value={isAndroid ? "Native Android" : isTelegram ? "Telegram Mini App" : "Web Engine"} />
+                    <Row label="Latency" value="~120ms" color="text-emerald-500" />
+                    <Row label="Data Stream" value="Synchronized" />
+                </Section>
 
-                <Row label="Version" value={version} mono />
-                <Row
-                    label="Platform"
-                    value={
-                        isAndroid
-                            ? "ANDROID"
-                            : isTelegram
-                                ? "TELEGRAM"
-                                : "WEB"
-                    }
-                />
-                <Row label="Latency" value="~120ms" />
-                <Row label="Last Sync" value="Live" />
+                {/* SUPPORT LINKS */}
+                <Section title="Resource Center">
+                    <div className="grid grid-cols-2 gap-y-3">
+                        <ExternalLink label="Technical Support" href="https://t.me/fxhedzbot" />
+                        <ExternalLink label="Risk Disclosure" href="/risk" />
+                        <ExternalLink label="Terms of Service" href="/terms" />
+                        <ExternalLink label="Community Hub" href="https://t.me/fxhedz" />
+                    </div>
+                </Section>
 
-            </Section>
-
-            <Section>
-
-                <Title>Support</Title>
-
-                <LinkBtn label="Help" href="https://t.me/fxhedzbot" />
-                <LinkBtn label="Telegram" href="https://t.me/fxhedzbot" />
-                <LinkBtn label="Risk Disclosure" href="/risk" />
-                <LinkBtn label="Terms" href="/terms" />
-
-            </Section>
-
-            <div className="pt-4">
+                {/* LOGOUT */}
                 <button
                     onClick={onLogout}
-                    className="
-  w-full
-  py-2
-  text-red-500
-  font-semibold
-  hover:text-red-400
-  transition-colors
-"
+                    className="w-full py-4 text-xs font-bold text-neutral-600 hover:text-red-500 transition-colors tracking-widest"
                 >
-                    Sign Out
+                    TERMINATE SESSION
                 </button>
             </div>
 
+            {/* EA SETUP MODAL OVERLAY */}
             {showEASetup && (
+                <div className="absolute inset-0 z-50 bg-black flex flex-col animate-in slide-in-from-bottom duration-300">
+                    <div className="flex justify-between items-center px-6 py-5 border-b border-neutral-900">
+                        <span className="text-xs font-bold tracking-widest text-white uppercase">MT5 Deployment Guide</span>
+                        <button onClick={() => setShowEASetup(false)} className="text-neutral-500 hover:text-white text-lg">✕</button>
+                    </div>
 
-<div className="
-absolute
-inset-0
-z-50
-bg-neutral-900
-flex
-flex-col
-">
+                    <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                        <Step 
+                            num="01" 
+                            title="Download Expert Advisor" 
+                            desc="Retrieve the .ex5 binary optimized for your account."
+                            img="/ea/step1.png"
+                            items={["Check for .ex5 extension", "Do not rename the binary", "Compatible with MT5 Build 4000+"]}
+                        />
+                        <Step 
+                            num="02" 
+                            title="Terminal Integration" 
+                            desc="Move file to MQL5/Experts folder."
+                            img="/ea/step1.png"
+                            items={["Open Data Folder in MT5", "Restart MT5 Terminal", "Enable 'Allow Algo Trading'"]}
+                        />
+                    </div>
 
-                    <div className="flex flex-col h-full">
-
-                        {/* Header */}
-
-                        <div className="
-flex
-justify-between
-items-center
-px-5
-py-4
-border-b
-border-neutral-800
-sticky
-top-0
-bg-neutral-900
-z-10
-">
-
-                            <div className="text-sm text-neutral-300 font-semibold">
-                                iHEDZ MT5 Expert Advisor Setup
-                            </div>
-
-                            <button
-                                onClick={() => setShowEASetup(false)}
-                                className="
-text-neutral-400
-hover:text-white
-text-[clamp(10px,6.33px+1.15vw,21px)]
-"
-                            >
-                                ✕
+                    <div className="p-6 bg-neutral-950 border-t border-neutral-900">
+                        {isLivePlus ? (
+                            <a href={MT5_EA_URL} download className="block w-full text-center bg-emerald-600 py-3 rounded-lg font-bold text-sm">
+                                DOWNLOAD .EX5 BINARY
+                            </a>
+                        ) : (
+                            <button onClick={() => setShowEASetup(false)} className="w-full bg-sky-600 py-3 rounded-lg font-bold text-sm">
+                                UPGRADE TO ACCESS EA
                             </button>
-
-                        </div>
-
-                        {/* Scrollable Content */}
-
-                        <div className="
-flex-1
-overflow-y-auto
-px-4
-py-4
-space-y-2
-text-[clamp(9px,5.5px+1.0937vw,19.5px)]
-text-neutral-300
-">
-
-                            <p>
-                                Follow these steps to install the FXHEDZ Expert Advisor in MetaTrader 5.
-                            </p>
-
-                            <div className="space-y-1">
-
-                                <img
-                                    src="/ea/step1.png"
-                                    className="w-full rounded-md border border-neutral-800"
-                                />
-
-                                <div className="font-semibold text-neutral-200">
-                                    1. Download Expert Advisor
-                                </div>
-
-                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                    <li>Download the FXHEDZ EA file</li>
-                                    <li>Save it to your desktop</li>
-                                    <li>Ensure the file extension is .ex5</li>
-                                    <li>Do not rename the file</li>
-                                    <li>Keep the file ready for MT5 installation</li>
-                                </ul>
-
-                            </div>
-
-                            <div className="space-y-1">
-
-                                <img
-                                    src="/ea/step1.png"
-                                    className="w-full rounded-md border border-neutral-800"
-                                />
-
-                                <div className="font-semibold text-neutral-200">
-                                    1. Download Expert Advisor
-                                </div>
-
-                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                    <li>Download the FXHEDZ EA file</li>
-                                    <li>Save it to your desktop</li>
-                                    <li>Ensure the file extension is .ex5</li>
-                                    <li>Do not rename the file</li>
-                                    <li>Keep the file ready for MT5 installation</li>
-                                </ul>
-
-                            </div>
-
-                            <div className="space-y-1">
-
-                                <img
-                                    src="/ea/step1.png"
-                                    className="w-full rounded-md border border-neutral-800"
-                                />
-
-                                <div className="font-semibold text-neutral-200">
-                                    1. Download Expert Advisor
-                                </div>
-
-                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                    <li>Download the FXHEDZ EA file</li>
-                                    <li>Save it to your desktop</li>
-                                    <li>Ensure the file extension is .ex5</li>
-                                    <li>Do not rename the file</li>
-                                    <li>Keep the file ready for MT5 installation</li>
-                                </ul>
-
-                            </div>
-
-                            <div className="space-y-1">
-
-                                <img
-                                    src="/ea/step1.png"
-                                    className="w-full rounded-md border border-neutral-800"
-                                />
-
-                                <div className="font-semibold text-neutral-200">
-                                    1. Download Expert Advisor
-                                </div>
-
-                                <ul className="list-disc pl-4 text-neutral-400 space-y-1 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
-                                    <li>Download the FXHEDZ EA file</li>
-                                    <li>Save it to your desktop</li>
-                                    <li>Ensure the file extension is .ex5</li>
-                                    <li>Do not rename the file</li>
-                                    <li>Keep the file ready for MT5 installation</li>
-                                </ul>
-
-                            </div>
-
-                        </div>
-
-                        {/* Footer */}
-
-                        <div className="
-border-t
-border-neutral-800
-p-2
-sticky
-bottom-0
-bg-neutral-900
-">
-
-                            {isLivePlus ? (
-
-                                <a
-                                    href={MT5_EA_URL}
-                                    download
-                                    className="
-block
-w-full
-text-center
-bg-emerald-600
-hover:bg-emerald-500
-rounded-md
-py-1
-text-[clamp(9px,5.5px+1.0937vw,19.5px)]
-font-semibold
-transition-colors
-"
-                                >
-                                    Download FXHEDZ EA
-                                </a>
-
-                            ) : (
-
-                                <div className="
-text-center
-text-[clamp(9px,5.5px+1.0937vw,19.5px)]
-text-neutral-400
-space-y-1
-">
-
-                                    <div>
-                                        EA download requires LIVE+ subscription
-                                    </div>
-
-                                    <button
-                                        onClick={() => setShowEASetup(false)}
-                                        className="
-w-full
-bg-sky-600
-hover:bg-sky-500
-rounded-md
-py-1
-font-semibold
-text-white
-"
-                                    >
-                                        Go LIVE+
-                                    </button>
-
-                                </div>
-
-                            )}
-
-                        </div>
-
+                        )}
                     </div>
                 </div>
-
             )}
-
         </div>
     )
 }
 
-function Section({ children }: any) {
+/* --- UI COMPONENTS --- */
+
+function Section({ title, children }: { title: string, children: React.ReactNode }) {
     return (
-        <div className="space-y-3 pt-6 pb-5 border-b border-neutral-800 first:pt-0 last:border-none">
-            {children}
+        <div className="space-y-3">
+            <h4 className="text-[10px] font-bold text-neutral-600 uppercase tracking-[0.2em]">{title}</h4>
+            <div className="space-y-2.5">{children}</div>
         </div>
     )
 }
 
-function Title({ children }: any) {
+function Row({ label, value, color = "text-neutral-200", mono = false }: any) {
     return (
-        <div className="text-neutral-400 uppercase text-xs tracking-wider">
-            {children}
-        </div>
-    )
-}
-
-function Row({ label, value, highlight, mono }: any) {
-    return (
-        <div className="flex justify-between items-center">
-            <span className="text-neutral-500">{label}</span>
-            <span
-                className={`
-  ${mono ? "font-mono text-[0.80em] text-neutral-400" : ""}
-  ${!mono ? "text-neutral-200" : ""}
-  ${highlight === "green" ? "text-green-400" : ""}
-  ${highlight === "red" ? "text-red-400" : ""}
-`}
-            >
+        <div className="flex justify-between items-center border-b border-neutral-900/50 pb-1.5">
+            <span className="text-[11px] text-neutral-500 font-medium">{label}</span>
+            <span className={`text-[11px] font-semibold ${color} ${mono ? "font-mono bg-neutral-900 px-1 rounded" : ""}`}>
                 {value}
             </span>
         </div>
     )
 }
 
-function LinkBtn({ label, href }: any) {
+function ExternalLink({ label, href }: { label: string, href: string }) {
     return (
-        <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-sky-400 hover:text-sky-300 transition-colors"
+        <a 
+            href={href} 
+            target="_blank" 
+            className="text-[11px] text-sky-500 hover:text-sky-400 font-medium flex items-center gap-1 transition-colors"
         >
-            {label}
+            {label} ↗
         </a>
+    )
+}
+
+function Step({ num, title, desc, img, items }: any) {
+    return (
+        <div className="space-y-4">
+            <div className="flex gap-4">
+                <span className="text-2xl font-black text-neutral-800 leading-none">{num}</span>
+                <div>
+                    <h5 className="text-sm font-bold text-white">{title}</h5>
+                    <p className="text-xs text-neutral-500">{desc}</p>
+                </div>
+            </div>
+            <img src={img} className="w-full rounded-lg border border-neutral-800 grayscale hover:grayscale-0 transition-all" />
+            <ul className="grid grid-cols-1 gap-2">
+                {items.map((item: string, i: number) => (
+                    <li key={i} className="text-[11px] text-neutral-400 flex items-center gap-2">
+                        <div className="h-1 w-1 rounded-full bg-sky-500" /> {item}
+                    </li>
+                ))}
+            </ul>
+        </div>
     )
 }
