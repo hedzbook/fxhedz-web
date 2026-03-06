@@ -543,7 +543,7 @@ PnL
 
 {/* ROWS */}
 
-<div className="flex-1 overflow-y-auto -mb-0 pb-0">
+<div className="flex-1 overflow-y-auto -mb-2 pb-2">
 
 {data?.history?.length ? data.history.map((h:any,i:number)=>(
 
@@ -630,7 +630,7 @@ historyPnl >= 0 ? "text-green-400" : "text-red-400"
 
 <Stat label="Wins" value={data?.performance?.wins} />
 
-<Stat label="Losses" value={data?.performance?.losses} />
+<Stat label="Hedges" value={data?.performance?.losses} />
 
 <Stat label="Total Trades" value={data?.performance?.trades} />
 
