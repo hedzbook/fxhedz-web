@@ -234,7 +234,7 @@ w-full
 
                     <img
                         src="/mt5ea.png"
-                        alt="MT5 EA"
+                        alt="iHEDZ MT5 EA"
                         className="h-12"
                     />
 
