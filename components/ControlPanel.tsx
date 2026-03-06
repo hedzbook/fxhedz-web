@@ -115,7 +115,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 </div>
             )}
 
-            {/* SUBSCRIPTION - COMPACT HEIGHT */}
+            {/* SUBSCRIPTION - ACTIVE BOX AT BOTTOM */}
             <Section title={isLivePlus ? "Extend Subscription" : "Premium Upgrade"}>
                 <div className="flex gap-2">
                     {PLANS.map(plan => {
@@ -124,74 +124,69 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                             <button
                                 key={plan.months}
                                 onClick={() => handleUpgrade(plan)}
-                                className={`relative flex-1 py-1.5 rounded-lg border text-center transition-all active:scale-95 ${
+                                className={`relative flex-1 pt-2 pb-4 rounded-lg border text-center transition-all active:scale-95 ${
                                     plan.highlight
                                         ? "bg-sky-600 border-sky-400 shadow-lg shadow-sky-900/20"
                                         : "bg-neutral-800 border-neutral-700 hover:bg-neutral-700"
                                 }`}
                             >
+                                <div className="text-[10px] font-bold opacity-80">{plan.label}</div>
+                                <div className="text-xs font-black">{plan.price}</div>
+                                
                                 {isCurrentPlan && (
-                                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[7px] px-1.5 py-[1px] bg-emerald-500 text-black rounded font-bold">
+                                    <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[7px] px-1.5 py-[1px] bg-emerald-500 text-black rounded font-black tracking-tighter shadow-md">
                                         ACTIVE
                                     </span>
                                 )}
-                                <div className="text-[10px] font-bold opacity-80">{plan.label}</div>
-                                <div className="text-xs font-black">{plan.price}</div>
                             </button>
                         )
                     })}
                 </div>
             </Section>
 
-            {/* EXPERT ADVISOR - 50% HEIGHT & SWAPPED */}
+            {/* EXPERT ADVISOR */}
             <Section title="Expert Advisor">
                 <div className="flex gap-2 items-stretch h-[44px]">
-                    
-                    {/* LEFT: DOWNLOAD */}
-                    <button 
-                        onClick={() => setShowEASetup(true)}
-                        className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform"
-                    >
+                    <button onClick={() => setShowEASetup(true)} className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" x2="12" y1="3" y2="15" />
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="3" y2="15" />
                         </svg>
                         <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">EA</div>
                     </button>
-
-                    {/* CENTER: IMAGE */}
                     <div className="flex-1 rounded-lg border border-sky-500/30 bg-sky-950/20 flex items-center justify-center overflow-hidden">
-                        <img 
-                            src="/mt5ea.png" 
-                            className="h-full w-auto object-contain scale-110 drop-shadow-[0_0_5px_rgba(56,189,248,0.5)]" 
-                            alt="EA"
-                        />
+                        <img src="/mt5ea.png" className="h-full w-auto object-contain scale-110 drop-shadow-[0_0_5px_rgba(56,189,248,0.5)]" alt="EA" />
                     </div>
-
-                    {/* RIGHT: MY EA */}
-                    <button 
-                        onClick={() => window.location.href="/ea"}
-                        className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform"
-                    >
+                    <button onClick={() => window.location.href="/ea"} className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex flex-col items-center justify-center active:scale-95 transition-transform">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400">
-                            <rect width="20" height="14" x="2" y="3" rx="2" />
-                            <line x1="12" x2="12" y1="17" y2="21" />
-                            <line x1="8" x2="16" y1="21" y2="21" />
+                            <rect width="20" height="14" x="2" y="3" rx="2" /><line x1="12" x2="12" y1="17" y2="21" /><line x1="8" x2="16" y1="21" y2="21" />
                         </svg>
                         <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">MY EA</div>
                     </button>
                 </div>
             </Section>
 
-            {/* ANDROID APP */}
+            {/* APP DOWNLOAD - TRIPLE BUTTON LAYOUT */}
             {!env.isAndroid && (
-            <Section title="Android App">
-                <ToolCard
-                    img="/playstore.png"
-                    text="Download Android App"
-                    onClick={() => window.open(PLAYSTORE_URL)}
-                />
+            <Section title="Download App">
+                <div className="flex gap-2 items-stretch h-[44px]">
+                    {/* LEFT: APPLE */}
+                    <button className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex items-center justify-center active:scale-95 transition-transform opacity-40">
+                         <img src="/apple.png" className="h-5 w-5 object-contain grayscale" alt="iOS" />
+                    </button>
+
+                    {/* CENTER: ANDROID (ACTIVE) */}
+                    <button 
+                        onClick={() => window.open(PLAYSTORE_URL)}
+                        className="flex-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 flex items-center justify-center active:scale-95 transition-transform shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                    >
+                         <img src="/playstore.png" className="h-5 w-auto object-contain" alt="Android" />
+                    </button>
+
+                    {/* RIGHT: WEB/WINDOWS */}
+                    <button className="flex-1 rounded-lg border border-neutral-700 bg-neutral-800 flex items-center justify-center active:scale-95 transition-transform opacity-40">
+                         <img src="/web.png" className="h-5 w-5 object-contain grayscale" alt="Web" />
+                    </button>
+                </div>
             </Section>
             )}
 
@@ -204,10 +199,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
             </Section>
 
             <div className="px-6 py-0 mt-4">
-                <button
-                    onClick={onLogout}
-                    className="w-full py-3 rounded-lg border border-red-900/30 text-red-500 text-xs font-bold active:scale-95 transition-transform"
-                >
+                <button onClick={onLogout} className="w-full py-3 rounded-lg border border-red-900/30 text-red-500 text-xs font-bold active:scale-95 transition-transform">
                     TERMINATE SESSION
                 </button>
                 <div className="mt-4 pb-4 text-center text-[8px] text-neutral-700 font-bold tracking-[0.3em] uppercase">
@@ -216,7 +208,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
             </div>
         </div>
 
-        {/* ... (EA Overlay code remains identical to your reference) ... */}
+        {/* EA OVERLAY */}
         {showEASetup && (
             <div className="fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col">
                 <div className="flex justify-between items-center px-4 py-4 border-b border-neutral-800">
@@ -264,15 +256,6 @@ function Row({ label, value, highlight, mono }: any) {
             <span className="text-neutral-500">{label}</span>
             <span className={`${mono ? "font-mono text-[11px]" : "font-semibold"} ${color}`}>{value}</span>
         </div>
-    )
-}
-
-function ToolCard({ img, text, onClick }: any) {
-    return (
-        <button onClick={onClick} className="w-full bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
-            <img src={img} className="w-full object-contain" />
-            <div className="text-[11px] text-neutral-400 text-center py-2">{text}</div>
-        </button>
     )
 }
 
