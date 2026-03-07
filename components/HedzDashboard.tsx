@@ -56,9 +56,19 @@ async function fetchData(){
 try{
 
 const hash = localStorage.getItem("hedz_hash")
-if(!hash) return
+
+if(!hash){
+setLoading(false)
+return
+}
 
 const res = await fetch(`/api/hedz?hash=${hash}`)
+
+if(!res.ok){
+setLoading(false)
+return
+}
+
 const json = await res.json()
 
 const terminalRows =
@@ -114,10 +124,13 @@ setOrders(orderRows)
 setHistory(historyRows)
 
 }catch(e){
-console.error(e)
+
+console.error("HEDZ DASHBOARD ERROR",e)
+
 }
 
 setLoading(false)
+
 }
 
 useEffect(()=>{
