@@ -11,6 +11,7 @@ type Props = {
     deviceId?: string | null
     version: string
     onLogout: () => void
+    setView: (view: "signals" | "hedz") => void
 }
 
 const PLANS = [
@@ -22,7 +23,7 @@ const PLANS = [
 const PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=com.fxhedz.live"
 const MT5_EA_URL = "/api/ea-download"
 
-export default function ControlPanel({ accessMeta, deviceId, version, onLogout }: Props) {
+export default function ControlPanel({ accessMeta, deviceId, version, onLogout, setView }: Props) {
 
     const [showEASetup, setShowEASetup] = useState(false)
 
@@ -77,48 +78,48 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                 <Section title="Account Profile">
                     <Row label="User" value={env.email} />
 
-{env.hash && (
-    <div className="flex justify-between items-center text-[12px] py-1">
-        <span className="text-neutral-500">License Hash</span>
+                    {env.hash && (
+                        <div className="flex justify-between items-center text-[12px] py-1">
+                            <span className="text-neutral-500">License Hash</span>
 
-        <div className="flex items-center gap-2">
-            <span
-                className="font-mono text-[11px] text-neutral-300 cursor-pointer"
-                onClick={() => navigator.clipboard.writeText(env.hash)}
-            >
-                {env.hash}
-            </span>
+                            <div className="flex items-center gap-2">
+                                <span
+                                    className="font-mono text-[11px] text-neutral-300 cursor-pointer"
+                                    onClick={() => navigator.clipboard.writeText(env.hash)}
+                                >
+                                    {env.hash}
+                                </span>
 
-            <button
-                onClick={async () => {
+                                <button
+                                    onClick={async () => {
 
-                    if (!confirm("Regenerate License Hash? This will disable all running Expert Advisors.")) {
-                        return
-                    }
+                                        if (!confirm("Regenerate License Hash? This will disable all running Expert Advisors.")) {
+                                            return
+                                        }
 
-                    const res = await fetch("/api/regenerate-hash", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: env.email })
-                    })
+                                        const res = await fetch("/api/regenerate-hash", {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ email: env.email })
+                                        })
 
-                    const data = await res.json()
+                                        const data = await res.json()
 
-                    if (data.hash) {
+                                        if (data.hash) {
 
-                        localStorage.setItem("hash", data.hash)
+                                            localStorage.setItem("hash", data.hash)
 
-                        location.reload()
-                    }
+                                            location.reload()
+                                        }
 
-                }}
-                className="text-[9px] px-2 py-1 rounded bg-neutral-800 border border-neutral-700 hover:bg-neutral-700"
-            >
-                REGEN
-            </button>
-        </div>
-    </div>
-)}
+                                    }}
+                                    className="text-[9px] px-2 py-1 rounded bg-neutral-800 border border-neutral-700 hover:bg-neutral-700"
+                                >
+                                    REGEN
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <Row label="Current Plan" value={(status || "Live").toUpperCase()} highlight={isLivePlus ? "green" : "blue"} />
                     <Row label="Status" value={isAccountActive ? "● ACTIVE" : "○ EXPIRED"} highlight={isAccountActive ? "green" : "red"} />
@@ -215,7 +216,9 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
 
                         {/* Right Button: My EA */}
                         <button
-                            onClick={() => window.location.href = "/ea"}
+                            onClick={() => {
+                                setView("hedz")
+                            }}
                             className="flex-1 rounded-lg border border-neutral-700 bg-neutral-900 flex flex-col items-center justify-center active:scale-95 transition-transform"
                         >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 mb-0.5">
@@ -296,7 +299,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                         <Step number={3} title="Install EA" img="/ea/step3.png">
                             <li>Copy file into Experts and restart</li>
                         </Step>
-                            <Step number={3} title="Allow Webrequest" img="/ea/step3.png">
+                        <Step number={3} title="Allow Webrequest" img="/ea/step3.png">
                             <li>Tools → Options → Expert Advisors</li>
                             <li>Allow WebRequest for listed URL</li>
                             <li>Add:</li>
@@ -307,7 +310,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                         </Step>
                     </div>
                     <div className="border-t border-neutral-800 p-4 grid grid-cols-2 gap-3">
-                        <button onClick={() => window.location.href = "/ea"} className="py-3 bg-neutral-800 rounded-lg text-sm font-bold">MY EA</button>
+                        <button onClick={() => setView("hedz")} className="py-3 bg-neutral-800 rounded-lg text-sm font-bold">MY EA</button>
                         <a href={MT5_EA_URL} download className="py-3 text-center bg-emerald-600 rounded-lg text-sm font-bold">DOWNLOAD EA</a>
                     </div>
                 </div>

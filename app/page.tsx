@@ -10,6 +10,7 @@ import AccessOverlay from "@/components/AccessOverlay"
 import { generateDummySignals } from "@/lib/dummySignals"
 import { generateDummyDetail } from "@/lib/dummyDetail"
 import ControlPanel from "@/components/ControlPanel"
+import HedzDashboard from "@/components/HedzDashboard"
 import pkg from "../package.json"
 
 import {
@@ -72,6 +73,7 @@ export default function Page() {
   const [uiSignals, setUiSignals] = useState<any>({})
   const [netState, setNetState] = useState("FLAT")
   const [menuOpen, setMenuOpen] = useState(false)
+  const [view, setView] = useState<"signals" | "hedz">("signals")
   const [isMobile, setIsMobile] = useState(false)
   const [appInstruments, setAppInstruments] = useState<string[]>([])
   const REFRESH_LEADER_KEY = "fxhedz_refresh_leader"
@@ -1056,62 +1058,69 @@ export default function Page() {
 
         </div>
 
-        {/* SCROLL AREA */}
-        <div className="flex-1 overflow-hidden relative">
+{/* SCROLL AREA */}
+<div className="flex-1 overflow-hidden relative">
 
-          {openPair ? (
+  {view === "hedz" ? (
 
-            <div
-              className="absolute inset-0 grid"
-              style={{
-                gridTemplateColumns: "clamp(30px, 3.5vw, 46px) 1fr",
-                gridTemplateRows: "1fr"
-              }}
-            >
+    <HedzDashboard />
 
-              {/* LEFT RAIL */}
-              <div className="grid"
-                style={{
-                  gridTemplateRows: `repeat(${instrumentOrder.length}, 1fr)`
-                }}
-              >
-                {instrumentOrder.map((pair) => (
-                  <VerticalSymbolButton
-                    key={pair}
-                    pair={pair}
-                    active={openPair === pair}
-                    onClick={() =>
-                      setOpenPair(prev => (prev === pair ? null : pair))
-                    }
-                  />
-                ))}
-              </div>
+  ) : openPair ? (
 
-              {/* RIGHT DETAIL */}
-              <PairDetail
-                pair={openPair}
-                data={detailData}
-                signal={uiSignals?.[openPair]}
-                onClose={() => setOpenPair(null)}
-                isGuest={isGuest}
-                email={email || (window as any).__NATIVE_EMAIL__}
-                appInstruments={appInstruments}
-                setAppInstruments={setAppInstruments}
-              />
+    // EXISTING OPEN PAIR VIEW
+    <div
+      className="absolute inset-0 grid"
+      style={{
+        gridTemplateColumns: "clamp(30px, 3.5vw, 46px) 1fr",
+        gridTemplateRows: "1fr"
+      }}
+    >
 
-            </div>
+      {/* LEFT RAIL */}
+      <div
+        className="grid"
+        style={{
+          gridTemplateRows: `repeat(${instrumentOrder.length}, 1fr)`
+        }}
+      >
+        {instrumentOrder.map((pair) => (
+          <VerticalSymbolButton
+            key={pair}
+            pair={pair}
+            active={openPair === pair}
+            onClick={() =>
+              setOpenPair(prev => (prev === pair ? null : pair))
+            }
+          />
+        ))}
+      </div>
 
-          ) : (
+      {/* RIGHT DETAIL */}
+      <PairDetail
+        pair={openPair}
+        data={detailData}
+        signal={uiSignals?.[openPair]}
+        onClose={() => setOpenPair(null)}
+        isGuest={isGuest}
+        email={email || (window as any).__NATIVE_EMAIL__}
+        appInstruments={appInstruments}
+        setAppInstruments={setAppInstruments}
+      />
 
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={instrumentOrder}
-                strategy={verticalListSortingStrategy}
-              >
+    </div>
+
+  ) : (
+
+    // EXISTING SIGNALS GRID
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={instrumentOrder}
+        strategy={verticalListSortingStrategy}
+      >
 
                 <div
                   className="grid h-full"
@@ -1241,16 +1250,17 @@ export default function Page() {
           `
             }
           >
-            <ControlPanel
-              accessMeta={accessMeta}
-              deviceId={
-                typeof window !== "undefined"
-                  ? localStorage.getItem("fxhedz_device_id")
-                  : null
-              }
-              version={`v${pkg.version}`}
-              onLogout={logoutCurrentSession}   // ðŸ‘ˆ ADD THIS
-            />
+<ControlPanel
+  accessMeta={accessMeta}
+  deviceId={
+    typeof window !== "undefined"
+      ? localStorage.getItem("fxhedz_device_id")
+      : null
+  }
+  version={`v${pkg.version}`}
+  onLogout={logoutCurrentSession}
+  setView={setView}
+/>
           </div>
         )}
 
