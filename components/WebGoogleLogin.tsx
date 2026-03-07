@@ -91,8 +91,9 @@ export default function WebGoogleLogin() {
     localStorage.removeItem("fx_device_limit")
     localStorage.removeItem("fx_device_limit_count")
 
-    localStorage.setItem("refreshToken", data.refreshToken)
-    localStorage.setItem("email", data.email)
+localStorage.setItem("refreshToken", data.refreshToken)
+localStorage.setItem("accessToken", data.accessToken)
+localStorage.setItem("email", data.email)
 
     // trigger loading UI immediately
     localStorage.setItem("fxhedz_loading", "true")

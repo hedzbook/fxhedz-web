@@ -218,6 +218,12 @@ export default function Page() {
     const storedEmail = localStorage.getItem("email")
     const storedDeviceId = localStorage.getItem("fxhedz_device_id")
 
+    const storedAccess = localStorage.getItem("accessToken")
+
+if (storedAccess) {
+  setAccessToken(storedAccess)
+}
+
     if (
       !storedRefresh ||
       storedRefresh === "undefined" ||
