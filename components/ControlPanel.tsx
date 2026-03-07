@@ -296,6 +296,15 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout }
                         <Step number={3} title="Install EA" img="/ea/step3.png">
                             <li>Copy file into Experts and restart</li>
                         </Step>
+                            <Step number={3} title="Allow Webrequest" img="/ea/step3.png">
+                            <li>Tools → Options → Expert Advisors</li>
+                            <li>Allow WebRequest for listed URL</li>
+                            <li>Add:</li>
+                            <li>https://script.google.com</li>
+                        </Step>
+                        <Step number={3} title="Input License Hash" img="/ea/step3.png">
+                            <li>Please enter your License Hash in EA properties Window</li>
+                        </Step>
                     </div>
                     <div className="border-t border-neutral-800 p-4 grid grid-cols-2 gap-3">
                         <button onClick={() => window.location.href = "/ea"} className="py-3 bg-neutral-800 rounded-lg text-sm font-bold">MY EA</button>

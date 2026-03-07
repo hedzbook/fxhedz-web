@@ -173,12 +173,12 @@ export default function PairDetail({
 
             const drawdown = equity - peak
 
-return {
-    index: i,
-    time: t.time,
-    equity,
-    drawdown
-}
+            return {
+                index: i,
+                time: t.time,
+                equity,
+                drawdown
+            }
 
         })
 
@@ -196,11 +196,11 @@ return {
     const totalPnl =
         data?.orders?.reduce((s: any, o: any) => s + Number(o.profit || 0), 0) ?? 0
 
-const historyLots =
-data?.history?.reduce((s:any,h:any)=>s + Number(h.lots || 0),0) ?? 0
+    const historyLots =
+        data?.history?.reduce((s: any, h: any) => s + Number(h.lots || 0), 0) ?? 0
 
-const historyPnl =
-data?.history?.reduce((s:any,h:any)=>s + Number(h.pnl || 0),0) ?? 0
+    const historyPnl =
+        data?.history?.reduce((s: any, h: any) => s + Number(h.pnl || 0), 0) ?? 0
 
     return (
         <div className="flex flex-col h-full bg-black min-h-0">
@@ -360,80 +360,79 @@ data?.history?.reduce((s:any,h:any)=>s + Number(h.pnl || 0),0) ?? 0
 
                         </div>
 
-<div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-{/* HEADER */}
-<div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
-<div className="px-2">Buys/Sells</div>
-<div className="px-2">Price</div>
-<div className="px-2 text-right">Lots</div>
-<div className="px-2 text-right">PnL</div>
-</div>
+                            {/* HEADER */}
+                            <div className="grid grid-cols-4 text-neutral-400 mb-2 font-mono tabular-nums">
+                                <div className="px-2">Buys/Sells</div>
+                                <div className="px-2">Price</div>
+                                <div className="px-2 text-right">Lots</div>
+                                <div className="px-2 text-right">PnL</div>
+                            </div>
 
-{/* SCROLL AREA */}
-<div className="flex-1 overflow-y-auto">
+                            {/* SCROLL AREA */}
+                            <div className="flex-1 overflow-y-auto">
 
-{data?.orders?.length ? data.orders.map((o:any,i:number)=>(
+                                {data?.orders?.length ? data.orders.map((o: any, i: number) => (
 
-<div
-key={i}
-className="grid grid-cols-4 border-t border-neutral-800 py-1 font-mono tabular-nums"
->
+                                    <div
+                                        key={i}
+                                        className="grid grid-cols-4 border-t border-neutral-800 py-1 font-mono tabular-nums"
+                                    >
 
-<div className={`px-2 ${o.direction==="BUY"?"text-green-400":"text-red-400"}`}>
-{o.direction}
-</div>
+                                        <div className={`px-2 ${o.direction === "BUY" ? "text-green-400" : "text-red-400"}`}>
+                                            {o.direction}
+                                        </div>
 
-<div className="px-2 text-neutral-300">
-{fmtPrice(pair,o.entry)}
-</div>
+                                        <div className="px-2 text-neutral-300">
+                                            {fmtPrice(pair, o.entry)}
+                                        </div>
 
-<div className="px-2 text-right">
-{fmtLots(o.lots)}
-</div>
+                                        <div className="px-2 text-right">
+                                            {fmtLots(o.lots)}
+                                        </div>
 
-<div className={`px-2 text-right ${Number(o.profit)>=0?"text-green-400":"text-red-400"}`}>
-{fmtPnl(o.profit)}
-</div>
+                                        <div className={`px-2 text-right ${Number(o.profit) >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                            {fmtPnl(o.profit)}
+                                        </div>
 
-</div>
+                                    </div>
 
-)) : (
+                                )) : (
 
-<div className="text-neutral-500 px-2">
-No open orders
-</div>
+                                    <div className="text-neutral-500 px-2">
+                                        No open orders
+                                    </div>
 
-)}
+                                )}
 
-</div>
+                            </div>
 
-{/* FIXED FOOTER */}
-<div className="grid grid-cols-4 border-t border-neutral-800 pt-2 mt-2 font-mono tabular-nums">
+                            {/* FIXED FOOTER */}
+                            <div className="grid grid-cols-4 border-t border-neutral-800 pt-2 mt-2 font-mono tabular-nums">
 
-<div className="px-2">
-<span className="text-green-400">{buyCount}B</span>
-<span className="text-neutral-500"> / </span>
-<span className="text-red-400">{sellCount}S</span>
-</div>
+                                <div className="px-2">
+                                    <span className="text-green-400">{buyCount}B</span>
+                                    <span className="text-neutral-500"> / </span>
+                                    <span className="text-red-400">{sellCount}S</span>
+                                </div>
 
-<div className="px-2 text-neutral-400">
-{/* - */}
-</div>
+                                <div className="px-2 text-neutral-400">
+                                    {/* - */}
+                                </div>
 
-<div className="px-2 text-right text-neutral-300">
-{fmtLots(totalLots)}
-</div>
+                                <div className="px-2 text-right text-neutral-300">
+                                    {fmtLots(totalLots)}
+                                </div>
 
-<div className={`px-2 text-right font-semibold ${
-totalPnl>=0 ? "text-green-400":"text-red-400"
-}`}>
-{fmtPnl(totalPnl)}
-</div>
+                                <div className={`px-2 text-right font-semibold ${totalPnl >= 0 ? "text-green-400" : "text-red-400"
+                                    }`}>
+                                    {fmtPnl(totalPnl)}
+                                </div>
 
-</div>
+                            </div>
 
-</div>
+                        </div>
 
                     </div>
                 )}
@@ -506,217 +505,215 @@ totalPnl>=0 ? "text-green-400":"text-red-400"
                     </div>
                 )}
 
-{tab === "history" && (
-<div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
+                {tab === "history" && (
+                    <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
 
-<div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-{/* HEADER */}
+                            {/* HEADER */}
 
-<div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
+                            <div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
 
-<div className="px-1">
-Time
-</div>
+                                <div className="px-1">
+                                    Time
+                                </div>
 
-<div className="px-5">
-Type
-</div>
+                                <div className="px-5">
+                                    Type
+                                </div>
 
-<div className="px-2 text-right">
-Entry
-</div>
+                                <div className="px-2 text-right">
+                                    Entry
+                                </div>
 
-<div className="px-2 text-right">
-Exit
-</div>
+                                <div className="px-2 text-right">
+                                    Exit
+                                </div>
 
-<div className="px-2 text-right">
-Lots
-</div>
+                                <div className="px-2 text-right">
+                                    Lots
+                                </div>
 
-<div className="px-2 text-right">
-PnL
-</div>
+                                <div className="px-2 text-right">
+                                    PnL
+                                </div>
 
-</div>
+                            </div>
 
-{/* ROWS */}
+                            {/* ROWS */}
 
-<div className="flex-1 overflow-y-auto -mb-2 pb-2">
+                            <div className="flex-1 overflow-y-auto -mb-2 pb-2">
 
-{data?.history?.length ? data.history.map((h:any,i:number)=>(
+                                {data?.history?.length ? data.history.map((h: any, i: number) => (
 
-<div
-key={i}
-className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-nums"
->
+                                    <div
+                                        key={i}
+                                        className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-nums"
+                                    >
 
-<div className="px-1 text-neutral-400">
-{String(h.time).substring(0,10)}
-</div>
+                                        <div className="px-1 text-neutral-400">
+                                            {String(h.time).substring(0, 10)}
+                                        </div>
 
-<div className={`px-5 ${h.direction==="BUY"?"text-green-400":"text-red-400"}`}>
-{h.direction}
-</div>
+                                        <div className={`px-5 ${h.direction === "BUY" ? "text-green-400" : "text-red-400"}`}>
+                                            {h.direction}
+                                        </div>
 
-<div className="px-2 text-right text-neutral-300">
-{fmtPrice(pair,h.entry)}
-</div>
+                                        <div className="px-2 text-right text-neutral-300">
+                                            {fmtPrice(pair, h.entry)}
+                                        </div>
 
-<div className="px-2 text-right text-neutral-300">
-{fmtPrice(pair,h.exit)}
-</div>
+                                        <div className="px-2 text-right text-neutral-300">
+                                            {fmtPrice(pair, h.exit)}
+                                        </div>
 
-<div className="px-2 text-right">
-{fmtLots(h.lots)}
-</div>
+                                        <div className="px-2 text-right">
+                                            {fmtLots(h.lots)}
+                                        </div>
 
-<div className={`px-2 text-right ${
-Number(h.pnl)>=0?"text-green-400":"text-red-400"
-}`}>
-{fmtPnl(h.pnl)}
-</div>
+                                        <div className={`px-2 text-right ${Number(h.pnl) >= 0 ? "text-green-400" : "text-red-400"
+                                            }`}>
+                                            {fmtPnl(h.pnl)}
+                                        </div>
 
-</div>
+                                    </div>
 
-)):(
+                                )) : (
 
-<div className="text-neutral-500 px-2">
-No history yet
-</div>
+                                    <div className="text-neutral-500 px-2">
+                                        No history yet
+                                    </div>
 
-)}
+                                )}
 
-</div>
+                            </div>
 
-{/* FOOTER TOTAL */}
-<div className="grid grid-cols-6 border-t border-neutral-800 pt-2 mt-2 font-mono tabular-nums">
+                            {/* FOOTER TOTAL */}
+                            <div className="grid grid-cols-6 border-t border-neutral-800 pt-2 mt-2 font-mono tabular-nums">
 
-<div className="px-1 text-neutral-400">
-Total
-</div>
+                                <div className="px-1 text-neutral-400">
+                                    Total
+                                </div>
 
-<div></div>
-<div></div>
-<div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
 
-<div className="px-2 text-right text-neutral-300">
-{fmtLots(historyLots)}
-</div>
+                                <div className="px-2 text-right text-neutral-300">
+                                    {fmtLots(historyLots)}
+                                </div>
 
-<div className={`px-2 text-right font-semibold ${
-historyPnl >= 0 ? "text-green-400" : "text-red-400"
-}`}>
-{fmtPnl(historyPnl)}
-</div>
+                                <div className={`px-2 text-right font-semibold ${historyPnl >= 0 ? "text-green-400" : "text-red-400"
+                                    }`}>
+                                    {fmtPnl(historyPnl)}
+                                </div>
 
-</div>
+                            </div>
 
-</div>
+                        </div>
 
-</div>
-)}
+                    </div>
+                )}
 
                 {tab === "performance" && (
                     <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
                         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto gap-[clamp(8px,1vh,16px)]">
 
-<div className="grid grid-cols-2 gap-[clamp(6px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                            <div className="grid grid-cols-2 gap-[clamp(6px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-<Stat label="Win Rate" value={data?.performance?.winRate + "%"} />
+                                <Stat label="Win Rate" value={data?.performance?.winRate + "%"} />
 
-<Stat label="Profit Factor" value={data?.performance?.profitFactor} />
+                                <Stat label="Profit Factor" value={data?.performance?.profitFactor} />
 
-<Stat label="Wins" value={data?.performance?.wins} />
+                                <Stat label="Wins" value={data?.performance?.wins} />
 
-<Stat label="Hedges" value={data?.performance?.losses} />
+                                <Stat label="Hedges" value={data?.performance?.losses} />
 
-<Stat label="Total Trades" value={data?.performance?.trades} />
+                                <Stat label="Total Trades" value={data?.performance?.trades} />
 
-<Stat label="Total PnL" value={data?.performance?.pnlTotal} />
+                                <Stat label="Total PnL" value={data?.performance?.pnlTotal} />
 
-</div>
-
-                                <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[125px] overflow-hidden">
-
-                                    <div className="text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)] mb-2">
-                                        Equity / Drawdown
-                                    </div>
-
-                                    <div className="flex-1 min-h-0 pt-1">
-
-                                        {curveData.length > 0 && (
-
-                                            <ResponsiveContainer width="100%" height="100%">
-<LineChart
-data={curveData}
-margin={{ top: 5, right: 0, left: 0, bottom: 0 }}
->
-
-<CartesianGrid stroke="#222" strokeDasharray="3 3" />
-
-<XAxis
-dataKey="time"
-stroke="#666"
-tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
-tickMargin={6}
-height={22}
-tickFormatter={(v)=>String(v).substring(5,10)}
-/>
-
-<YAxis
-orientation="right"
-stroke="#666"
-tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
-tickMargin={6}
-width={45}
-domain={["dataMin","dataMax"]}
-/>
-
-<Line
-type="monotone"
-dataKey="equity"
-stroke="#3b82f6"
-strokeWidth={2}
-dot={false}
-/>
-
-<Line
-type="monotone"
-dataKey="drawdown"
-stroke="#ef4444"
-strokeWidth={1.5}
-dot={false}
-/>
-
-<Tooltip
-formatter={(value,name)=>{
-const v=Number(value??0).toFixed(2)
-const label=name==="equity"?"Equity":"Drawdown"
-return [v,label]
-}}
-contentStyle={{
-background:"#0a0a0a",
-border:"1px solid #222"
-}}
-wrapperStyle={{
-fontSize:"clamp(9px,5.5px+1.0937vw,19.5px)",
-fontVariantNumeric:"tabular-nums"
-}}
-/>
-
-</LineChart>
-                                            </ResponsiveContainer>
-
-                                        )}
-
-                                    </div>
-
-                                </div>
                             </div>
 
+                            <div className="bg-neutral-800 border border-neutral-700 p-[clamp(10px,1vw,16px)] flex flex-col flex-1 min-h-[125px] overflow-hidden">
+
+                                <div className="text-neutral-400 text-[clamp(9px,5.5px+1.0937vw,19.5px)] mb-2">
+                                    Equity / Drawdown
+                                </div>
+
+                                <div className="flex-1 min-h-0 pt-1">
+
+                                    {curveData.length > 0 && (
+
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart
+                                                data={curveData}
+                                                margin={{ top: 5, right: 0, left: 0, bottom: 0 }}
+                                            >
+
+                                                <CartesianGrid stroke="#222" strokeDasharray="3 3" />
+
+                                                <XAxis
+                                                    dataKey="time"
+                                                    stroke="#666"
+                                                    tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
+                                                    tickMargin={6}
+                                                    height={22}
+                                                    tickFormatter={(v) => String(v).substring(5, 10)}
+                                                />
+
+                                                <YAxis
+                                                    orientation="right"
+                                                    stroke="#666"
+                                                    tick={{ fontSize: "clamp(8px,0.6vw,12px)" }}
+                                                    tickMargin={6}
+                                                    width={45}
+                                                    domain={["dataMin", "dataMax"]}
+                                                />
+
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="equity"
+                                                    stroke="#3b82f6"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                />
+
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="drawdown"
+                                                    stroke="#ef4444"
+                                                    strokeWidth={1.5}
+                                                    dot={false}
+                                                />
+
+                                                <Tooltip
+                                                    formatter={(value, name) => {
+                                                        const v = Number(value ?? 0).toFixed(2)
+                                                        const label = name === "equity" ? "Equity" : "Drawdown"
+                                                        return [v, label]
+                                                    }}
+                                                    contentStyle={{
+                                                        background: "#0a0a0a",
+                                                        border: "1px solid #222"
+                                                    }}
+                                                    wrapperStyle={{
+                                                        fontSize: "clamp(9px,5.5px+1.0937vw,19.5px)",
+                                                        fontVariantNumeric: "tabular-nums"
+                                                    }}
+                                                />
+
+                                            </LineChart>
+                                        </ResponsiveContainer>
+
+                                    )}
+
+                                </div>
+
+                            </div>
                         </div>
+
+                    </div>
 
                 )}
             </div>

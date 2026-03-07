@@ -74,6 +74,7 @@ export default function Page() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [appInstruments, setAppInstruments] = useState<string[]>([])
+  const REFRESH_LEADER_KEY = "fxhedz_refresh_leader"
   const isAndroid =
     typeof window !== "undefined" &&
     !!(window as any).ReactNativeWebView
@@ -214,26 +215,22 @@ export default function Page() {
       return
     }
 
-const storedRefresh = localStorage.getItem("refreshToken")
-const storedEmail = localStorage.getItem("email")
-const storedDeviceId = localStorage.getItem("fxhedz_device_id")
-const storedAccess = localStorage.getItem("accessToken")
+    const storedRefresh = localStorage.getItem("refreshToken")
+    const storedEmail = localStorage.getItem("email")
+    const storedDeviceId = localStorage.getItem("fxhedz_device_id")
+    const storedAccess = localStorage.getItem("accessToken")
 
-if (storedAccess) {
-  setAccessToken(storedAccess)
-}
+    if (storedAccess) {
+      setAccessToken(storedAccess)
+    }
 
-if (storedRefresh) {
-  setRefreshToken(storedRefresh)
-}
+    if (storedRefresh) {
+      setRefreshToken(storedRefresh)
+    }
 
-if (storedEmail) {
-  setEmail(storedEmail)
-}
-
-if (storedAccess) {
-  setAccessToken(storedAccess)
-}
+    if (storedEmail) {
+      setEmail(storedEmail)
+    }
 
     if (
       !storedRefresh ||
@@ -293,6 +290,8 @@ if (storedAccess) {
         const data = await res.json()
 
         setAccessToken(data.accessToken)
+        localStorage.setItem("accessToken", data.accessToken)
+
         setRefreshToken(storedRefresh)
         setEmail(storedEmail)
 
@@ -314,6 +313,19 @@ if (storedAccess) {
 
     if (isAndroid) return
     if (!refreshToken || !email) return
+
+    // elect refresh leader tab
+    const myId = localStorage.getItem("fxhedz_device_id")
+
+    const leader = localStorage.getItem(REFRESH_LEADER_KEY)
+
+    if (!leader) {
+      localStorage.setItem(REFRESH_LEADER_KEY, myId || "")
+    }
+
+    if (leader && leader !== myId) {
+      return
+    }
 
     const interval = setInterval(async () => {
 
@@ -337,21 +349,21 @@ if (storedAccess) {
           return
         }
 
-const data = await res.json()
+        const data = await res.json()
 
-if (data?.accessToken) {
+        if (data?.accessToken) {
 
-  setAccessToken(data.accessToken)
+          setAccessToken(data.accessToken)
 
-  // persist new token so reload doesn't break session
-  localStorage.setItem("accessToken", data.accessToken)
+          // persist new token so reload doesn't break session
+          localStorage.setItem("accessToken", data.accessToken)
 
-  fetch("/api/signals", {
-    headers: {
-      Authorization: `Bearer ${data.accessToken}`
-    }
-  })
-}
+          fetch("/api/signals", {
+            headers: {
+              Authorization: `Bearer ${data.accessToken}`
+            }
+          })
+        }
 
       } catch {
         // Optional silent fail
@@ -362,6 +374,22 @@ if (data?.accessToken) {
     return () => clearInterval(interval)
 
   }, [refreshToken, email])
+
+  useEffect(() => {
+
+    function syncTokens(e: StorageEvent) {
+
+      if (e.key === "accessToken" && e.newValue) {
+        setAccessToken(e.newValue)
+      }
+
+    }
+
+    window.addEventListener("storage", syncTokens)
+
+    return () => window.removeEventListener("storage", syncTokens)
+
+  }, [])
 
   const isAuthenticated =
     isAndroid
@@ -545,7 +573,7 @@ if (data?.accessToken) {
     if (authLoading) return
 
     // Only block unauthenticated for WEB
-    if (platform === "web" && !isAuthenticated) {
+    if (platform === "web" && !sessionExists) {
       setSubActive(false)
       return
     }
