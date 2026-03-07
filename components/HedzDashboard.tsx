@@ -44,7 +44,11 @@ lots:number
 pnl:number
 }
 
-export default function HedzDashboard(){
+export default function HedzDashboard({
+setView
+}:{
+setView:(view:"signals"|"hedz")=>void
+}){
 
 const [terminal,setTerminal] = useState<TerminalRow[]>([])
 const [orders,setOrders] = useState<OrderRow[]>([])
@@ -220,7 +224,7 @@ return(
 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-32 space-y-8 relative">
 
 <button
-onClick={()=>window.location.reload()}
+onClick={()=>setView("signals")}
 className="
 fixed
 top-4

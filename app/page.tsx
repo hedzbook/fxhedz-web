@@ -1066,7 +1066,7 @@ setNetState(state)
 
   {view === "hedz" ? (
 
-    <HedzDashboard />
+    <HedzDashboard setView={setView} />
 
   ) : openPair ? (
 
