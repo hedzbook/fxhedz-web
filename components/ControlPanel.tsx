@@ -12,8 +12,8 @@ type Props = {
     version: string
     onLogout: () => void
     setView: (view: "signals" | "hedz") => void
+    closeMenu: () => void
 }
-
 const PLANS = [
     { label: "1 Month", price: "$9.99", months: 1, razorpay: "https://rzp.io/rzp/ssReKHK", sku: "fxhedz_monthly" },
     { label: "3 Months", price: "$26.99", months: 3, razorpay: "https://rzp.io/rzp/Npm6HPL", sku: "fxhedz_quarterly", highlight: true },
@@ -23,7 +23,7 @@ const PLANS = [
 const PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=com.fxhedz.live"
 const MT5_EA_URL = "/api/ea-download"
 
-export default function ControlPanel({ accessMeta, deviceId, version, onLogout, setView }: Props) {
+export default function ControlPanel({ accessMeta, deviceId, version, onLogout, setView, closeMenu }: Props) {
 
     const [showEASetup, setShowEASetup] = useState(false)
 
@@ -218,6 +218,7 @@ export default function ControlPanel({ accessMeta, deviceId, version, onLogout, 
                         <button
                             onClick={() => {
                                 setView("hedz")
+                                closeMenu()
                             }}
                             className="flex-1 rounded-lg border border-neutral-700 bg-neutral-900 flex flex-col items-center justify-center active:scale-95 transition-transform"
                         >

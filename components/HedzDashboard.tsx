@@ -12,42 +12,39 @@ CartesianGrid
 } from "recharts"
 
 type TerminalRow = {
-time: string
-balance: number
-equity: number
-margin: number
-free_margin: number
-drawdown: number
-open_positions: number
-account_login: string
-server: string
-terminal_build: string
+time:string
+balance:number
+equity:number
+margin:number
+free_margin:number
+drawdown:number
+open_positions:number
 }
 
 type OrderRow = {
-time: string
-ticket: string
-symbol: string
-type: string
-lots: number
-entry: number
-sl: number
-tp: number
-profit: number
+time:string
+ticket:string
+symbol:string
+type:string
+lots:number
+entry:number
+sl:number
+tp:number
+profit:number
 }
 
 type HistoryRow = {
-time: string
-ticket: string
-symbol: string
-direction: string
-entry: number
-exit: number
-lots: number
-pnl: number
+time:string
+ticket:string
+symbol:string
+direction:string
+entry:number
+exit:number
+lots:number
+pnl:number
 }
 
-export default function HedzDashboard() {
+export default function HedzDashboard(){
 
 const [terminal,setTerminal] = useState<TerminalRow[]>([])
 const [orders,setOrders] = useState<OrderRow[]>([])
@@ -58,13 +55,63 @@ async function fetchData(){
 
 try{
 
-const res = await fetch("/api/hedz")
+const hash = localStorage.getItem("hedz_hash")
+if(!hash) return
 
+const res = await fetch(`/api/hedz?hash=${hash}`)
 const json = await res.json()
 
-setTerminal(json.terminal || [])
-setOrders(json.orders || [])
-setHistory(json.history || [])
+const terminalRows =
+(json.terminal || [])
+.slice(1)
+.map((r:any)=>({
+
+time:r[0],
+balance:Number(r[1]),
+equity:Number(r[2]),
+margin:Number(r[3]),
+free_margin:Number(r[4]),
+drawdown:Number(r[5]),
+open_positions:Number(r[6])
+
+}))
+
+const orderRows =
+(json.orders || [])
+.slice(1)
+.map((r:any)=>({
+
+time:r[0],
+ticket:r[1],
+symbol:r[2],
+type:r[3],
+lots:Number(r[4]),
+entry:Number(r[5]),
+sl:Number(r[6]),
+tp:Number(r[7]),
+profit:Number(r[8])
+
+}))
+
+const historyRows =
+(json.history || [])
+.slice(1)
+.map((r:any)=>({
+
+time:r[0],
+ticket:r[1],
+symbol:r[2],
+direction:r[3],
+entry:Number(r[4]),
+exit:Number(r[5]),
+lots:Number(r[6]),
+pnl:Number(r[7])
+
+}))
+
+setTerminal(terminalRows)
+setOrders(orderRows)
+setHistory(historyRows)
 
 }catch(e){
 console.error(e)
@@ -76,18 +123,18 @@ setLoading(false)
 useEffect(()=>{
 
 fetchData()
-
 const timer = setInterval(fetchData,15000)
-
 return ()=>clearInterval(timer)
 
 },[])
 
-const latest = terminal.length
+const latest =
+terminal.length
 ? terminal[terminal.length-1]
 : null
 
-const pnl = latest
+const pnl =
+latest
 ? latest.equity - latest.balance
 : 0
 
@@ -95,7 +142,7 @@ const buyLots = useMemo(()=>{
 
 return orders
 .filter(o=>o.type === "BUY")
-.reduce((sum,o)=>sum + Number(o.lots),0)
+.reduce((s,o)=>s+o.lots,0)
 
 },[orders])
 
@@ -103,7 +150,7 @@ const sellLots = useMemo(()=>{
 
 return orders
 .filter(o=>o.type === "SELL")
-.reduce((sum,o)=>sum + Number(o.lots),0)
+.reduce((s,o)=>s+o.lots,0)
 
 },[orders])
 
@@ -114,22 +161,25 @@ const tradeStats = useMemo(()=>{
 const trades = history.length
 
 const wins = history.filter(t=>t.pnl > 0)
-
 const losses = history.filter(t=>t.pnl < 0)
 
-const winRate = trades
+const winRate =
+trades
 ? (wins.length / trades) * 100
 : 0
 
-const profit = wins.reduce((s,t)=>s+t.pnl,0)
+const profit =
+wins.reduce((s,t)=>s+t.pnl,0)
 
-const loss = losses.reduce((s,t)=>s+t.pnl,0)
+const loss =
+losses.reduce((s,t)=>s+t.pnl,0)
 
-const profitFactor = loss !== 0
+const profitFactor =
+loss !== 0
 ? profit / Math.abs(loss)
 : 0
 
-return {
+return{
 trades,
 winRate,
 profitFactor,
@@ -140,21 +190,44 @@ profit
 
 if(loading){
 
-return (
-<div className="p-10 text-center text-gray-400">
+return(
+
+<div className="flex items-center justify-center h-screen text-gray-400">
 Loading dashboard...
 </div>
+
 )
 
 }
 
-return (
+return(
 
-<div className="p-6 space-y-8">
+<div className="w-full h-screen overflow-y-auto bg-black text-white">
 
-{/* ACCOUNT CARDS */}
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-32 space-y-8 relative">
 
-<div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+<button
+onClick={()=>window.location.reload()}
+className="
+fixed
+top-4
+right-4
+z-50
+text-sm
+px-3
+py-1
+rounded
+bg-slate-800
+text-gray-300
+hover:text-white
+"
+>
+Close
+</button>
+
+{/* ACCOUNT */}
+
+<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
 
 <Card title="Balance" value={latest?.balance}/>
 <Card title="Equity" value={latest?.equity}/>
@@ -171,7 +244,9 @@ return (
 
 <h2 className="text-lg mb-4">Equity Curve</h2>
 
-<ResponsiveContainer width="100%" height={300}>
+<div className="w-full h-[260px] sm:h-[320px]">
+
+<ResponsiveContainer width="100%" height="100%">
 
 <LineChart data={terminal}>
 
@@ -183,23 +258,15 @@ return (
 
 <Tooltip/>
 
-<Line
-type="monotone"
-dataKey="equity"
-stroke="#22c55e"
-dot={false}
-/>
+<Line type="monotone" dataKey="equity" stroke="#22c55e" dot={false}/>
 
-<Line
-type="monotone"
-dataKey="balance"
-stroke="#3b82f6"
-dot={false}
-/>
+<Line type="monotone" dataKey="balance" stroke="#3b82f6" dot={false}/>
 
 </LineChart>
 
 </ResponsiveContainer>
+
+</div>
 
 </div>
 
@@ -212,33 +279,35 @@ dot={false}
 <div className="grid grid-cols-3 gap-4">
 
 <Stat label="Buy Lots" value={buyLots}/>
-
 <Stat label="Sell Lots" value={sellLots}/>
-
 <Stat label="Total Lots" value={totalLots}/>
 
 </div>
 
 </div>
 
-{/* LIVE POSITIONS */}
+{/* OPEN POSITIONS */}
 
 <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
 
 <h2 className="text-lg mb-4">Open Positions</h2>
 
-<table className="w-full text-sm">
+<div className="overflow-x-auto">
+
+<table className="min-w-full text-sm">
 
 <thead className="text-gray-400">
 
 <tr>
-<th>Symbol</th>
+
+<th className="px-2 py-2">Symbol</th>
 <th>Side</th>
 <th>Lots</th>
 <th>Entry</th>
 <th>SL</th>
 <th>TP</th>
 <th>PnL</th>
+
 </tr>
 
 </thead>
@@ -246,29 +315,29 @@ dot={false}
 <tbody>
 
 {orders.map((o,i)=>(
+
 <tr key={i} className="border-t border-slate-800">
 
-<td>{o.symbol}</td>
+<td className="px-2 py-2">{o.symbol}</td>
 <td>{o.type}</td>
 <td>{o.lots}</td>
 <td>{o.entry}</td>
 <td>{o.sl}</td>
 <td>{o.tp}</td>
 
-<td className={
-o.profit >= 0
-? "text-green-400"
-: "text-red-400"
-}>
+<td className={o.profit >= 0 ? "text-green-400":"text-red-400"}>
 {o.profit}
 </td>
 
 </tr>
+
 ))}
 
 </tbody>
 
 </table>
+
+</div>
 
 </div>
 
@@ -278,14 +347,11 @@ o.profit >= 0
 
 <h2 className="text-lg mb-4">Trade Statistics</h2>
 
-<div className="grid grid-cols-4 gap-4">
+<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
 
 <Stat label="Trades" value={tradeStats.trades}/>
-
 <Stat label="Win Rate" value={tradeStats.winRate.toFixed(1)+"%"}/>
-
 <Stat label="Profit Factor" value={tradeStats.profitFactor.toFixed(2)}/>
-
 <Stat label="Total PnL" value={tradeStats.profit}/>
 
 </div>
@@ -298,13 +364,15 @@ o.profit >= 0
 
 <h2 className="text-lg mb-4">Trade History</h2>
 
-<table className="w-full text-sm">
+<div className="overflow-x-auto">
+
+<table className="min-w-full text-sm">
 
 <thead className="text-gray-400">
 
 <tr>
 
-<th>Time</th>
+<th className="px-2 py-2">Time</th>
 <th>Symbol</th>
 <th>Side</th>
 <th>Entry</th>
@@ -318,22 +386,21 @@ o.profit >= 0
 
 <tbody>
 
-{history.slice().reverse().map((t,i)=>(
+{history
+.slice(-200)
+.reverse()
+.map((t,i)=>(
 
 <tr key={i} className="border-t border-slate-800">
 
-<td>{t.time}</td>
+<td className="px-2 py-2 whitespace-nowrap">{t.time}</td>
 <td>{t.symbol}</td>
 <td>{t.direction}</td>
 <td>{t.entry}</td>
 <td>{t.exit}</td>
 <td>{t.lots}</td>
 
-<td className={
-t.pnl >= 0
-? "text-green-400"
-: "text-red-400"
-}>
+<td className={t.pnl >= 0 ? "text-green-400":"text-red-400"}>
 {t.pnl}
 </td>
 
@@ -344,6 +411,10 @@ t.pnl >= 0
 </tbody>
 
 </table>
+
+</div>
+
+</div>
 
 </div>
 
@@ -363,8 +434,8 @@ return(
 {title}
 </div>
 
-<div className="text-lg font-semibold">
-{value}
+<div className="text-lg sm:text-xl font-semibold">
+{value ?? "-"}
 </div>
 
 </div>

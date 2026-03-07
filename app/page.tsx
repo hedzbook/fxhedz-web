@@ -1014,49 +1014,52 @@ export default function Page() {
         className="h-[100dvh] bg-black text-white flex flex-col"
       >
 
-        {/* TOP BAR */}
-        <div
-          className="shrink-0 grid border-b border-neutral-800"
-          style={{
-            gridTemplateColumns: "clamp(30px, 3.5vw, 46px) 1fr",
-            height: "clamp(28px,3.5vh,50px)"
-          }}
-        >
+{view !== "hedz" && (
 
-          {/* TOP LEFT BUTTON */}
-          <button
-            onClick={() => {
-              setOpenPair(null)
-            }}
-            className="
-    border-r border-neutral-800
-    bg-neutral-000
-    hover:bg-neutral-000
-    flex items-center justify-center
-  "
-          >
-            <img
-              src="/favicon.png"
-              alt="FXHEDZ"
-              className="
-      w-[80%]
-      h-[90%]
-      object-contain
-      select-none
-      pointer-events-none
-    "
-            />
-          </button>
+<div
+className="shrink-0 grid border-b border-neutral-800"
+style={{
+gridTemplateColumns: "clamp(30px, 3.5vw, 46px) 1fr",
+height: "clamp(28px,3.5vh,50px)"
+}}
+>
 
-          {/* ACCOUNT STRIP */}
-          <AccountStrip
-            pairs={pairsData}
-            onStateChange={(state: string) => {
-              setNetState(state)
-            }}
-          />
+{/* TOP LEFT BUTTON */}
+<button
+onClick={()=>{
+setOpenPair(null)
+}}
+className="
+border-r border-neutral-800
+bg-neutral-000
+hover:bg-neutral-000
+flex items-center justify-center
+"
+>
+<img
+src="/favicon.png"
+alt="FXHEDZ"
+className="
+w-[80%]
+h-[90%]
+object-contain
+select-none
+pointer-events-none
+"
+/>
+</button>
 
-        </div>
+{/* ACCOUNT STRIP */}
+<AccountStrip
+pairs={pairsData}
+onStateChange={(state:string)=>{
+setNetState(state)
+}}
+/>
+
+</div>
+
+)}
 
 {/* SCROLL AREA */}
 <div className="flex-1 overflow-hidden relative">
@@ -1260,6 +1263,7 @@ export default function Page() {
   version={`v${pkg.version}`}
   onLogout={logoutCurrentSession}
   setView={setView}
+  closeMenu={() => setMenuOpen(false)}
 />
           </div>
         )}
