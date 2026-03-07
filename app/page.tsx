@@ -214,11 +214,22 @@ export default function Page() {
       return
     }
 
-    const storedRefresh = localStorage.getItem("refreshToken")
-    const storedEmail = localStorage.getItem("email")
-    const storedDeviceId = localStorage.getItem("fxhedz_device_id")
+const storedRefresh = localStorage.getItem("refreshToken")
+const storedEmail = localStorage.getItem("email")
+const storedDeviceId = localStorage.getItem("fxhedz_device_id")
+const storedAccess = localStorage.getItem("accessToken")
 
-    const storedAccess = localStorage.getItem("accessToken")
+if (storedAccess) {
+  setAccessToken(storedAccess)
+}
+
+if (storedRefresh) {
+  setRefreshToken(storedRefresh)
+}
+
+if (storedEmail) {
+  setEmail(storedEmail)
+}
 
 if (storedAccess) {
   setAccessToken(storedAccess)
@@ -326,17 +337,21 @@ if (storedAccess) {
           return
         }
 
-        const data = await res.json()
+const data = await res.json()
 
-        if (data?.accessToken) {
-          setAccessToken(data.accessToken)
+if (data?.accessToken) {
 
-          fetch("/api/signals", {
-            headers: {
-              Authorization: `Bearer ${data.accessToken}`
-            }
-          })
-        }
+  setAccessToken(data.accessToken)
+
+  // persist new token so reload doesn't break session
+  localStorage.setItem("accessToken", data.accessToken)
+
+  fetch("/api/signals", {
+    headers: {
+      Authorization: `Bearer ${data.accessToken}`
+    }
+  })
+}
 
       } catch {
         // Optional silent fail
