@@ -44,11 +44,7 @@ type HistoryRow = {
     pnl: number
 }
 
-export default function HedzDashboard({
-    setView
-}: {
-    setView: (view: "signals" | "hedz") => void
-}) {
+export default function HedzDashboard({ setView }: { setView: (view: "signals" | "hedz") => void }) {
 
     const [terminal, setTerminal] = useState<TerminalRow[]>([])
     const [orders, setOrders] = useState<OrderRow[]>([])
@@ -62,77 +58,64 @@ export default function HedzDashboard({
         try {
 
             const hash = localStorage.getItem("hash")
-
-            if (!hash) {
-                setLoading(false)
-                return
-            }
+            if (!hash) { setLoading(false); return }
 
             const res = await fetch(`/api/hedz?hash=${hash}`)
-
-            if (!res.ok) {
-                setLoading(false)
-                return
-            }
+            if (!res.ok) { setLoading(false); return }
 
             const json = await res.json()
 
-            const terminalRows =
-                (json.terminal || [])
-                    .slice(1)
-                    .map((r: any) => ({
+            const terminalRows = (json.terminal || []).slice(1).map((r: any) => ({
+                time: r[0],
+                balance: Number(r[1]),
+                equity: Number(r[2]),
+                margin: Number(r[3]),
+                free_margin: Number(r[4]),
+                drawdown: Number(r[5]),
+                open_positions: Number(r[6])
+            }))
 
-                        time: r[0],
-                        balance: Number(r[1]),
-                        equity: Number(r[2]),
-                        margin: Number(r[3]),
-                        free_margin: Number(r[4]),
-                        drawdown: Number(r[5]),
-                        open_positions: Number(r[6])
+            const orderRows = (json.orders || []).slice(1).map((r: any) => {
 
-                    }))
+                const raw = String(r[3] || "").toUpperCase()
 
-            const orderRows =
-                (json.orders || [])
-                    .slice(1)
-                    .map((r: any) => ({
+                let side = ""
 
-                        time: r[0],
-                        ticket: r[1],
-                        symbol: r[2],
-                        type: r[3],
-                        lots: Number(r[4]),
-                        entry: Number(r[5]),
-                        sl: Number(r[6]),
-                        tp: Number(r[7]),
-                        profit: Number(r[8])
+                if (raw.includes("BUY")) side = "BUY"
+                else if (raw.includes("SELL")) side = "SELL"
+                else side = raw
 
-                    }))
+                return {
+                    time: r[0],
+                    ticket: r[1],
+                    symbol: r[2],
+                    type: side,
+                    lots: Number(r[4]),
+                    entry: Number(r[5]),
+                    sl: Number(r[6]),
+                    tp: Number(r[7]),
+                    profit: Number(r[8])
+                }
 
-            const historyRows =
-                (json.history || [])
-                    .slice(1)
-                    .map((r: any) => ({
+            })
 
-                        time: r[0],
-                        ticket: r[1],
-                        symbol: r[2],
-                        direction: r[3],
-                        entry: Number(r[4]),
-                        exit: Number(r[5]),
-                        lots: Number(r[6]),
-                        pnl: Number(r[7])
-
-                    }))
+            const historyRows = (json.history || []).slice(1).map((r: any) => ({
+                time: r[0],
+                ticket: r[1],
+                symbol: r[2],
+                direction: r[3],
+                entry: Number(r[4]),
+                exit: Number(r[5]),
+                lots: Number(r[6]),
+                pnl: Number(r[7])
+            }))
 
             setTerminal(terminalRows.slice(-300))
             setOrders(orderRows)
             setHistory(historyRows)
 
         } catch (e) {
-
-            console.error("HEDZ DASHBOARD ERROR", e)
-
+            console.error(e)
         }
 
         setLoading(false)
@@ -140,40 +123,21 @@ export default function HedzDashboard({
     }
 
     useEffect(() => {
-
         fetchData()
         const timer = setInterval(fetchData, 15000)
         return () => clearInterval(timer)
-
     }, [])
 
-    const latest =
-        terminal.length
-            ? terminal[terminal.length - 1]
-            : null
+    const latest = terminal.length ? terminal[terminal.length - 1] : null
 
-    const pnl =
-        latest
-            ? latest.equity - latest.balance
-            : 0
+    const pnl = latest ? latest.equity - latest.balance : 0
 
-    const buyLots = useMemo(() => {
-
-        return orders
-            .filter(o => o.type === "BUY")
-            .reduce((s, o) => s + o.lots, 0)
-
-    }, [orders])
-
-    const sellLots = useMemo(() => {
-
-        return orders
-            .filter(o => o.type === "SELL")
-            .reduce((s, o) => s + o.lots, 0)
-
-    }, [orders])
-
-    const totalLots = buyLots + sellLots
+    const curveData = terminal.map((t, i) => ({
+        index: i,
+        time: t.time,
+        equity: t.equity,
+        balance: t.balance
+    }))
 
     const tradeStats = useMemo(() => {
 
@@ -182,140 +146,114 @@ export default function HedzDashboard({
         const wins = history.filter(t => t.pnl > 0)
         const losses = history.filter(t => t.pnl < 0)
 
-        const winRate =
-            trades
-                ? (wins.length / trades) * 100
-                : 0
+        const winRate = trades ? (wins.length / trades) * 100 : 0
 
-        const profit =
-            wins.reduce((s, t) => s + t.pnl, 0)
+        const profit = wins.reduce((s, t) => s + t.pnl, 0)
+        const loss = losses.reduce((s, t) => s + t.pnl, 0)
 
-        const loss =
-            losses.reduce((s, t) => s + t.pnl, 0)
+        const profitFactor = loss !== 0 ? profit / Math.abs(loss) : 0
 
-        const profitFactor =
-            loss !== 0
-                ? profit / Math.abs(loss)
-                : 0
+        const totalPnl = history.reduce((s, t) => s + t.pnl, 0)
 
         return {
             trades,
+            wins: wins.length,
+            hedges: losses.length,
             winRate,
             profitFactor,
-            profit
+            totalPnl
         }
 
     }, [history])
 
     if (loading) {
-
         return (
-
-            <div className="flex items-center justify-center h-screen text-gray-400">
+            <div className="flex items-center justify-center h-screen text-neutral-400">
                 Loading dashboard...
             </div>
-
         )
-
     }
 
     return (
 
-        <div className="w-full h-screen overflow-y-auto bg-black text-white">
+        <div className="flex flex-col h-full bg-black min-h-0">
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-32 relative">
+            {/* HEADER */}
+
+            <div className="shrink-0 flex items-center justify-between px-3 py-[clamp(6px,1vh,10px)] border-b border-neutral-800">
+
+                <div className="font-semibold text-[clamp(11px,6.66px+1.354vw,24px)]">
+                    MY HEDZ
+                </div>
 
                 <button
                     onClick={() => setView("signals")}
-                    className="
-fixed
-top-4
-right-4
-z-50
-text-sm
-px-3
-py-1
-rounded
-bg-slate-800
-text-gray-300
-hover:text-white
-"
+                    className="text-[clamp(9px,5.5px+1.0937vw,19.5px)] text-neutral-400 hover:text-white"
                 >
-                    Close
+                    CLOSE
                 </button>
 
-                {/* HEADER */}
+            </div>
 
-                <div className="flex items-center justify-between mb-6">
+            {/* TABS */}
 
-                    <div className="text-xl font-semibold tracking-wide">
-                        MY HEDZ
-                    </div>
+            <div className="shrink-0 flex border-b border-neutral-800 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                    <div className="flex gap-2 text-sm">
+                <Tab label="Terminal" active={tab === "terminal"} onClick={() => setTab("terminal")} />
+                <Tab label="Orders" active={tab === "orders"} onClick={() => setTab("orders")} />
+                <Tab label="History" active={tab === "history"} onClick={() => setTab("history")} />
+                <Tab label="Statistics" active={tab === "stats"} onClick={() => setTab("stats")} />
 
-                        <Tab label="Terminal" active={tab === "terminal"} onClick={() => setTab("terminal")} />
-                        <Tab label="Orders" active={tab === "orders"} onClick={() => setTab("orders")} />
-                        <Tab label="History" active={tab === "history"} onClick={() => setTab("history")} />
-                        <Tab label="Stats" active={tab === "stats"} onClick={() => setTab("stats")} />
+            </div>
 
-                    </div>
+            <div className="flex-1 flex flex-col min-h-0">
 
-                </div>
-
-                {/* TERMINAL TAB */}
+                {/* TERMINAL */}
 
                 {tab === "terminal" && (
 
-                    <div className="space-y-6">
+                    <div className="flex flex-col flex-1 min-h-0 gap-[clamp(8px,1vh,16px)] p-[clamp(8px,1.2vw,16px)]">
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-3 gap-[clamp(6px,1vw,12px)]">
 
-                            <Card title="Balance" value={latest?.balance} />
-                            <Card title="Equity" value={latest?.equity} />
-                            <Card title="PnL" value={pnl} />
-                            <Card title="Drawdown" value={latest?.drawdown} />
-                            <Card title="Free Margin" value={latest?.free_margin} />
-                            <Card title="Positions" value={latest?.open_positions} />
+                            <MiniBlock label="Balance" value={latest?.balance?.toFixed(2)} />
+                            <MiniBlock label="Equity" value={latest?.equity?.toFixed(2)} />
+                            <MiniBlock label="PnL" value={pnl.toFixed(2)} highlight={pnl >= 0 ? "text-green-400" : "text-red-400"} />
+
+                            <MiniBlock label="Drawdown" value={latest?.drawdown?.toFixed(2)} />
+                            <MiniBlock label="Free Margin" value={latest?.free_margin?.toFixed(2)} />
+                            <MiniBlock label="Positions" value={latest?.open_positions} />
 
                         </div>
 
-                        <div className="bg-neutral-900 border border-neutral-800 p-4">
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)]">
 
-                            <div className="text-gray-400 mb-2">
+                            <div className="text-neutral-400 mb-2 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
                                 Equity Curve
                             </div>
 
-                            <div className="w-full h-[320px]">
+                            <div className="flex-1">
 
                                 <ResponsiveContainer width="100%" height="100%">
 
-                                    <LineChart data={terminal}>
+                                    <LineChart data={curveData}>
 
                                         <CartesianGrid stroke="#222" />
 
-                                        <XAxis dataKey="time" hide />
+                                        <XAxis dataKey="time" stroke="#666" />
 
-                                        <YAxis />
+                                        <YAxis orientation="right" stroke="#666" />
+
+                                        <Line type="monotone" dataKey="equity" stroke="#3b82f6" dot={false} />
+                                        <Line type="monotone" dataKey="balance" stroke="#22c55e" dot={false} />
 
                                         <Tooltip />
-
-                                        <Line type="monotone" dataKey="equity" stroke="#22c55e" dot={false} />
-                                        <Line type="monotone" dataKey="balance" stroke="#3b82f6" dot={false} />
 
                                     </LineChart>
 
                                 </ResponsiveContainer>
 
                             </div>
-
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4">
-
-                            <Stat label="Buy Lots" value={buyLots} />
-                            <Stat label="Sell Lots" value={sellLots} />
-                            <Stat label="Total Lots" value={totalLots} />
 
                         </div>
 
@@ -327,56 +265,46 @@ hover:text-white
 
                 {tab === "orders" && (
 
-                    <div className="bg-neutral-900 border border-neutral-800 p-4">
+                    <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
 
-                        <div className="text-gray-400 mb-3">
-                            Open Positions
-                        </div>
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                        <div className="overflow-x-auto">
+                            <div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
 
-                            <table className="min-w-full text-sm">
+                                <div>Symbol</div>
+                                <div>Side</div>
+                                <div className="text-right">Lots</div>
+                                <div className="text-right">Entry</div>
+                                <div className="text-right">SL</div>
+                                <div className="text-right">PnL</div>
 
-                                <thead className="text-gray-400">
+                            </div>
 
-                                    <tr>
+                            <div className="flex-1 overflow-y-auto">
 
-                                        <th className="px-2 py-2">Symbol</th>
-                                        <th>Side</th>
-                                        <th>Lots</th>
-                                        <th>Entry</th>
-                                        <th>SL</th>
-                                        <th>TP</th>
-                                        <th>PnL</th>
+                                {orders.map((o, i) => (
 
-                                    </tr>
+                                    <div key={i} className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-nums">
 
-                                </thead>
+                                        <div className="text-neutral-300">{o.symbol}</div>
 
-                                <tbody>
+                                        <div className={o.type === "BUY" ? "text-green-400" : "text-red-400"}>
+                                            {o.type}
+                                        </div>
 
-                                    {orders.map((o, i) => (
+                                        <div className="text-right">{o.lots.toFixed(2)}</div>
+                                        <div className="text-right">{o.entry}</div>
+                                        <div className="text-right">{o.sl}</div>
 
-                                        <tr key={i} className="border-t border-neutral-800">
+                                        <div className={`text-right ${o.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                            {o.profit.toFixed(2)}
+                                        </div>
 
-                                            <td className="px-2 py-2">{o.symbol}</td>
-                                            <td>{o.type}</td>
-                                            <td>{o.lots}</td>
-                                            <td>{o.entry}</td>
-                                            <td>{o.sl}</td>
-                                            <td>{o.tp}</td>
+                                    </div>
 
-                                            <td className={o.profit >= 0 ? "text-green-400" : "text-red-400"}>
-                                                {o.profit}
-                                            </td>
+                                ))}
 
-                                        </tr>
-
-                                    ))}
-
-                                </tbody>
-
-                            </table>
+                            </div>
 
                         </div>
 
@@ -388,56 +316,49 @@ hover:text-white
 
                 {tab === "history" && (
 
-                    <div className="bg-neutral-900 border border-neutral-800 p-4">
+                    <div className="flex flex-col flex-1 min-h-0 p-[clamp(8px,1.2vw,16px)]">
 
-                        <div className="text-gray-400 mb-3">
-                            Trade History
-                        </div>
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
 
-                        <div className="overflow-x-auto">
+                            <div className="grid grid-cols-6 text-neutral-400 mb-2 font-mono tabular-nums">
 
-                            <table className="min-w-full text-sm">
+                                <div>Time</div>
+                                <div>Symbol</div>
+                                <div>Side</div>
+                                <div className="text-right">Entry</div>
+                                <div className="text-right">Exit</div>
+                                <div className="text-right">PnL</div>
 
-                                <thead className="text-gray-400">
+                            </div>
 
-                                    <tr>
+                            <div className="flex-1 overflow-y-auto">
 
-                                        <th className="px-2 py-2">Time</th>
-                                        <th>Symbol</th>
-                                        <th>Side</th>
-                                        <th>Entry</th>
-                                        <th>Exit</th>
-                                        <th>Lots</th>
-                                        <th>PnL</th>
+                                {history.slice(-200).reverse().map((t, i) => (
 
-                                    </tr>
+                                    <div key={i} className="grid grid-cols-6 border-t border-neutral-800 py-1 font-mono tabular-nums">
 
-                                </thead>
+                                        <div className="text-neutral-400">
+                                            {String(t.time).substring(0, 10)}
+                                        </div>
 
-                                <tbody>
+                                        <div>{t.symbol}</div>
 
-                                    {history.slice(-200).reverse().map((t, i) => (
+                                        <div className={t.direction === "BUY" ? "text-green-400" : "text-red-400"}>
+                                            {t.direction}
+                                        </div>
 
-                                        <tr key={i} className="border-t border-neutral-800">
+                                        <div className="text-right">{t.entry}</div>
+                                        <div className="text-right">{t.exit}</div>
 
-                                            <td className="px-2 py-2">{t.time}</td>
-                                            <td>{t.symbol}</td>
-                                            <td>{t.direction}</td>
-                                            <td>{t.entry}</td>
-                                            <td>{t.exit}</td>
-                                            <td>{t.lots}</td>
+                                        <div className={`text-right ${t.pnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                            {t.pnl.toFixed(2)}
+                                        </div>
 
-                                            <td className={t.pnl >= 0 ? "text-green-400" : "text-red-400"}>
-                                                {t.pnl}
-                                            </td>
+                                    </div>
 
-                                        </tr>
+                                ))}
 
-                                    ))}
-
-                                </tbody>
-
-                            </table>
+                            </div>
 
                         </div>
 
@@ -445,16 +366,44 @@ hover:text-white
 
                 )}
 
-                {/* STATS TAB */}
+                {/* STATISTICS */}
 
                 {tab === "stats" && (
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="flex flex-col flex-1 min-h-0 gap-[clamp(8px,1vh,16px)] p-[clamp(8px,1.2vw,16px)]">
 
-                        <Stat label="Trades" value={tradeStats.trades} />
-                        <Stat label="Win Rate" value={tradeStats.winRate.toFixed(1) + "%"} />
-                        <Stat label="Profit Factor" value={tradeStats.profitFactor.toFixed(2)} />
-                        <Stat label="Total PnL" value={tradeStats.profit} />
+                        <div className="grid grid-cols-2 gap-[clamp(6px,1vw,12px)]">
+
+                            <Stat label="Win Rate" value={tradeStats.winRate.toFixed(1) + "%"} />
+                            <Stat label="Profit Factor" value={tradeStats.profitFactor.toFixed(2)} />
+                            <Stat label="Wins" value={tradeStats.wins} />
+                            <Stat label="Hedges" value={tradeStats.hedges} />
+                            <Stat label="Total Trades" value={tradeStats.trades} />
+                            <Stat label="Total PnL" value={tradeStats.totalPnl.toFixed(2)} />
+
+                        </div>
+
+                        <div className="flex flex-col flex-1 min-h-0 bg-neutral-900 border border-neutral-800 p-[clamp(8px,1vw,14px)]">
+
+                            <div className="text-neutral-400 mb-2 text-[clamp(9px,5.5px+1.0937vw,19.5px)]">
+                                Equity / Drawdown
+                            </div>
+
+                            <div className="flex-1">
+
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={curveData}>
+                                        <CartesianGrid stroke="#222" />
+                                        <XAxis dataKey="time" stroke="#666" />
+                                        <YAxis orientation="right" stroke="#666" />
+                                        <Line type="monotone" dataKey="equity" stroke="#3b82f6" dot={false} />
+                                        <Tooltip />
+                                    </LineChart>
+                                </ResponsiveContainer>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -463,71 +412,37 @@ hover:text-white
             </div>
 
         </div>
-
     )
-
 }
 
 function Tab({ label, active, onClick }: any) {
-
     return (
-
         <button
             onClick={onClick}
-            className={`
-px-3
-py-1
-rounded
-transition
-${active
-                    ? "bg-neutral-800 text-white"
-                    : "text-neutral-500 hover:text-white"
-                }
-`}
+            className={`flex-1 py-[clamp(6px,1vh,12px)] text-[clamp(9px,5.5px+1.0937vw,19.5px)]
+${active ? "text-white border-b-2 border-white bg-neutral-900" : "text-neutral-500 hover:text-neutral-300"}`}
         >
-            {label}
+            {label.toUpperCase()}
         </button>
-
     )
-
 }
 
-function Card({ title, value }: { title: string, value: any }) {
-
+function MiniBlock({ label, value, highlight = "" }: any) {
     return (
-
-        <div className="bg-neutral-900 border border-neutral-800 p-3">
-
-            <div className="text-gray-400 text-xs">
-                {title}
+        <div className="bg-neutral-900 px-[clamp(8px,1vw,14px)] py-[clamp(8px,1vh,12px)]">
+            <div className="text-neutral-500 text-[clamp(8px,4.8px+1vw,16px)]">{label}</div>
+            <div className={`font-semibold text-[clamp(9px,5.5px+1.0937vw,19.5px)] ${highlight}`}>
+                {value ?? "--"}
             </div>
-
-            <div className="text-lg font-semibold">
-                {value ?? "-"}
-            </div>
-
         </div>
-
     )
-
 }
 
-function Stat({ label, value }: { label: string, value: any }) {
-
+function Stat({ label, value }: any) {
     return (
-
-        <div className="bg-neutral-900 border border-neutral-800 p-3">
-
-            <div className="text-gray-400 text-xs">
-                {label}
-            </div>
-
-            <div className="text-lg font-semibold">
-                {value}
-            </div>
-
+        <div className="flex justify-between bg-neutral-800 border border-neutral-700 p-[clamp(8px,1vw,14px)]">
+            <span className="text-neutral-400">{label}</span>
+            <span className="font-semibold">{value}</span>
         </div>
-
     )
-
 }
